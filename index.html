@@ -187,17 +187,28 @@
             <div class="payment-section">
                 <div class="section-title">Song Library</div>
 
-                <!-- Spotify Import -->
-                <div style="margin-bottom: 16px; padding: 14px; background: rgba(30,215,96,0.08); border: 1px solid rgba(30,215,96,0.25); border-radius: 12px;">
+                <!-- Artist Search Import -->
+                <div style="margin-bottom: 16px; padding: 14px; background: rgba(78,205,196,0.08); border: 1px solid rgba(78,205,196,0.25); border-radius: 12px;">
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="#1ED760"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
-                        <span style="font-size: 13px; font-weight: 600; color: #1ED760;">Import from Spotify</span>
+                        <span style="font-size: 16px;">🎵</span>
+                        <span style="font-size: 13px; font-weight: 600; color: #4ecdc4;">Add Songs by Artist</span>
                     </div>
-                    <div style="display: flex; gap: 8px;">
-                        <input type="text" class="auth-input" id="spotifyUrl" placeholder="Paste playlist URL..." style="font-size: 13px; text-align: left; padding: 10px 12px; flex: 1;">
-                        <button class="auth-btn" onclick="importSpotifyPlaylist()" id="importBtn" style="width: auto; padding: 10px 16px; font-size: 13px; white-space: nowrap; background: linear-gradient(45deg, #1ED760, #1aa34a);">Import</button>
+                    <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                        <input type="text" class="auth-input" id="artistSearchInput" placeholder="Search any artist..." style="font-size: 13px; text-align: left; padding: 10px 12px; flex: 1;" onkeydown="if(event.key==='Enter') searchArtistSongs()">
+                        <button class="auth-btn" onclick="searchArtistSongs()" id="artistSearchBtn" style="width: auto; padding: 10px 16px; font-size: 13px; white-space: nowrap;">Search</button>
                     </div>
-                    <div id="importStatus" style="font-size: 12px; margin-top: 8px; color: rgba(255,255,255,0.6); min-height: 16px;"></div>
+                    <div id="artistSearchStatus" style="font-size: 12px; color: rgba(255,255,255,0.6); min-height: 16px;"></div>
+                    <div id="artistSearchResults" style="display: none; margin-top: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span id="artistResultsLabel" style="font-size: 12px; opacity: 0.7;"></span>
+                            <div style="display: flex; gap: 6px;">
+                                <button class="control-btn" onclick="selectAllArtistSongs()" style="font-size: 11px; padding: 4px 10px;">Select All</button>
+                                <button class="control-btn" onclick="clearArtistSelection()" style="font-size: 11px; padding: 4px 10px;">Clear</button>
+                            </div>
+                        </div>
+                        <div id="artistSongsList" style="max-height: 240px; overflow-y: auto; margin-bottom: 10px; border-radius: 8px; background: rgba(0,0,0,0.2);"></div>
+                        <button class="auth-btn" onclick="addSelectedArtistSongs()" id="addSelectedBtn" style="background: linear-gradient(45deg, #4ecdc4, #44a08d); font-size: 13px; padding: 10px;">Add Selected Songs</button>
+                    </div>
                 </div>
 
                 <!-- Manual Add -->
@@ -573,114 +584,148 @@ function openHelp() { document.getElementById('helpModal').classList.add('show')
 function closeHelpModal() { document.getElementById('helpModal').classList.remove('show'); }
 
 
-// ── SPOTIFY IMPORT ────────────────────────────────────
+// ── ARTIST SONG SEARCH (iTunes API) ──────────────────────────────────
 
-const SPOTIFY_CLIENT_ID = '0c1c62521be14885a12676f810e5b8c7';
-const SPOTIFY_CLIENT_SECRET = '8588bd3437514c88adaedc305a6958bb';
-let spotifyToken = null;
-let spotifyTokenExpiry = 0;
+let artistSearchResults = [];
+let selectedArtistSongs = new Set();
 
-async function getSpotifyToken() {
-    if (spotifyToken && Date.now() < spotifyTokenExpiry) return spotifyToken;
-    const res = await fetch('https://accounts.spotify.com/api/token', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Basic ' + btoa(SPOTIFY_CLIENT_ID + ':' + SPOTIFY_CLIENT_SECRET)
-        },
-        body: 'grant_type=client_credentials'
-    });
-    const data = await res.json();
-    if (!data.access_token) throw new Error('Could not get Spotify token');
-    spotifyToken = data.access_token;
-    spotifyTokenExpiry = Date.now() + (data.expires_in - 60) * 1000;
-    return spotifyToken;
-}
+async function searchArtistSongs() {
+    const query = document.getElementById('artistSearchInput').value.trim();
+    const status = document.getElementById('artistSearchStatus');
+    const btn = document.getElementById('artistSearchBtn');
+    const resultsDiv = document.getElementById('artistSearchResults');
 
-function extractSpotifyPlaylistId(url) {
-    const match = url.match(/playlist\/([a-zA-Z0-9]+)/);
-    return match ? match[1] : null;
-}
-
-async function importSpotifyPlaylist() {
-    const url = document.getElementById('spotifyUrl').value.trim();
-    const status = document.getElementById('importStatus');
-    const btn = document.getElementById('importBtn');
-
-    if (!url) { status.textContent = 'Paste a Spotify playlist URL first.'; return; }
-
-    const playlistId = extractSpotifyPlaylistId(url);
-    if (!playlistId) { status.textContent = 'Invalid Spotify URL. Copy the link from a playlist.'; return; }
+    if (!query) { status.textContent = 'Enter an artist name first.'; return; }
 
     btn.disabled = true;
-    btn.textContent = 'Importing...';
-    status.style.color = 'rgba(255,255,255,0.6)';
-    status.textContent = 'Connecting to Spotify...';
+    btn.textContent = 'Searching...';
+    status.textContent = '';
+    resultsDiv.style.display = 'none';
+    artistSearchResults = [];
+    selectedArtistSongs = new Set();
 
     try {
-        const token = await getSpotifyToken();
+        const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=200&country=US`);
+        const data = await res.json();
 
-        // Fetch all tracks (Spotify returns max 100 at a time)
-        let tracks = [];
-        let nextUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=100`;
-
-        while (nextUrl) {
-            const res = await fetch(nextUrl, { headers: { 'Authorization': 'Bearer ' + token } });
-            if (!res.ok) {
-                const errBody = await res.json().catch(() => ({}));
-                throw new Error(`${res.status}: ${errBody?.error?.message || 'Playlist not found or is private.'}`);
-            }
-            const data = await res.json();
-            tracks = tracks.concat(data.items || []);
-            nextUrl = data.next;
-            status.textContent = `Fetched ${tracks.length} tracks...`;
-        }
-
-        // Filter valid tracks and skip duplicates already in library
-        const toInsert = [];
-        for (const item of tracks) {
-            if (!item.track || !item.track.name) continue;
-            const title = item.track.name;
-            const artist = item.track.artists[0]?.name || 'Unknown';
-            const exists = songLibrary.some(function(s) {
-                return s.title.toLowerCase() === title.toLowerCase() && s.artist.toLowerCase() === artist.toLowerCase();
-            });
-            if (!exists) toInsert.push({ artist_id: ARTIST_ID, title: title, artist_name: artist });
-        }
-
-        if (toInsert.length === 0) {
-            status.style.color = '#ffd700';
-            status.textContent = 'All songs already in your library.';
-            btn.disabled = false; btn.textContent = 'Import';
+        if (!data.results || data.results.length === 0) {
+            status.textContent = 'No songs found. Try a different artist name.';
+            btn.disabled = false; btn.textContent = 'Search';
             return;
         }
 
-        status.textContent = `Adding ${toInsert.length} songs to library...`;
+        // Deduplicate by song title (keep first occurrence)
+        const seen = new Set();
+        artistSearchResults = data.results.filter(function(track) {
+            const key = track.trackName.toLowerCase();
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
 
-        // Insert in batches of 50
-        const batchSize = 50;
-        for (let i = 0; i < toInsert.length; i += batchSize) {
-            const batch = toInsert.slice(i, i + batchSize);
-            const { error } = await db.from('songs').insert(batch);
-            if (error) throw new Error(error.message);
-        }
-
-        await loadFromSupabase();
-        updateStats();
-        renderQuickAdd();
-        document.getElementById('spotifyUrl').value = '';
-        status.style.color = '#1ED760';
-        status.textContent = `✓ ${toInsert.length} songs imported! (${tracks.length - toInsert.length} already existed)`;
-        showToast(`${toInsert.length} songs imported from Spotify!`);
+        document.getElementById('artistResultsLabel').textContent = artistSearchResults.length + ' songs found for "' + query + '"';
+        renderArtistSearchResults();
+        resultsDiv.style.display = 'block';
+        status.textContent = '';
 
     } catch(err) {
-        status.style.color = '#ff6b6b';
-        status.textContent = 'Error: ' + err.message;
+        status.textContent = 'Search failed. Check your connection.';
     }
 
     btn.disabled = false;
-    btn.textContent = 'Import';
+    btn.textContent = 'Search';
 }
+
+function renderArtistSearchResults() {
+    const list = document.getElementById('artistSongsList');
+    list.innerHTML = '';
+
+    artistSearchResults.forEach(function(track, index) {
+        const alreadyInLibrary = songLibrary.some(function(s) {
+            return s.title.toLowerCase() === track.trackName.toLowerCase();
+        });
+
+        const row = document.createElement('div');
+        row.style.cssText = 'display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;' + (alreadyInLibrary ? 'opacity: 0.4;' : '');
+        row.onclick = function() { if (!alreadyInLibrary) toggleArtistSong(index, row); };
+
+        const isSelected = selectedArtistSongs.has(index);
+        row.innerHTML = `
+            <div style="width: 18px; height: 18px; border-radius: 4px; border: 2px solid ${isSelected ? '#4ecdc4' : 'rgba(255,255,255,0.3)'}; background: ${isSelected ? '#4ecdc4' : 'transparent'}; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s;">
+                ${isSelected ? '<svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#1a1a2e" stroke-width="2" fill="none" stroke-linecap="round"/></svg>' : ''}
+            </div>
+            <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${track.trackName}${alreadyInLibrary ? ' <span style="font-size: 10px; color: #4ecdc4;">✓ In library</span>' : ''}</div>
+                <div style="font-size: 11px; opacity: 0.6;">${track.artistName}</div>
+            </div>
+        `;
+        list.appendChild(row);
+    });
+}
+
+function toggleArtistSong(index, row) {
+    if (selectedArtistSongs.has(index)) {
+        selectedArtistSongs.delete(index);
+    } else {
+        selectedArtistSongs.add(index);
+    }
+    renderArtistSearchResults();
+    document.getElementById('addSelectedBtn').textContent = selectedArtistSongs.size > 0
+        ? `Add ${selectedArtistSongs.size} Song${selectedArtistSongs.size > 1 ? 's' : ''}`
+        : 'Add Selected Songs';
+}
+
+function selectAllArtistSongs() {
+    artistSearchResults.forEach(function(track, index) {
+        const inLib = songLibrary.some(function(s) { return s.title.toLowerCase() === track.trackName.toLowerCase(); });
+        if (!inLib) selectedArtistSongs.add(index);
+    });
+    renderArtistSearchResults();
+    document.getElementById('addSelectedBtn').textContent = `Add ${selectedArtistSongs.size} Songs`;
+}
+
+function clearArtistSelection() {
+    selectedArtistSongs.clear();
+    renderArtistSearchResults();
+    document.getElementById('addSelectedBtn').textContent = 'Add Selected Songs';
+}
+
+async function addSelectedArtistSongs() {
+    if (selectedArtistSongs.size === 0) { showToast('Select at least one song first.', 'warning'); return; }
+
+    const btn = document.getElementById('addSelectedBtn');
+    btn.disabled = true;
+    btn.textContent = 'Adding...';
+
+    const toInsert = [];
+    selectedArtistSongs.forEach(function(index) {
+        const track = artistSearchResults[index];
+        if (track) toInsert.push({ artist_id: ARTIST_ID, title: track.trackName, artist_name: track.artistName });
+    });
+
+    try {
+        const batchSize = 50;
+        for (let i = 0; i < toInsert.length; i += batchSize) {
+            const { error } = await db.from('songs').insert(toInsert.slice(i, i + batchSize));
+            if (error) throw error;
+        }
+        await loadFromSupabase();
+        updateStats();
+        renderQuickAdd();
+        showToast(`✓ ${toInsert.length} songs added to library!`);
+        selectedArtistSongs.clear();
+        document.getElementById('artistSearchInput').value = '';
+        document.getElementById('artistSearchResults').style.display = 'none';
+        document.getElementById('artistSearchStatus').textContent = '';
+    } catch(err) {
+        showToast('Error adding songs: ' + err.message, 'error');
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Add Selected Songs';
+}
+
+
 
 
 const QR_TARGET_URL = 'https://jolly-nougat-c7d3f5.netlify.app/customer.html';
