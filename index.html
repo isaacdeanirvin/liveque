@@ -108,6 +108,11 @@
         .login-error { color: #ff6b6b; font-size: 13px; margin-top: 12px; min-height: 18px; }
         .signout-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); font-size: 11px; padding: 4px 10px; border-radius: 8px; cursor: pointer; margin-top: 6px; }
         .signout-btn:hover { background: rgba(255,71,87,0.2); border-color: rgba(255,71,87,0.4); color: #ff6b6b; }
+        .login-toggle { display: flex; background: rgba(255,255,255,0.08); border-radius: 10px; padding: 4px; margin-bottom: 24px; }
+        .login-toggle-btn { flex: 1; padding: 8px; border: none; background: transparent; color: rgba(255,255,255,0.5); font-size: 13px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .login-toggle-btn.active { background: rgba(255,255,255,0.15); color: white; }
+        .login-panel { display: none; }
+        .login-panel.active { display: block; }
     </style>
 </head>
 <body>
@@ -117,16 +122,47 @@
         <div class="login-card">
             <div class="login-logo">LiveQue<sup>™</sup></div>
             <div class="login-subtitle">Performer Dashboard</div>
-            <div class="login-field">
-                <label>Email</label>
-                <input type="email" class="login-input" id="loginEmail" placeholder="you@example.com" autocomplete="email">
+
+            <div class="login-toggle">
+                <button class="login-toggle-btn active" id="toggleSignIn" onclick="showSignInPanel()">Sign In</button>
+                <button class="login-toggle-btn" id="toggleSignUp" onclick="showSignUpPanel()">Create Account</button>
             </div>
-            <div class="login-field">
-                <label>Password</label>
-                <input type="password" class="login-input" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+
+            <!-- SIGN IN PANEL -->
+            <div class="login-panel active" id="signInPanel">
+                <div class="login-field">
+                    <label>Email</label>
+                    <input type="email" class="login-input" id="loginEmail" placeholder="you@example.com" autocomplete="email">
+                </div>
+                <div class="login-field">
+                    <label>Password</label>
+                    <input type="password" class="login-input" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+                </div>
+                <button class="login-btn" id="loginBtn" onclick="signIn()">Sign In</button>
+                <div class="login-error" id="loginError"></div>
             </div>
-            <button class="login-btn" id="loginBtn" onclick="signIn()">Sign In</button>
-            <div class="login-error" id="loginError"></div>
+
+            <!-- SIGN UP PANEL -->
+            <div class="login-panel" id="signUpPanel">
+                <div class="login-field">
+                    <label>Your Artist / Performer Name</label>
+                    <input type="text" class="login-input" id="signupName" placeholder="Glen Irvin Jr." autocomplete="name">
+                </div>
+                <div class="login-field">
+                    <label>Email</label>
+                    <input type="email" class="login-input" id="signupEmail" placeholder="you@example.com" autocomplete="email">
+                </div>
+                <div class="login-field">
+                    <label>Password</label>
+                    <input type="password" class="login-input" id="signupPassword" placeholder="Min. 6 characters" autocomplete="new-password">
+                </div>
+                <div class="login-field">
+                    <label>Confirm Password</label>
+                    <input type="password" class="login-input" id="signupConfirm" placeholder="••••••••" autocomplete="new-password">
+                </div>
+                <button class="login-btn" id="signupBtn" onclick="signUp()">Create Account</button>
+                <div class="login-error" id="signupError"></div>
+            </div>
         </div>
     </div>
 
@@ -320,10 +356,75 @@ function showApp() {
     document.getElementById('loginOverlay').classList.add('hidden');
 }
 
-// Allow Enter key on login form
+function showSignInPanel() {
+    document.getElementById('signInPanel').classList.add('active');
+    document.getElementById('signUpPanel').classList.remove('active');
+    document.getElementById('toggleSignIn').classList.add('active');
+    document.getElementById('toggleSignUp').classList.remove('active');
+    document.getElementById('loginError').textContent = '';
+}
+
+function showSignUpPanel() {
+    document.getElementById('signUpPanel').classList.add('active');
+    document.getElementById('signInPanel').classList.remove('active');
+    document.getElementById('toggleSignUp').classList.add('active');
+    document.getElementById('toggleSignIn').classList.remove('active');
+    document.getElementById('signupError').textContent = '';
+}
+
+async function signUp() {
+    const name = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    const confirm = document.getElementById('signupConfirm').value;
+    const btn = document.getElementById('signupBtn');
+    const errorEl = document.getElementById('signupError');
+
+    errorEl.textContent = '';
+    if (!name) { errorEl.textContent = 'Enter your performer name.'; return; }
+    if (!email) { errorEl.textContent = 'Enter your email.'; return; }
+    if (password.length < 6) { errorEl.textContent = 'Password must be at least 6 characters.'; return; }
+    if (password !== confirm) { errorEl.textContent = "Passwords don't match."; return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Creating account...';
+
+    const { data, error } = await db.auth.signUp({ email, password });
+    if (error) { errorEl.textContent = error.message; btn.disabled = false; btn.textContent = 'Create Account'; return; }
+
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Date.now();
+    const { error: artistError } = await db.from('artists').insert([{
+        auth_user_id: data.user.id,
+        name: name,
+        email: email,
+        slug: slug
+    }]);
+
+    if (artistError) {
+        console.error('Artist insert error:', artistError);
+        errorEl.textContent = 'Account created but profile setup failed: ' + artistError.message;
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+        return;
+    }
+
+    const loaded = await loadArtistId(data.user.id);
+    if (loaded) {
+        showApp();
+        await initializeApp();
+    } else {
+        errorEl.textContent = 'Profile created but could not load. Try signing in.';
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+        showSignInPanel();
+    }
+}
+
+// Allow Enter key on login forms
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && !document.getElementById('loginOverlay').classList.contains('hidden')) {
-        signIn();
+        const signUpActive = document.getElementById('signUpPanel').classList.contains('active');
+        if (signUpActive) { signUp(); } else { signIn(); }
     }
 });
 
