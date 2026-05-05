@@ -184,7 +184,30 @@
             <div class="payment-section"><div class="section-title">Payment Settings</div><div id="paymentMethodsDisplay"></div><div style="text-align: center;"><button class="auth-btn" onclick="openPaymentSettings()">Configure Payment Methods</button></div></div>
             <div class="payment-section"><div class="section-title">Social Media</div><div id="socialMediaDisplay"></div><div style="text-align: center;"><button class="auth-btn" onclick="openSocialSettings()">Update Social Profiles</button></div></div>
             <div class="payment-section"><div class="section-title">Tip Options</div><div style="margin-bottom: 12px; font-size: 12px; opacity: 0.7; text-align: center;">Set the tip amounts that appear when fans request songs</div><div class="tip-settings-grid" id="tipSettingsGrid"></div><div style="text-align: center;"><button class="auth-btn" onclick="saveTipSettings()" style="background: linear-gradient(45deg, #ffd700, #ffa500);">Save Tip Settings</button></div><div style="margin-top: 12px; text-align: center;"><button class="control-btn" onclick="resetTipSettings()">Reset to Default (0, 2, 5, 10)</button></div></div>
-            <div class="payment-section"><div class="section-title">Song Library</div><div style="display: flex; flex-direction: column; gap: 12px;"><input type="text" class="auth-input" id="newSongTitle" placeholder="Song title"><input type="text" class="auth-input" id="newSongArtist" placeholder="Artist"><div style="text-align: center;"><button class="auth-btn" onclick="addNewSong()">Add Song</button></div></div></div>
+            <div class="payment-section">
+                <div class="section-title">Song Library</div>
+
+                <!-- Spotify Import -->
+                <div style="margin-bottom: 16px; padding: 14px; background: rgba(30,215,96,0.08); border: 1px solid rgba(30,215,96,0.25); border-radius: 12px;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="#1ED760"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+                        <span style="font-size: 13px; font-weight: 600; color: #1ED760;">Import from Spotify</span>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" class="auth-input" id="spotifyUrl" placeholder="Paste playlist URL..." style="font-size: 13px; text-align: left; padding: 10px 12px; flex: 1;">
+                        <button class="auth-btn" onclick="importSpotifyPlaylist()" id="importBtn" style="width: auto; padding: 10px 16px; font-size: 13px; white-space: nowrap; background: linear-gradient(45deg, #1ED760, #1aa34a);">Import</button>
+                    </div>
+                    <div id="importStatus" style="font-size: 12px; margin-top: 8px; color: rgba(255,255,255,0.6); min-height: 16px;"></div>
+                </div>
+
+                <!-- Manual Add -->
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.5; margin-bottom: 10px; text-align: center;">Or add manually</div>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <input type="text" class="auth-input" id="newSongTitle" placeholder="Song title">
+                    <input type="text" class="auth-input" id="newSongArtist" placeholder="Artist">
+                    <div style="text-align: center;"><button class="auth-btn" onclick="addNewSong()">Add Song</button></div>
+                </div>
+            </div>
         </div>
         <div id="livequeueTab" class="tab-content active">
             <div class="payment-section"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;"><div class="section-title" style="margin: 0;">Live Queue</div><button class="control-btn" onclick="resetAllCooldowns()">Clear Recently Played</button></div><div style="margin-bottom: 16px;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;"><div style="font-size: 15px; font-weight: bold;">Quick Add</div><div style="display: flex; gap: 8px;"><button class="shuffle-btn" onclick="shuffleQuickAdd()">↻</button><button class="control-btn" onclick="showAllSongsModal()">View All Songs</button></div></div><div id="quickAddGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;"></div></div><div id="liveQueueList"></div></div>
@@ -549,7 +572,113 @@ async function quickAddFromModal(title, artist) { const song = songLibrary.find(
 function openHelp() { document.getElementById('helpModal').classList.add('show'); }
 function closeHelpModal() { document.getElementById('helpModal').classList.remove('show'); }
 
-// ── QR CODE ───────────────────────────────────────────
+
+// ── SPOTIFY IMPORT ────────────────────────────────────
+
+const SPOTIFY_CLIENT_ID = '0c1c62521be14885a12676f810e5b8c7';
+const SPOTIFY_CLIENT_SECRET = '8588bd3437514c88adaedc305a6958bb';
+let spotifyToken = null;
+let spotifyTokenExpiry = 0;
+
+async function getSpotifyToken() {
+    if (spotifyToken && Date.now() < spotifyTokenExpiry) return spotifyToken;
+    const res = await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': 'Basic ' + btoa(SPOTIFY_CLIENT_ID + ':' + SPOTIFY_CLIENT_SECRET)
+        },
+        body: 'grant_type=client_credentials'
+    });
+    const data = await res.json();
+    if (!data.access_token) throw new Error('Could not get Spotify token');
+    spotifyToken = data.access_token;
+    spotifyTokenExpiry = Date.now() + (data.expires_in - 60) * 1000;
+    return spotifyToken;
+}
+
+function extractSpotifyPlaylistId(url) {
+    const match = url.match(/playlist\/([a-zA-Z0-9]+)/);
+    return match ? match[1] : null;
+}
+
+async function importSpotifyPlaylist() {
+    const url = document.getElementById('spotifyUrl').value.trim();
+    const status = document.getElementById('importStatus');
+    const btn = document.getElementById('importBtn');
+
+    if (!url) { status.textContent = 'Paste a Spotify playlist URL first.'; return; }
+
+    const playlistId = extractSpotifyPlaylistId(url);
+    if (!playlistId) { status.textContent = 'Invalid Spotify URL. Copy the link from a playlist.'; return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Importing...';
+    status.style.color = 'rgba(255,255,255,0.6)';
+    status.textContent = 'Connecting to Spotify...';
+
+    try {
+        const token = await getSpotifyToken();
+
+        // Fetch all tracks (Spotify returns max 100 at a time)
+        let tracks = [];
+        let nextUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=100&fields=next,items(track(name,artists(name)))`;
+
+        while (nextUrl) {
+            const res = await fetch(nextUrl, { headers: { 'Authorization': 'Bearer ' + token } });
+            if (!res.ok) throw new Error('Playlist not found or is private.');
+            const data = await res.json();
+            tracks = tracks.concat(data.items || []);
+            nextUrl = data.next;
+            status.textContent = `Fetched ${tracks.length} tracks...`;
+        }
+
+        // Filter valid tracks and skip duplicates already in library
+        const toInsert = [];
+        for (const item of tracks) {
+            if (!item.track || !item.track.name) continue;
+            const title = item.track.name;
+            const artist = item.track.artists[0]?.name || 'Unknown';
+            const exists = songLibrary.some(function(s) {
+                return s.title.toLowerCase() === title.toLowerCase() && s.artist.toLowerCase() === artist.toLowerCase();
+            });
+            if (!exists) toInsert.push({ artist_id: ARTIST_ID, title: title, artist_name: artist });
+        }
+
+        if (toInsert.length === 0) {
+            status.style.color = '#ffd700';
+            status.textContent = 'All songs already in your library.';
+            btn.disabled = false; btn.textContent = 'Import';
+            return;
+        }
+
+        status.textContent = `Adding ${toInsert.length} songs to library...`;
+
+        // Insert in batches of 50
+        const batchSize = 50;
+        for (let i = 0; i < toInsert.length; i += batchSize) {
+            const batch = toInsert.slice(i, i + batchSize);
+            const { error } = await db.from('songs').insert(batch);
+            if (error) throw new Error(error.message);
+        }
+
+        await loadFromSupabase();
+        updateStats();
+        renderQuickAdd();
+        document.getElementById('spotifyUrl').value = '';
+        status.style.color = '#1ED760';
+        status.textContent = `✓ ${toInsert.length} songs imported! (${tracks.length - toInsert.length} already existed)`;
+        showToast(`${toInsert.length} songs imported from Spotify!`);
+
+    } catch(err) {
+        status.style.color = '#ff6b6b';
+        status.textContent = 'Error: ' + err.message;
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Import';
+}
+
 
 const QR_TARGET_URL = 'https://jolly-nougat-c7d3f5.netlify.app/customer.html';
 let qrCodeInstance = null;
