@@ -622,11 +622,14 @@ async function importSpotifyPlaylist() {
 
         // Fetch all tracks (Spotify returns max 100 at a time)
         let tracks = [];
-        let nextUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=100&fields=next,items(track(name,artists(name)))`;
+        let nextUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=100`;
 
         while (nextUrl) {
             const res = await fetch(nextUrl, { headers: { 'Authorization': 'Bearer ' + token } });
-            if (!res.ok) throw new Error('Playlist not found or is private.');
+            if (!res.ok) {
+                const errBody = await res.json().catch(() => ({}));
+                throw new Error(`${res.status}: ${errBody?.error?.message || 'Playlist not found or is private.'}`);
+            }
             const data = await res.json();
             tracks = tracks.concat(data.items || []);
             nextUrl = data.next;
