@@ -863,7 +863,7 @@ async function selectSpotifyPlaylist(playlist) {
     try {
         let tracks = []; let url = (playlist.items && playlist.items.href) ? playlist.items.href : `https://api.spotify.com/v1/playlists/${playlist.id}/items`;
         let firstFetch = true;
-        while (url) { const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + spotifyAccessToken } }); if (!res.ok) throw new Error('Could not load tracks'); const data = await res.json(); if (firstFetch) { console.log('TRACK SAMPLE:', JSON.stringify(data.items ? data.items[0] : data, null, 2)); firstFetch = false; } tracks = tracks.concat((data.items || []).filter(function(i) { return i.track && i.track.name; })); url = data.next; }
+        while (url) { const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + spotifyAccessToken } }); if (!res.ok) throw new Error('Could not load tracks'); const data = await res.json(); if (firstFetch) { console.log('TRACK SAMPLE:', JSON.stringify(data.items ? data.items[0] : data, null, 2)); firstFetch = false; } tracks = tracks.concat((data.items || []).filter(function(i) { return i && i.name; })); url = data.next; }
         const seen = new Set();
         spotifyTracks = tracks.filter(function(item) { const key = item.track.name.toLowerCase(); if (seen.has(key)) return false; seen.add(key); return true; });
         selectedSpotifyTracks = new Set();
@@ -878,7 +878,7 @@ function renderSpotifyTracks(playlistName) {
     const list = document.getElementById('spotifyTrackList');
     list.innerHTML = '';
     spotifyTracks.forEach(function(item, index) {
-        const track = item.track;
+        const track = item;
         const inLibrary = songLibrary.some(function(s) { return s.title.toLowerCase() === track.name.toLowerCase(); });
         const isSelected = selectedSpotifyTracks.has(index);
         const row = document.createElement('div');
@@ -903,7 +903,7 @@ async function addSelectedSpotifyTracks() {
     const btn = document.getElementById('spotifyAddBtn');
     btn.disabled = true; btn.textContent = 'Adding...';
     const toInsert = [];
-    selectedSpotifyTracks.forEach(function(index) { const track = spotifyTracks[index].track; toInsert.push({ artist_id: ARTIST_ID, title: track.name, artist_name: track.artists[0]?.name || 'Unknown' }); });
+    selectedSpotifyTracks.forEach(function(index) { const track = spotifyTracks[index]; toInsert.push({ artist_id: ARTIST_ID, title: track.name, artist_name: track.artists?.[0]?.name || 'Unknown' }); });
     try {
         for (let i = 0; i < toInsert.length; i += 50) { const { error } = await db.from('songs').insert(toInsert.slice(i, i + 50)); if (error) throw error; }
         await loadFromSupabase(); updateStats(); renderQuickAdd();
