@@ -834,7 +834,6 @@ async function loadSpotifyPlaylists() {
         let playlists = []; let url = 'https://api.spotify.com/v1/me/playlists?limit=50';
         while (url) { const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + spotifyAccessToken } }); if (!res.ok) throw new Error('Could not load playlists'); const data = await res.json(); playlists = playlists.concat(data.items || []); url = data.next; }
         spotifyPlaylists = playlists.filter(function(p) { return p && p.name; });
-        if (spotifyPlaylists.length > 0) console.log('PLAYLIST SAMPLE:', JSON.stringify(spotifyPlaylists[0], null, 2));
         hideSpotifyLoading(); renderSpotifyPlaylists();
     } catch(err) { hideSpotifyLoading(); showToast('Could not load playlists: ' + err.message, 'error'); closeSpotifyModal(); }
 }
@@ -851,7 +850,7 @@ function renderSpotifyPlaylists() {
         item.onmouseover = function() { item.style.background = 'rgba(255,255,255,0.08)'; };
         item.onmouseout = function() { item.style.background = 'transparent'; };
         const img = playlist.images && playlist.images[0] ? `<img src="${playlist.images[0].url}" style="width:44px;height:44px;border-radius:6px;object-fit:cover;flex-shrink:0;">` : `<div style="width:44px;height:44px;border-radius:6px;background:rgba(255,255,255,0.1);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;">🎵</div>`;
-        item.innerHTML = img + `<div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${playlist.name}</div><div style="font-size:11px;opacity:0.5;">${playlist.tracks ? playlist.tracks.total : '?'} songs</div></div><div style="opacity:0.4;font-size:16px;">›</div>`;
+        item.innerHTML = img + `<div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${playlist.name}</div><div style="font-size:11px;opacity:0.5;">${playlist.items ? playlist.items.total : '?'} songs</div></div><div style="opacity:0.4;font-size:16px;">›</div>`;
         item.onclick = function() { selectSpotifyPlaylist(playlist); };
         list.appendChild(item);
     });
@@ -862,7 +861,7 @@ async function selectSpotifyPlaylist(playlist) {
     document.getElementById('spotifyStep1').style.display = 'none';
     showSpotifyLoading('Loading tracks...');
     try {
-        let tracks = []; let url = `https://api.spotify.com/v1/playlists/${playlist.id}/tracks?limit=100`;
+        let tracks = []; let url = (playlist.items && playlist.items.href) ? playlist.items.href : `https://api.spotify.com/v1/playlists/${playlist.id}/items`;
         while (url) { const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + spotifyAccessToken } }); if (!res.ok) throw new Error('Could not load tracks'); const data = await res.json(); tracks = tracks.concat((data.items || []).filter(function(i) { return i.track && i.track.name; })); url = data.next; }
         const seen = new Set();
         spotifyTracks = tracks.filter(function(item) { const key = item.track.name.toLowerCase(); if (seen.has(key)) return false; seen.add(key); return true; });
