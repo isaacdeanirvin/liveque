@@ -327,6 +327,7 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ARTIST_ID is now dynamic — set after login
 let ARTIST_ID = null;
+let ARTIST_NAME = null;
 
 let currentSort = 'artist';
 let currentSong = null;
@@ -368,7 +369,7 @@ async function checkAuth() {
 async function loadArtistId(authUserId) {
     const { data, error } = await db
         .from('artists')
-        .select('id')
+        .select('id, name')
         .eq('auth_user_id', authUserId)
         .single();
     if (error || !data) {
@@ -376,6 +377,7 @@ async function loadArtistId(authUserId) {
         return false;
     }
     ARTIST_ID = data.id;
+    ARTIST_NAME = data.name || 'Performer';
     console.log('✅ ARTIST_ID set:', ARTIST_ID);
     return true;
 }
@@ -604,7 +606,7 @@ function renderQuickAdd() { const quickAddGrid = document.getElementById('quickA
 
 function isSongAvailable(song) { const inQueue = requestQueue.find(function(r) { return r.title === song.title && r.artist === song.artist; }); if (inQueue) { return { available: false, reason: 'in-queue' }; } const songKey = song.title + '-' + song.artist; const playedTime = playedSongs[songKey]; if (!playedTime) return { available: true }; const now = Date.now(); const timeSincePlayed = now - playedTime; const cooldownMs = 2 * 60 * 60 * 1000; if (timeSincePlayed >= cooldownMs) { return { available: true }; } else { const remainingMs = cooldownMs - timeSincePlayed; const remainingSeconds = Math.ceil(remainingMs / 1000); const hours = Math.floor(remainingSeconds / 3600); const minutes = Math.floor((remainingSeconds % 3600) / 60); const seconds = remainingSeconds % 60; const timeString = hours > 0 ? hours + 'h ' + minutes + 'm ' + seconds + 's' : minutes > 0 ? minutes + 'm ' + seconds + 's' : seconds + 's'; return { available: false, timeRemaining: timeString, reason: 'recently-played', songId: song.id }; } }
 
-async function quickAddToQueue(song) { const existingRequest = requestQueue.find(function(r) { return r.title === song.title && r.artist === song.artist; }); if (existingRequest) { showToast('"' + song.title + '" is already in the queue!', 'warning'); return; } showToast('Adding "' + song.title + '"...', 'warning'); try { const insertData = { artist_id: ARTIST_ID, song_title: song.title, song_artist: song.artist, requester_name: 'Glen (Manual Add)', tip_amount: 0, status: 'queued', gig_session_id: currentGigSessionId, spanish: song.spanish || false }; const result = await db.from('requests').insert([insertData]).select().single(); if (result.error) throw result.error; if (result.data) { showToast('✓ "' + song.title + '" added to queue!'); } } catch(error) { showToast('Failed: ' + (error.message || 'Unknown error'), 'error'); } }
+async function quickAddToQueue(song) { const existingRequest = requestQueue.find(function(r) { return r.title === song.title && r.artist === song.artist; }); if (existingRequest) { showToast('"' + song.title + '" is already in the queue!', 'warning'); return; } showToast('Adding "' + song.title + '"...', 'warning'); try { const insertData = { artist_id: ARTIST_ID, song_title: song.title, song_artist: song.artist, requester_name: (ARTIST_NAME || 'Performer') + ' (Manual Add)', tip_amount: 0, status: 'queued', gig_session_id: currentGigSessionId, spanish: song.spanish || false }; const result = await db.from('requests').insert([insertData]).select().single(); if (result.error) throw result.error; if (result.data) { showToast('✓ "' + song.title + '" added to queue!'); } } catch(error) { showToast('Failed: ' + (error.message || 'Unknown error'), 'error'); } }
 
 function renderQueues() { renderLiveQueue(); updateStats(); }
 function renderLiveQueue() { const queueDiv = document.getElementById('liveQueueList'); if (!queueDiv) return; if (requestQueue.length === 0) { queueDiv.innerHTML = '<div style="text-align: center; opacity: 0.7; padding: 40px;">No requests in queue</div>'; return; } queueDiv.innerHTML = ''; const playingSong = requestQueue.find(function(r) { return r.status === 'playing'; }); if (playingSong) { const nowPlayingDiv = document.createElement('div'); nowPlayingDiv.className = 'now-playing-card'; const spanishFlag = playingSong.spanish ? ' 🇪🇸' : ''; nowPlayingDiv.innerHTML = '<div style="flex: 1;"><div style="font-size: 12px; opacity: 0.9; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 1px;">NOW PLAYING</div><div style="font-size: 18px; font-weight: bold; margin-bottom: 3px;">' + playingSong.title + spanishFlag + '</div><div style="font-size: 14px; opacity: 0.9;">' + playingSong.artist + '</div><div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Requested by ' + playingSong.requesterName + '</div></div><button class="control-btn" onclick="markAsComplete(\'' + playingSong.id + '\')" style="background: linear-gradient(45deg, #ff4757, #ff6b6b); color: white; font-weight: bold; padding: 15px 25px; font-size: 16px; border-radius: 12px; box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4); border: 2px solid rgba(255, 255, 255, 0.3); cursor: pointer; transition: all 0.3s ease; animation: completePulse 2s ease-in-out infinite;">✓ COMPLETE<br><span style="font-size: 11px; font-weight: normal; opacity: 0.9;">Click when done</span></button>'; queueDiv.appendChild(nowPlayingDiv); } requestQueue.forEach(function(request) { if (request.status === 'playing') return; const queueItem = document.createElement('div'); queueItem.className = 'queue-item' + (request.tip > 0 ? ' priority' : ''); const spanishFlag = request.spanish ? ' 🇪🇸' : ''; const tipBadge = request.tip > 0 ? '<div class="priority-badge">$' + request.tip + '</div>' : ''; queueItem.innerHTML = '<div class="song-info"><div class="song-title">' + request.title + spanishFlag + '</div><div class="song-artist">' + request.artist + '</div><div class="requester-name">by ' + request.requesterName + '</div></div><div style="display: flex; flex-direction: column; gap: 5px;">' + tipBadge + '<button class="control-btn" onclick="markAsPlaying(\'' + request.id + '\')">▶ Play</button><button class="control-btn" onclick="markAsComplete(\'' + request.id + '\')">✓ Done</button></div>'; queueDiv.appendChild(queueItem); }); }
