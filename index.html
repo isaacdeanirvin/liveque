@@ -78,8 +78,21 @@
         .shuffle-btn:hover { transform: scale(1.1); box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4); }
         .shuffle-btn:active { transform: rotate(180deg) scale(1.1); }
         .cooldown-timer { font-size: 10px; color: #ff6b6b; margin-top: 2px; }
-        .version-info { font-size: 10px; opacity: 0.6; margin-top: 8px; }
-        .session-badge { background: rgba(78, 205, 196, 0.2); border: 1px solid #4ecdc4; color: #4ecdc4; padding: 4px 10px; border-radius: 12px; font-size: 9px; font-weight: bold; margin-top: 8px; display: inline-block; font-family: monospace; }
+        .version-info { display: none; }
+        .session-badge { display: none; }
+        .gig-status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 6px; letter-spacing: 0.02em; transition: all 0.5s ease; }
+        .gig-status-badge.ready { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.4); }
+        .gig-status-badge.live { background: rgba(46,213,115,0.15); border: 1px solid rgba(46,213,115,0.4); color: #2ed573; }
+        .gig-status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; animation: syncPulse 2s infinite; }
+        .settings-btn { position: fixed; top: 14px; right: 60px; width: 36px; height: 36px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 999; color: rgba(255,255,255,0.5); font-size: 15px; transition: all 0.2s; }
+        .settings-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+        .settings-dropdown { display: none; position: fixed; top: 56px; right: 14px; background: rgba(18,18,30,0.97); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 8px; z-index: 1000; min-width: 170px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+        .settings-dropdown.show { display: block; }
+        .settings-item { padding: 10px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; color: rgba(255,255,255,0.75); display: flex; align-items: center; gap: 10px; transition: background 0.15s; }
+        .settings-item:hover { background: rgba(255,255,255,0.08); }
+        .settings-item.danger { color: #ff6b6b; }
+        .settings-item.danger:hover { background: rgba(255,71,87,0.12); }
+        .settings-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 4px 0; }
         .scroll-top-btn { position: fixed; bottom: 25px; right: 15px; width: 44px; height: 44px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 998; opacity: 0; visibility: hidden; transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.2); }
         .scroll-top-btn.visible { opacity: 1; visibility: visible; }
         .scroll-top-btn:hover { background: rgba(255, 255, 255, 0.25); transform: scale(1.05); }
@@ -171,11 +184,23 @@
     <div class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"></polyline></svg></div>
     <a href="mailto:getliveque@gmail.com" class="feedback-btn"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>Feedback</a>
     <div class="container">
-        <div style="text-align: center; margin-bottom: 8px; padding: 4px 0;">
+            <div style="text-align: center; margin-bottom: 8px; padding: 4px 0;">
             <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 28px; font-weight: 600; color: white; letter-spacing: -0.5px;">LiveQue<span style="font-size: 12px; vertical-align: super;">™</span></span>
-            <div class="version-info">Admin Dashboard v6.9.5</div>
-            <div class="session-badge" id="sessionBadge">Loading...</div>
-            <div style="margin-top: 6px;"><button class="signout-btn" onclick="signOut()">Sign out</button></div>
+            <div>
+                <div class="gig-status-badge ready" id="gigStatusBadge">Ready to Perform</div>
+            </div>
+        </div>
+
+        <!-- Settings button -->
+        <div class="settings-btn" id="settingsBtn" onclick="toggleSettings()">⚙</div>
+        <div class="settings-dropdown" id="settingsDropdown">
+            <div class="settings-item" onclick="openHelp(); toggleSettings();">
+                <span>❓</span> Help
+            </div>
+            <div class="settings-divider"></div>
+            <div class="settings-item danger" onclick="confirmSignOut()">
+                <span>→</span> Sign Out
+            </div>
         </div>
         <div class="tabs"><div class="tab" onclick="switchTab(0)">Dashboard</div><div class="tab active" onclick="switchTab(1)">Live Queue</div><div class="tab" onclick="switchTab(2)">QR Code</div></div>
         <div id="dashboardTab" class="tab-content">
@@ -519,7 +544,56 @@ function showToast(message, type) { const toast = document.createElement('div');
 
 function updateSyncStatus(status) { const syncStatus = document.getElementById('syncStatus'); const syncText = document.getElementById('syncStatusText'); if (status === 'SUBSCRIBED') { syncStatus.className = 'sync-status'; syncText.textContent = 'Live Sync'; } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') { syncStatus.className = 'sync-status error'; syncText.textContent = 'Disconnected'; } else { syncStatus.className = 'sync-status reconnecting'; syncText.textContent = 'Connecting...'; } }
 
-function updateSessionBadge() { const badge = document.getElementById('sessionBadge'); if (currentGigSessionId) { badge.textContent = 'Session: ' + currentGigSessionId.substring(0, 20) + '...'; } else { badge.textContent = 'No Session'; } }
+let gigStartTime = null;
+let gigStatusInterval = null;
+
+function updateGigStatus() {
+    const badge = document.getElementById('gigStatusBadge');
+    if (!badge) return;
+    const hasQueue = requestQueue.length > 0;
+    if (hasQueue) {
+        if (!gigStartTime) gigStartTime = Date.now();
+        if (!gigStatusInterval) {
+            gigStatusInterval = setInterval(updateGigStatus, 30000);
+        }
+        const elapsed = Date.now() - gigStartTime;
+        const hours = Math.floor(elapsed / 3600000);
+        const minutes = Math.floor((elapsed % 3600000) / 60000);
+        const timeStr = hours > 0 ? hours + 'h ' + minutes + 'm' : minutes + 'm';
+        badge.className = 'gig-status-badge live';
+        badge.innerHTML = '<div class="gig-status-dot"></div>🎸 Live · ' + timeStr;
+    } else {
+        gigStartTime = null;
+        if (gigStatusInterval) { clearInterval(gigStatusInterval); gigStatusInterval = null; }
+        badge.className = 'gig-status-badge ready';
+        badge.innerHTML = 'Ready to Perform';
+    }
+}
+
+function updateSessionBadge() { updateGigStatus(); }
+
+function toggleSettings() {
+    const dd = document.getElementById('settingsDropdown');
+    dd.classList.toggle('show');
+}
+
+function confirmSignOut() {
+    toggleSettings();
+    if (confirm('Sign out of LiveQue?\n\nThis will end your current session.')) {
+        signOut();
+    }
+}
+
+// Close settings dropdown when clicking outside
+document.addEventListener('click', function(e) {
+    const btn = document.getElementById('settingsBtn');
+    const dd = document.getElementById('settingsDropdown');
+    if (dd && btn && !btn.contains(e.target) && !dd.contains(e.target)) {
+        dd.classList.remove('show');
+    }
+});
+
+
 
 document.addEventListener('DOMContentLoaded', function() {
     checkAuth().then(function() {
@@ -608,7 +682,7 @@ function isSongAvailable(song) { const inQueue = requestQueue.find(function(r) {
 
 async function quickAddToQueue(song) { const existingRequest = requestQueue.find(function(r) { return r.title === song.title && r.artist === song.artist; }); if (existingRequest) { showToast('"' + song.title + '" is already in the queue!', 'warning'); return; } showToast('Adding "' + song.title + '"...', 'warning'); try { const insertData = { artist_id: ARTIST_ID, song_title: song.title, song_artist: song.artist, requester_name: (ARTIST_NAME || 'Performer') + ' (Manual Add)', tip_amount: 0, status: 'queued', gig_session_id: currentGigSessionId, spanish: song.spanish || false }; const result = await db.from('requests').insert([insertData]).select().single(); if (result.error) throw result.error; if (result.data) { showToast('✓ "' + song.title + '" added to queue!'); } } catch(error) { showToast('Failed: ' + (error.message || 'Unknown error'), 'error'); } }
 
-function renderQueues() { renderLiveQueue(); updateStats(); }
+function renderQueues() { renderLiveQueue(); updateStats(); updateGigStatus(); }
 function renderLiveQueue() { const queueDiv = document.getElementById('liveQueueList'); if (!queueDiv) return; if (requestQueue.length === 0) { queueDiv.innerHTML = '<div style="text-align: center; opacity: 0.7; padding: 40px;">No requests in queue</div>'; return; } queueDiv.innerHTML = ''; const playingSong = requestQueue.find(function(r) { return r.status === 'playing'; }); if (playingSong) { const nowPlayingDiv = document.createElement('div'); nowPlayingDiv.className = 'now-playing-card'; const spanishFlag = playingSong.spanish ? ' 🇪🇸' : ''; nowPlayingDiv.innerHTML = '<div style="flex: 1;"><div style="font-size: 12px; opacity: 0.9; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 1px;">NOW PLAYING</div><div style="font-size: 18px; font-weight: bold; margin-bottom: 3px;">' + playingSong.title + spanishFlag + '</div><div style="font-size: 14px; opacity: 0.9;">' + playingSong.artist + '</div><div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Requested by ' + playingSong.requesterName + '</div></div><button class="control-btn" onclick="markAsComplete(\'' + playingSong.id + '\')" style="background: linear-gradient(45deg, #ff4757, #ff6b6b); color: white; font-weight: bold; padding: 15px 25px; font-size: 16px; border-radius: 12px; box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4); border: 2px solid rgba(255, 255, 255, 0.3); cursor: pointer; transition: all 0.3s ease; animation: completePulse 2s ease-in-out infinite;">✓ COMPLETE<br><span style="font-size: 11px; font-weight: normal; opacity: 0.9;">Click when done</span></button>'; queueDiv.appendChild(nowPlayingDiv); } requestQueue.forEach(function(request) { if (request.status === 'playing') return; const queueItem = document.createElement('div'); queueItem.className = 'queue-item' + (request.tip > 0 ? ' priority' : ''); const spanishFlag = request.spanish ? ' 🇪🇸' : ''; const tipBadge = request.tip > 0 ? '<div class="priority-badge">$' + request.tip + '</div>' : ''; queueItem.innerHTML = '<div class="song-info"><div class="song-title">' + request.title + spanishFlag + '</div><div class="song-artist">' + request.artist + '</div><div class="requester-name">by ' + request.requesterName + '</div></div><div style="display: flex; flex-direction: column; gap: 5px;">' + tipBadge + '<button class="control-btn" onclick="markAsPlaying(\'' + request.id + '\')">▶ Play</button><button class="control-btn" onclick="markAsComplete(\'' + request.id + '\')">✓ Done</button></div>'; queueDiv.appendChild(queueItem); }); }
 
 async function markAsPlaying(songId) { const request = requestQueue.find(function(r) { return r.id === songId; }); if (!request) { showToast('Song not found', 'error'); return; } try { await db.from('requests').update({ status: 'queued' }).eq('artist_id', ARTIST_ID).neq('id', songId); const updatePlayingResult = await db.from('requests').update({ status: 'playing' }).eq('id', songId); if (updatePlayingResult.error) throw updatePlayingResult.error; showToast('▶ Now playing: "' + request.title + '"'); } catch(error) { showToast('Failed to start playing: ' + error.message, 'error'); } }
@@ -919,6 +993,15 @@ let qrCodeInstance = null;
 
 function initQRCode() {
     if (typeof QRCode === 'undefined') { setTimeout(initQRCode, 500); return; }
+    // Populate artist name from profile
+    if (ARTIST_NAME && ARTIST_NAME !== 'Performer') {
+        const nameInput = document.getElementById('qrArtistName');
+        const nameDisplay = document.getElementById('qrArtistDisplay');
+        if (nameInput && nameInput.value === 'Glen Irvin Jr.') {
+            nameInput.value = ARTIST_NAME;
+            if (nameDisplay) nameDisplay.textContent = ARTIST_NAME;
+        }
+    }
     const container = document.getElementById('qrCodeContainer');
     if (!container) return;
     container.innerHTML = '';
