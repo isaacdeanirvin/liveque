@@ -865,7 +865,7 @@ async function selectSpotifyPlaylist(playlist) {
         let firstFetch = true;
         while (url) { const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + spotifyAccessToken } }); if (!res.ok) throw new Error('Could not load tracks'); const data = await res.json(); if (firstFetch) { console.log('TRACK SAMPLE:', JSON.stringify(data.items ? data.items[0] : data, null, 2)); firstFetch = false; } tracks = tracks.concat((data.items || []).filter(function(i) { return i && i.name; })); url = data.next; }
         const seen = new Set();
-        spotifyTracks = tracks.filter(function(item) { const key = item.track.name.toLowerCase(); if (seen.has(key)) return false; seen.add(key); return true; });
+        spotifyTracks = tracks.filter(function(item) { const key = item.name.toLowerCase(); if (seen.has(key)) return false; seen.add(key); return true; });
         selectedSpotifyTracks = new Set();
         hideSpotifyLoading(); renderSpotifyTracks(playlist.name);
     } catch(err) { hideSpotifyLoading(); showToast('Could not load tracks: ' + err.message, 'error'); renderSpotifyPlaylists(); }
@@ -891,7 +891,7 @@ function renderSpotifyTracks(playlistName) {
     btn.textContent = selectedSpotifyTracks.size > 0 ? `Add ${selectedSpotifyTracks.size} Song${selectedSpotifyTracks.size > 1 ? 's' : ''} to Library` : 'Add Selected Songs';
 }
 
-function selectAllSpotifyTracks() { spotifyTracks.forEach(function(item, index) { const inLib = songLibrary.some(function(s) { return s.title.toLowerCase() === item.track.name.toLowerCase(); }); if (!inLib) selectedSpotifyTracks.add(index); }); renderSpotifyTracks(currentSpotifyPlaylist.name); }
+function selectAllSpotifyTracks() { spotifyTracks.forEach(function(item, index) { const inLib = songLibrary.some(function(s) { return s.title.toLowerCase() === item.name.toLowerCase(); }); if (!inLib) selectedSpotifyTracks.add(index); }); renderSpotifyTracks(currentSpotifyPlaylist.name); }
 function clearSpotifySelection() { selectedSpotifyTracks.clear(); renderSpotifyTracks(currentSpotifyPlaylist.name); }
 function backToSpotifyPlaylists() { document.getElementById('spotifyStep2').style.display = 'none'; renderSpotifyPlaylists(); }
 function showSpotifyLoading(msg) { document.getElementById('spotifyStep1').style.display = 'none'; document.getElementById('spotifyStep2').style.display = 'none'; document.getElementById('spotifyLoading').style.display = 'block'; document.getElementById('spotifyLoadingText').textContent = msg || 'Loading...'; }
