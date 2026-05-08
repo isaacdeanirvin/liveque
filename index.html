@@ -862,7 +862,8 @@ async function selectSpotifyPlaylist(playlist) {
     showSpotifyLoading('Loading tracks...');
     try {
         let tracks = []; let url = (playlist.items && playlist.items.href) ? playlist.items.href : `https://api.spotify.com/v1/playlists/${playlist.id}/items`;
-        while (url) { const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + spotifyAccessToken } }); if (!res.ok) throw new Error('Could not load tracks'); const data = await res.json(); tracks = tracks.concat((data.items || []).filter(function(i) { return i.track && i.track.name; })); url = data.next; }
+        let firstFetch = true;
+        while (url) { const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + spotifyAccessToken } }); if (!res.ok) throw new Error('Could not load tracks'); const data = await res.json(); if (firstFetch) { console.log('TRACK SAMPLE:', JSON.stringify(data.items ? data.items[0] : data, null, 2)); firstFetch = false; } tracks = tracks.concat((data.items || []).filter(function(i) { return i.track && i.track.name; })); url = data.next; }
         const seen = new Set();
         spotifyTracks = tracks.filter(function(item) { const key = item.track.name.toLowerCase(); if (seen.has(key)) return false; seen.add(key); return true; });
         selectedSpotifyTracks = new Set();
