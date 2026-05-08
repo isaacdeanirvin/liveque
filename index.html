@@ -834,6 +834,7 @@ async function loadSpotifyPlaylists() {
         let playlists = []; let url = 'https://api.spotify.com/v1/me/playlists?limit=50';
         while (url) { const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + spotifyAccessToken } }); if (!res.ok) throw new Error('Could not load playlists'); const data = await res.json(); playlists = playlists.concat(data.items || []); url = data.next; }
         spotifyPlaylists = playlists.filter(function(p) { return p && p.name; });
+        if (spotifyPlaylists.length > 0) console.log('PLAYLIST SAMPLE:', JSON.stringify(spotifyPlaylists[0], null, 2));
         hideSpotifyLoading(); renderSpotifyPlaylists();
     } catch(err) { hideSpotifyLoading(); showToast('Could not load playlists: ' + err.message, 'error'); closeSpotifyModal(); }
 }
