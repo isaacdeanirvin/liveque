@@ -272,12 +272,12 @@
                     <div style="text-align: center;">
                         <div id="qrCodeContainer" style="margin: 0 auto 12px; width: 150px; height: 150px; display: flex; align-items: center; justify-content: center;"></div>
                         <div style="color: #666; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.2px; margin-bottom: 4px;">Scan to Request a Song</div>
-                        <div id="qrArtistDisplay" style="color: #000; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 600; letter-spacing: -0.3px;">Glen Irvin Jr.</div>
+                        <div id="qrArtistDisplay" style="color: #000; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 600; letter-spacing: -0.3px;"></div>
                         <div style="color: #aaa; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif; font-size: 8px; font-weight: 500; letter-spacing: 0.5px; margin-top: 12px; text-transform: uppercase;">Powered by LiveQue</div>
                     </div>
                 </div>
                 <div style="max-width: 240px; margin: 0 auto 12px;">
-                    <input type="text" id="qrArtistName" class="auth-input" placeholder="Your name" value="Glen Irvin Jr." oninput="updateQRCardLive()" style="text-align: center; font-size: 14px; font-weight: 500; padding: 10px;">
+                    <input type="text" id="qrArtistName" class="auth-input" placeholder="Your name" value="" oninput="updateQRCardLive()" style="text-align: center; font-size: 14px; font-weight: 500; padding: 10px;">
                 </div>
                 <div style="max-width: 240px; margin: 0 auto;">
                     <button class="auth-btn" onclick="downloadQRPDF()" style="width: 100%; background: white; color: #000; font-weight: 600; font-size: 14px; padding: 12px; border-radius: 10px;">Download for Print</button>
@@ -999,15 +999,12 @@ let qrCodeInstance = null;
 
 function initQRCode() {
     if (typeof QRCode === 'undefined') { setTimeout(initQRCode, 500); return; }
-    // Populate artist name from profile
-    if (ARTIST_NAME && ARTIST_NAME !== 'Performer') {
-        const nameInput = document.getElementById('qrArtistName');
-        const nameDisplay = document.getElementById('qrArtistDisplay');
-        if (nameInput && nameInput.value === 'Glen Irvin Jr.') {
-            nameInput.value = ARTIST_NAME;
-            if (nameDisplay) nameDisplay.textContent = ARTIST_NAME;
-        }
-    }
+    // Always populate name from the authenticated artist profile
+    const nameInput = document.getElementById('qrArtistName');
+    const nameDisplay = document.getElementById('qrArtistDisplay');
+    const displayName = (ARTIST_NAME && ARTIST_NAME !== 'Performer') ? ARTIST_NAME : '';
+    if (nameInput) nameInput.value = displayName;
+    if (nameDisplay) nameDisplay.textContent = displayName;
     const container = document.getElementById('qrCodeContainer');
     if (!container) return;
     container.innerHTML = '';

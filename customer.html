@@ -77,7 +77,8 @@
         .modal-content p { font-size: 14px; line-height: 1.6; margin-bottom: 8px; opacity: 0.9; }
         .close { position: absolute; right: 15px; top: 15px; font-size: 28px; font-weight: bold; cursor: pointer; opacity: 0.7; }
         .close:hover { opacity: 1; }
-        .now-playing-card { background: linear-gradient(135deg, #c97c20, #f0a050); border-radius: 20px; padding: 12px 16px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border: 2px solid rgba(240,160,80,0.5); box-shadow: 0 4px 24px rgba(240,160,80,0.25); }
+        .now-playing-card { background: linear-gradient(135deg, #c97c20, #f0a050); border-radius: 20px; padding: 12px 16px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border: 2px solid rgba(240,160,80,0.5); box-shadow: 0 4px 24px rgba(240,160,80,0.25); animation: heartbeat 1.5s ease-in-out infinite; }
+        @keyframes heartbeat { 0%,100%{box-shadow:0 4px 24px rgba(240,160,80,0.25);} 12%{box-shadow:0 4px 36px rgba(240,160,80,0.65),0 0 0 5px rgba(240,160,80,0.12);} 24%{box-shadow:0 4px 24px rgba(240,160,80,0.25);} 38%{box-shadow:0 4px 32px rgba(240,160,80,0.5),0 0 0 3px rgba(240,160,80,0.09);} 65%{box-shadow:0 4px 24px rgba(240,160,80,0.25);} }
         .up-next-bubble { background: linear-gradient(135deg, #4ecdc4, #44a08d); border-radius: 16px; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; border: 2px solid rgba(78, 205, 196, 0.5); box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3); }
         .unavailable-text { font-size: 11px; color: #ff6b6b; margin-top: 5px; }
         .sync-indicator { position: fixed; bottom: 10px; right: 10px; background: rgba(46, 213, 115, 0.9); color: white; padding: 5px 10px; border-radius: 20px; font-size: 10px; font-weight: bold; display: flex; align-items: center; gap: 5px; z-index: 100; }
@@ -111,8 +112,8 @@
     <div class="container">
         <div style="text-align: center; margin-bottom: 8px;"><span style="font-size: 28px; font-weight: 600; letter-spacing: -0.5px;">LiveQue<span style="font-size: 12px; vertical-align: super;">™</span></span></div>
         <div class="header">
-            <div class="artist-avatar">GI</div>
-            <div class="artist-name">Glen Irvin Jr.</div>
+            <div class="artist-avatar" id="artistAvatar">…</div>
+            <div class="artist-name" id="artistNameDisplay">Loading…</div>
             <div class="version-info">v6.9.5</div>
             <div class="live-indicator"><div class="live-dot"></div>Live</div>
             <div class="social-links" id="socialLinksContainer"></div>
@@ -132,7 +133,11 @@ const SUPABASE_URL='https://jttswydixqeyyqvcohnq.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dHN3eWRpeHFleXlxdmNvaG5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNjE3ODYsImV4cCI6MjA3NDkzNzc4Nn0.WlvOfl11qVUVatSCIPy8t6u9-j4u1z5CpnBxXe50BdQ';
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 const _urlParams = new URLSearchParams(window.location.search);
-const ARTIST_ID = _urlParams.get('artist') || 'f2c819fc-5665-4852-bcd7-797f92f7f0a5';
+const ARTIST_ID = _urlParams.get('artist');
+if (!ARTIST_ID) {
+    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;text-align:center;padding:20px;font-family:sans-serif;color:white;background:#080808;"><div><div style="font-size:32px;margin-bottom:16px;">🎸</div><div style="font-size:20px;font-weight:bold;margin-bottom:8px;">LiveQue</div><div style="opacity:0.6;font-size:14px;">Invalid link. Scan the QR code again.</div></div></div>';
+    throw new Error('No artist ID in URL');
+}
 
 let currentSong=null;
 let requestQueue=[];
@@ -227,6 +232,18 @@ function updateSyncStatus(s){
 
 async function loadFromSupabase(){
     try{
+        // ── Load artist name and update header ──
+        const ar=await db.from('artists').select('name').eq('id',ARTIST_ID).single();
+        if(ar.data&&ar.data.name){
+            const name=ar.data.name;
+            const nameEl=document.getElementById('artistNameDisplay');
+            const avatarEl=document.getElementById('artistAvatar');
+            if(nameEl) nameEl.textContent=name;
+            if(avatarEl){
+                const initials=name.split(' ').map(function(w){return w[0];}).filter(Boolean).slice(0,2).join('').toUpperCase();
+                avatarEl.textContent=initials;
+            }
+        }
         const st=await db.from('artist_settings').select('*').eq('artist_id',ARTIST_ID).single();
         if(st.data){
             currentGigSessionId=st.data.current_gig_session_id;
