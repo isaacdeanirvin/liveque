@@ -127,7 +127,8 @@ console.log('=== LIVEQUE CUSTOMER v6.9.5 ===');
 const SUPABASE_URL='https://jttswydixqeyyqvcohnq.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dHN3eWRpeHFleXlxdmNvaG5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNjE3ODYsImV4cCI6MjA3NDkzNzc4Nn0.WlvOfl11qVUVatSCIPy8t6u9-j4u1z5CpnBxXe50BdQ';
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-const ARTIST_ID='f2c819fc-5665-4852-bcd7-797f92f7f0a5';
+const _urlParams = new URLSearchParams(window.location.search);
+const ARTIST_ID = _urlParams.get('artist') || 'f2c819fc-5665-4852-bcd7-797f92f7f0a5';
 
 let currentSong=null;
 let requestQueue=[];

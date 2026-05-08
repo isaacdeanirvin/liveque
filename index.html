@@ -84,7 +84,7 @@
         .gig-status-badge.ready { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.4); }
         .gig-status-badge.live { background: rgba(46,213,115,0.15); border: 1px solid rgba(46,213,115,0.4); color: #2ed573; }
         .gig-status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; animation: syncPulse 2s infinite; }
-        .settings-btn { position: fixed; top: 14px; right: 60px; width: 36px; height: 36px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 999; color: rgba(255,255,255,0.5); font-size: 15px; transition: all 0.2s; }
+        .settings-btn { position: fixed; top: 14px; right: 20px; width: 36px; height: 36px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 999; color: rgba(255,255,255,0.5); font-size: 15px; transition: all 0.2s; }
         .settings-btn:hover { background: rgba(255,255,255,0.2); color: white; }
         .settings-dropdown { display: none; position: fixed; top: 56px; right: 14px; background: rgba(18,18,30,0.97); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 8px; z-index: 1000; min-width: 170px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
         .settings-dropdown.show { display: block; }
@@ -121,7 +121,8 @@
         .login-error { color: #ff6b6b; font-size: 13px; margin-top: 12px; min-height: 18px; }
         .signout-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); font-size: 11px; padding: 4px 10px; border-radius: 8px; cursor: pointer; margin-top: 6px; }
         .signout-btn:hover { background: rgba(255,71,87,0.2); border-color: rgba(255,71,87,0.4); color: #ff6b6b; }
-        .login-toggle { display: flex; background: rgba(255,255,255,0.08); border-radius: 10px; padding: 4px; margin-bottom: 24px; }
+        .liquid-glass-live { box-shadow: 0 0 0 1px rgba(78,205,196,0.3), 0 0 30px rgba(78,205,196,0.08); animation: glassBreath 4s ease-in-out infinite; }
+        @keyframes glassBreath { 0%,100%{ box-shadow: 0 0 0 1px rgba(78,205,196,0.2), 0 0 20px rgba(78,205,196,0.06); } 50%{ box-shadow: 0 0 0 1px rgba(78,205,196,0.45), 0 0 40px rgba(78,205,196,0.14); } }
         .login-toggle-btn { flex: 1; padding: 8px; border: none; background: transparent; color: rgba(255,255,255,0.5); font-size: 13px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
         .login-toggle-btn.active { background: rgba(255,255,255,0.15); color: white; }
         .login-panel { display: none; }
@@ -202,7 +203,11 @@
                 <span>→</span> Sign Out
             </div>
         </div>
-        <div class="tabs"><div class="tab" onclick="switchTab(0)">Dashboard</div><div class="tab active" onclick="switchTab(1)">Live Queue</div><div class="tab" onclick="switchTab(2)">QR Code</div></div>
+        <div class="tabs">
+            <div class="tab" onclick="switchTab(0)" style="font-size: 12px; opacity: 0.7;">Setup</div>
+            <div class="tab active" onclick="switchTab(1)" id="liveTab" style="font-size: 14px; font-weight: 700; letter-spacing: 0.01em;">Live</div>
+            <div class="tab" onclick="switchTab(2)" style="font-size: 12px; opacity: 0.7;">Card</div>
+        </div>
         <div id="dashboardTab" class="tab-content">
             <div class="payment-section"><div class="section-title">Live Stats</div><div class="stats-grid"><div class="stat-item"><div class="stat-number" style="color: #4ecdc4;" id="requestCount">0</div><div class="stat-label">Requests</div></div><div class="stat-item"><div class="stat-number" style="color: #ffd700;" id="tipCount">0 tips</div><div class="stat-label">Tips Today</div></div><div class="stat-item"><div class="stat-number" style="color: #ff6b6b;" id="songCount">0</div><div class="stat-label">Songs</div></div></div></div>
             <div class="payment-section"><div class="section-title">Start New Gig</div><div style="margin-bottom: 12px; font-size: 12px; opacity: 0.7; text-align: center;">Prepare for a new performance. This will clear the queue, reset played songs, and reset daily tips.</div><div style="text-align: center;"><button class="auth-btn" onclick="startNewGig()" style="background: linear-gradient(45deg, #2ed573, #26de81); font-size: 16px; padding: 12px;">Start New Gig</button></div></div>
@@ -283,7 +288,6 @@
             </div>
         </div>
     </div>
-    <div style="position: fixed; top: 20px; right: 20px; width: 40px; height: 40px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 999; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); font-size: 18px; color: white; transition: all 0.3s ease;" onclick="openHelp()">?</div>
     <div id="helpModal" class="modal">
         <div class="modal-content" style="max-height: 90vh; overflow-y: auto; padding: 40px 30px; text-align: left;">
             <span class="close" onclick="closeHelpModal()">&times;</span>
@@ -549,24 +553,25 @@ let gigStatusInterval = null;
 
 function updateGigStatus() {
     const badge = document.getElementById('gigStatusBadge');
+    const liveSection = document.querySelector('#livequeueTab .payment-section');
     if (!badge) return;
     const hasQueue = requestQueue.length > 0;
     if (hasQueue) {
         if (!gigStartTime) gigStartTime = Date.now();
-        if (!gigStatusInterval) {
-            gigStatusInterval = setInterval(updateGigStatus, 30000);
-        }
+        if (!gigStatusInterval) { gigStatusInterval = setInterval(updateGigStatus, 30000); }
         const elapsed = Date.now() - gigStartTime;
         const hours = Math.floor(elapsed / 3600000);
         const minutes = Math.floor((elapsed % 3600000) / 60000);
-        const timeStr = hours > 0 ? hours + 'h ' + minutes + 'm' : minutes + 'm';
+        const timeStr = hours > 0 ? hours + 'h ' + minutes + 'm' : minutes > 0 ? minutes + 'm' : 'just started';
         badge.className = 'gig-status-badge live';
         badge.innerHTML = '<div class="gig-status-dot"></div>🎸 Live · ' + timeStr;
+        if (liveSection) liveSection.classList.add('liquid-glass-live');
     } else {
         gigStartTime = null;
         if (gigStatusInterval) { clearInterval(gigStatusInterval); gigStatusInterval = null; }
         badge.className = 'gig-status-badge ready';
         badge.innerHTML = 'Ready to Perform';
+        if (liveSection) liveSection.classList.remove('liquid-glass-live');
     }
 }
 
@@ -988,7 +993,8 @@ async function addSelectedSpotifyTracks() {
     } catch(err) { showToast('Error: ' + err.message, 'error'); btn.disabled = false; btn.textContent = 'Add Selected Songs'; }
 }
 
-const QR_TARGET_URL = 'https://jolly-nougat-c7d3f5.netlify.app/customer.html';
+const QR_BASE_URL = 'https://soft-nasturtium-c51aac.netlify.app/customer.html';
+function getQRTargetURL() { return QR_BASE_URL + (ARTIST_ID ? '?artist=' + ARTIST_ID : ''); }
 let qrCodeInstance = null;
 
 function initQRCode() {
@@ -1006,7 +1012,7 @@ function initQRCode() {
     if (!container) return;
     container.innerHTML = '';
     try {
-        qrCodeInstance = new QRCode(container, { text: QR_TARGET_URL, width: 150, height: 150, colorDark: '#000000', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H });
+        qrCodeInstance = new QRCode(container, { text: getQRTargetURL(), width: 150, height: 150, colorDark: '#000000', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H });
     } catch(error) { console.error('QR generation error:', error); }
 }
 
