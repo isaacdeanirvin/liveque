@@ -506,12 +506,12 @@ async function signUp() {
     if (error) { errorEl.textContent = error.message; btn.disabled = false; btn.textContent = 'Create Account'; return; }
 
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Date.now();
-    const { error: artistError } = await db.from('artists').insert([{
+    const { data: newArtist, error: artistError } = await db.from('artists').insert([{
         auth_user_id: data.user.id,
         name: name,
         email: email,
         slug: slug
-    }]);
+    }]).select().single();
 
     if (artistError) {
         console.error('Artist insert error:', artistError);
@@ -519,6 +519,20 @@ async function signUp() {
         btn.disabled = false;
         btn.textContent = 'Create Account';
         return;
+    }
+
+    // Auto-create artist_settings row so the new performer doesn't 406 on first dashboard load.
+    // Non-fatal: if this fails, we log it and continue — the dashboard can lazily create it on first save.
+    const { error: settingsError } = await db.from('artist_settings').insert([{
+        artist_id: newArtist.id,
+        payment_methods: {},
+        social_handles: {},
+        tip_amounts: [0, 2, 5, 10],
+        current_gig_session_id: null
+    }]);
+
+    if (settingsError) {
+        console.error('Settings insert error (non-fatal):', settingsError);
     }
 
     const loaded = await loadArtistId(data.user.id);
