@@ -114,7 +114,7 @@
         <div class="header">
             <div class="artist-avatar" id="artistAvatar">…</div>
             <div class="artist-name" id="artistNameDisplay">Loading…</div>
-            <div class="version-info">v6.9.7</div>
+            <div class="version-info">v6.9.9</div>
             <div class="live-indicator"><div class="live-dot"></div>Live</div>
             <div class="social-links" id="socialLinksContainer"></div>
         </div>
@@ -123,11 +123,11 @@
         <div class="payment-section"><div class="section-title">Current Queue</div><div id="audienceQueue"></div></div>
         <div class="payment-section"><div class="section-title">Request a Song</div><input type="text" class="search-bar" placeholder="Search LiveQue..." oninput="searchSongs(this.value)"><div id="songsList"></div></div>
     </div>
-    <div id="requestModal" class="modal"><div class="modal-content"><span class="close" onclick="closeModal()">&times;</span><h2>Request Song</h2><div id="modalSongInfo" style="margin: 20px 0;"></div><div id="tipButtonsContainer"></div></div></div>
+    <div id="requestModal" class="modal"><div class="modal-content"><span class="close" onclick="closeModal()">&times;</span><h2>Request Song</h2><div id="modalSongInfo" style="margin: 20px 0;"></div><div id="tipButtonsContainer"></div><div id="paymentArea" style="display:none; margin-top:16px; text-align:left;"><div id="paymentElementContainer" style="margin-bottom:12px;"></div><button id="payNowBtn" class="tip-btn" style="width:100%; margin:0;" onclick="confirmTipPayment()">Pay</button><div id="paymentMessage" style="margin-top:10px; font-size:13px; min-height:16px; text-align:center;"></div></div></div></div>
     <div id="helpModal" class="modal"><div class="modal-content" style="max-height: 90vh; overflow-y: auto; padding: 24px;"><span class="close" onclick="closeHelpModal()">&times;</span><div style="margin-bottom: 24px;"><div style="font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">LiveQue</div><div style="font-size: 14px; opacity: 0.6; margin-top: 4px;">How It Works</div></div><div style="text-align: left; font-size: 14px; line-height: 1.7;"><div style="margin-bottom: 16px;"><div style="font-weight: 600; margin-bottom: 8px;">Requesting a Song</div><div style="opacity: 0.85;">Tap any song to request it. Your request goes straight to the artist's live queue. Add your name if you'd like a shoutout.</div></div><div style="margin-bottom: 16px;"><div style="font-weight: 600; margin-bottom: 8px;">The Queue</div><div style="opacity: 0.85;">Watch the queue update in real-time. Green means now playing. Songs with tips get priority.</div></div><div style="margin-bottom: 16px;"><div style="font-weight: 600; margin-bottom: 8px;">Cooldowns</div><div style="opacity: 0.85;">Recently played songs show a timer. When it expires, the song can be requested again.</div></div></div><button style="margin-top: 16px; width: 100%; padding: 12px; background: rgba(255,255,255,0.15); border: none; border-radius: 10px; color: white; font-size: 16px; cursor: pointer;" onclick="closeHelpModal()">Done</button><div style="margin-top: 16px; font-size: 11px; opacity: 0.4; text-align: center;">getliveque.com</div></div></div>
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://js.stripe.com/v3/"></script>
     <script>
-console.log('=== LIVEQUE CUSTOMER v6.9.7 ===');
+console.log('=== LIVEQUE CUSTOMER v6.9.9 ===');
 
 const SUPABASE_URL='https://jttswydixqeyyqvcohnq.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dHN3eWRpeHFleXlxdmNvaG5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNjE3ODYsImV4cCI6MjA3NDkzNzc4Nn0.WlvOfl11qVUVatSCIPy8t6u9-j4u1z5CpnBxXe50BdQ';
@@ -917,13 +917,25 @@ function openRequestModal(t,a,sp){
     nameDiv.innerHTML='<label class="name-label">Your Name (optional):</label><input type="text" id="requesterNameInput" class="name-input-field" placeholder="Anonymous">';
     tc.appendChild(nameDiv);
     
-    tipAmounts.filter(function(am){return am===0;}).forEach(function(am){
+    const freeBtn=document.createElement('button');
+    freeBtn.className='tip-btn';
+    freeBtn.style.cssText='display:block; width:100%; margin:6px 0;';
+    freeBtn.textContent='Request (Free)';
+    freeBtn.onclick=function(){requestSong(0);};
+    tc.appendChild(freeBtn);
+
+    tipAmounts.filter(function(am){return am>0;}).forEach(function(am){
         const b=document.createElement('button');
         b.className='tip-btn';
-        b.textContent='REQUEST THIS SONG';
-        b.onclick=function(){requestSong(am);};
+        b.style.cssText='display:block; width:100%; margin:6px 0; background:linear-gradient(45deg,#ffd700,#ffa500); color:#1a1a2e; border-color:#ffd700;';
+        b.textContent='Request + Tip $'+am+' \uD83C\uDFB5';
+        b.onclick=function(){startTipPayment(am);};
         tc.appendChild(b);
     });
+
+    const pa=document.getElementById('paymentArea');
+    if(pa){ pa.style.display='none'; document.getElementById('paymentElementContainer').innerHTML=''; document.getElementById('paymentMessage').textContent=''; }
+    stripeTipState=null;
     
     document.getElementById('requestModal').classList.add('show');
 }
@@ -962,6 +974,108 @@ async function requestSong(payAmount){
     }
 }
 
+let stripeTipState=null;
+
+async function startTipPayment(amount){
+    const nameInput=document.getElementById('requesterNameInput');
+    const requesterName=nameInput&&nameInput.value.trim()?nameInput.value.trim():'Anonymous';
+    const tc=document.getElementById('tipButtonsContainer');
+    const pa=document.getElementById('paymentArea');
+    const msg=document.getElementById('paymentMessage');
+    const payBtn=document.getElementById('payNowBtn');
+
+    tc.querySelectorAll('button').forEach(function(b){ b.disabled=true; b.style.opacity='0.5'; });
+    msg.style.color='rgba(255,255,255,0.7)';
+    msg.textContent='Setting up secure payment\u2026';
+    pa.style.display='block';
+
+    try{
+        const { data, error } = await db.functions.invoke('stripe-create-tip', {
+            body: {
+                artist_id: ARTIST_ID,
+                amount: amount,
+                song_title: currentSong.title,
+                song_artist: currentSong.artist,
+                requester_name: requesterName
+            }
+        });
+        if(error){
+            let m=error.message;
+            try{ const b=await error.context.json(); if(b&&b.error) m=b.error; }catch(_){}
+            throw new Error(m);
+        }
+        if(!data||!data.client_secret||!data.publishable_key) throw new Error('Could not start payment');
+
+        const stripe=Stripe(data.publishable_key);
+        const elements=stripe.elements({ clientSecret:data.client_secret, appearance:{ theme:'night' } });
+        const paymentElement=elements.create('payment');
+        document.getElementById('paymentElementContainer').innerHTML='';
+        paymentElement.mount('#paymentElementContainer');
+
+        stripeTipState={ stripe:stripe, elements:elements, amount:amount, requesterName:requesterName };
+
+        msg.textContent='';
+        payBtn.textContent='Pay $'+amount;
+        payBtn.disabled=false;
+        payBtn.style.opacity='1';
+    }catch(e){
+        pa.style.display='none';
+        tc.querySelectorAll('button').forEach(function(b){ b.disabled=false; b.style.opacity='1'; });
+        showToast(e.message||'Could not start payment','error');
+    }
+}
+
+async function confirmTipPayment(){
+    if(!stripeTipState) return;
+    const payBtn=document.getElementById('payNowBtn');
+    const msg=document.getElementById('paymentMessage');
+    payBtn.disabled=true;
+    payBtn.textContent='Processing\u2026';
+    msg.style.color='rgba(255,255,255,0.7)';
+    msg.textContent='';
+
+    try{
+        const { error, paymentIntent } = await stripeTipState.stripe.confirmPayment({
+            elements: stripeTipState.elements,
+            redirect: 'if_required'
+        });
+        if(error){
+            msg.style.color='#ff6b6b';
+            msg.textContent=error.message||'Payment failed';
+            payBtn.disabled=false;
+            payBtn.textContent='Pay $'+stripeTipState.amount;
+            return;
+        }
+        if(paymentIntent && paymentIntent.status==='succeeded'){
+            const insertData={
+                artist_id:ARTIST_ID,
+                song_title:currentSong.title,
+                song_artist:currentSong.artist,
+                requester_name:stripeTipState.requesterName,
+                tip_amount:stripeTipState.amount,
+                status:'queued',
+                gig_session_id:currentGigSessionId,
+                spanish:currentSong.spanish||false
+            };
+            const result=await db.from('requests').insert([insertData]).select().single();
+            if(result.error){ msg.style.color='#ff6b6b'; msg.textContent='Paid, but the request didn\u2019t send \u2014 show this to the performer.'; return; }
+            showToast('\u2713 $'+stripeTipState.amount+' tip sent \u2014 "'+currentSong.title+'" requested!');
+            stripeTipState=null;
+            closeModal();
+        }else{
+            msg.style.color='#ffd700';
+            msg.textContent='Payment processing\u2026';
+            payBtn.disabled=false;
+            payBtn.textContent='Pay $'+stripeTipState.amount;
+        }
+    }catch(e){
+        msg.style.color='#ff6b6b';
+        msg.textContent=e.message||'Payment error';
+        payBtn.disabled=false;
+        payBtn.textContent='Pay $'+stripeTipState.amount;
+    }
+}
+
 function searchSongs(q){
     if(q&&!showingAllSongs){
         showingAllSongs=true;
@@ -981,6 +1095,9 @@ function searchSongs(q){
 
 function closeModal(){
     document.getElementById('requestModal').classList.remove('show');
+    stripeTipState=null;
+    const pa=document.getElementById('paymentArea');
+    if(pa){ pa.style.display='none'; document.getElementById('paymentElementContainer').innerHTML=''; document.getElementById('paymentMessage').textContent=''; }
 }
 
 function openHelp(){
