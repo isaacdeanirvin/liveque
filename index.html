@@ -211,7 +211,13 @@
         <div id="dashboardTab" class="tab-content">
             <div class="payment-section"><div class="section-title">Live Stats</div><div class="stats-grid"><div class="stat-item"><div class="stat-number" style="color: #4ecdc4;" id="requestCount">0</div><div class="stat-label">Requests</div></div><div class="stat-item"><div class="stat-number" style="color: #ffd700;" id="tipCount">0 tips</div><div class="stat-label">Tips Today</div></div><div class="stat-item"><div class="stat-number" style="color: #ff6b6b;" id="songCount">0</div><div class="stat-label">Songs</div></div></div></div>
             <div class="payment-section"><div class="section-title">Start New Gig</div><div style="margin-bottom: 12px; font-size: 12px; opacity: 0.7; text-align: center;">Prepare for a new performance. This will clear the queue, reset played songs, and reset daily tips.</div><div style="text-align: center;"><button class="auth-btn" onclick="startNewGig()" style="background: linear-gradient(45deg, #2ed573, #26de81); font-size: 16px; padding: 12px;">Start New Gig</button></div></div>
-            <div class="payment-section"><div class="section-title">Payment Settings</div><div id="paymentMethodsDisplay"></div><div style="text-align: center;"><button class="auth-btn" onclick="openPaymentSettings()">Configure Payment Methods</button></div></div>
+            <div class="payment-section">
+                <div class="section-title">Get Paid with LiveQue</div>
+                <div style="margin-bottom: 12px; font-size: 12px; opacity: 0.7; text-align: center;">Set up secure payouts so fans can tip you directly in-app. Takes about 2 minutes.</div>
+                <div id="stripeStatus" style="font-size: 13px; text-align: center; margin-bottom: 10px; opacity: 0.85; min-height: 16px;"></div>
+                <div style="text-align: center;"><button class="auth-btn" id="stripeOnboardBtn" onclick="startStripeOnboarding()" style="background: linear-gradient(45deg, #635bff, #4b45c6);">Set Up Payouts</button></div>
+            </div>
+            <div class="payment-section"><div class="section-title">Payment Settings</div><div style="margin-bottom: 12px; font-size: 12px; opacity: 0.6; text-align: center;">Fallback methods, shown until your in-app payouts are active.</div><div id="paymentMethodsDisplay"></div><div style="text-align: center;"><button class="auth-btn" onclick="openPaymentSettings()">Configure Payment Methods</button></div></div>
             <div class="payment-section"><div class="section-title">Social Media</div><div id="socialMediaDisplay"></div><div style="text-align: center;"><button class="auth-btn" onclick="openSocialSettings()">Update Social Profiles</button></div></div>
             <div class="payment-section"><div class="section-title">Tip Options</div><div style="margin-bottom: 12px; font-size: 12px; opacity: 0.7; text-align: center;">Set the tip amounts that appear when fans request songs</div><div class="tip-settings-grid" id="tipSettingsGrid"></div><div style="text-align: center;"><button class="auth-btn" onclick="saveTipSettings()" style="background: linear-gradient(45deg, #ffd700, #ffa500);">Save Tip Settings</button></div><div style="margin-top: 12px; text-align: center;"><button class="control-btn" onclick="resetTipSettings()">Reset to Default (0, 2, 5, 10)</button></div></div>
             <div class="payment-section">
@@ -316,7 +322,7 @@
                 <div style="margin-bottom: 28px;"><div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.6;">Connection Status</div><p style="margin: 0;"><span style="color: #2ed573;">Green</span> means live. <span style="color: #ffd700;">Yellow</span> means reconnecting. <span style="color: #ff4757;">Red</span> means disconnected — refresh the page.</p></div>
             </div>
             <div style="margin-top: 30px; text-align: center;"><button class="auth-btn" onclick="closeHelpModal()" style="background: rgba(255,255,255,0.15); padding: 12px 40px;">Done</button></div>
-            <div style="margin-top: 24px; text-align: center; font-size: 11px; opacity: 0.4;">v6.9.7 · getliveque.com</div>
+            <div style="margin-top: 24px; text-align: center; font-size: 11px; opacity: 0.4;">v6.9.8 · getliveque.com</div>
         </div>
     </div>
     <div id="socialModal" class="modal"><div class="modal-content"><span class="close" onclick="closeSocialModal()">&times;</span><h2>Social Media Settings</h2><div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;"><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Instagram:</label><input type="text" id="instagramInput" class="auth-input" placeholder="username (without @)"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">X (Twitter):</label><input type="text" id="xInput" class="auth-input" placeholder="username (without @)"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">TikTok:</label><input type="text" id="tiktokInput" class="auth-input" placeholder="@username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Facebook:</label><input type="text" id="facebookInput" class="auth-input" placeholder="facebook.com/username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">YouTube:</label><input type="text" id="youtubeInput" class="auth-input" placeholder="@channelname"></div><button class="auth-btn" onclick="saveSocialMedia()">Update Social Profiles</button></div></div></div>
@@ -327,7 +333,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script>
-console.log('=== LIVEQUE ADMIN v6.9.7 ===');
+console.log('=== LIVEQUE ADMIN v6.9.8 ===');
 
 const SUPABASE_URL = 'https://jttswydixqeyyqvcohnq.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dHN3eWRpeHFleXlxdmNvaG5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNjE3ODYsImV4cCI6MjA3NDkzNzc4Nn0.WlvOfl11qVUVatSCIPy8t6u9-j4u1z5CpnBxXe50BdQ';
@@ -366,6 +372,7 @@ async function checkAuth() {
             showApp();
             await initializeApp();
             await handleSpotifyCallback();
+            handleStripeReturn();
         } else {
             showLogin('Account not linked to an artist profile. Contact support.');
         }
@@ -857,6 +864,37 @@ let selectedSpotifyLink = new Set();
 
 // No-op stub: OAuth flow removed, but login still calls this. Kept so nothing breaks.
 async function handleSpotifyCallback() {}
+
+// ── STRIPE CONNECT ONBOARDING ──────────────────────────
+async function startStripeOnboarding() {
+    const btn = document.getElementById('stripeOnboardBtn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Opening Stripe...'; }
+    try {
+        const { data, error } = await db.functions.invoke('stripe-onboard');
+        if (error) {
+            let msg = error.message;
+            try { const body = await error.context.json(); if (body && body.error) msg = body.error; } catch(_) {}
+            throw new Error(msg);
+        }
+        if (!data || !data.url) throw new Error('No onboarding link returned');
+        window.location.href = data.url;
+    } catch (e) {
+        showToast('Stripe error: ' + (e.message || 'Could not start setup'), 'error');
+        if (btn) { btn.disabled = false; btn.textContent = 'Set Up Payouts'; }
+    }
+}
+
+function handleStripeReturn() {
+    const params = new URLSearchParams(window.location.search);
+    const s = params.get('stripe');
+    if (!s) return;
+    window.history.replaceState({}, document.title, window.location.pathname);
+    if (s === 'done') {
+        showToast('\u2713 Payout setup complete!');
+    } else if (s === 'refresh') {
+        showToast('Stripe setup didn\'t finish \u2014 tap Set Up Payouts to continue.', 'warning');
+    }
+}
 
 async function importSpotifyLink() {
     const url = document.getElementById('spotifyLinkInput').value.trim();
