@@ -612,6 +612,11 @@ async function signUp() {
         console.error('Settings insert error (non-fatal):', settingsError);
     }
 
+    // Welcome / PR-intro email (non-fatal). Sends only when Resend is configured
+    // on the LiveQue Supabase project; the function emails the authenticated
+    // user only, so it can never be aimed at anyone else.
+    try { db.functions.invoke('liveque-email', { body: { type: 'welcome', name: name } }).catch(function(){}); } catch(_) {}
+
     const loaded = await loadArtistId(data.user.id);
     if (loaded) {
         showApp();
