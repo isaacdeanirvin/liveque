@@ -41,6 +41,8 @@ create policy "reviews_public_select" on public.reviews for select using (true);
 alter table public.played_songs add column if not exists tip_amount integer not null default 0;
 alter table public.played_songs add column if not exists gig_session_id text;
 create index if not exists played_songs_artist_session_idx on public.played_songs (artist_id, gig_session_id);
+-- recap dedupe flag shared by the client and the cron sweeper
+alter table public.artist_settings add column if not exists recap_sent_session text;
 
 -- ── 3. feedback ─────────────────────────────────────────────────────────────
 create table if not exists public.feedback (
