@@ -187,6 +187,7 @@
                 </div>
                 <button class="login-btn" id="loginBtn" onclick="signIn()">Sign In</button>
                 <div class="login-error" id="loginError"></div>
+                <div style="text-align:center; margin-top:14px;"><button class="wiz-reopen" onclick="showResetPanel()">Forgot your password?</button></div>
             </div>
 
             <!-- SIGN UP PANEL -->
@@ -212,6 +213,36 @@
                 </div>
                 <button class="login-btn" id="signupBtn" onclick="signUp()">Create Account</button>
                 <div class="login-error" id="signupError"></div>
+            </div>
+
+            <!-- FORGOT PASSWORD PANEL -->
+            <div class="login-panel" id="resetPanel">
+                <div style="font-size:13px; color:rgba(255,255,255,0.65); margin-bottom:16px; text-align:center; line-height:1.55;">Enter your email and we'll send you a link to set a new password.</div>
+                <div class="login-field">
+                    <label for="resetEmail">Email</label>
+                    <input type="email" class="login-input" id="resetEmail" placeholder="you@example.com" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false">
+                </div>
+                <button class="login-btn" id="resetBtn" onclick="sendPasswordReset()">Send reset link</button>
+                <div class="login-error" id="resetError"></div>
+                <div style="text-align:center; margin-top:14px;"><button class="wiz-reopen" onclick="showSignInPanel()">Back to sign in</button></div>
+            </div>
+
+            <!-- SET NEW PASSWORD PANEL (opened from the emailed reset link) -->
+            <div class="login-panel" id="newPassPanel">
+                <div style="font-size:13px; color:rgba(255,255,255,0.65); margin-bottom:16px; text-align:center; line-height:1.55;">Choose a new password for your account.</div>
+                <div class="login-field">
+                    <label for="newPassword">New password</label>
+                    <div class="login-input-wrap">
+                        <input type="password" class="login-input" id="newPassword" placeholder="At least 6 characters" autocomplete="new-password">
+                        <button type="button" class="pw-toggle" aria-label="Show password" onclick="var w=this.parentNode,i=w.querySelector('input'),s=i.type==='password';i.type=s?'text':'password';this.classList.toggle('on',s);this.setAttribute('aria-label',s?'Hide password':'Show password')"><svg class="eye-on" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20C5 20 1 12 1 12a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
+                    </div>
+                </div>
+                <div class="login-field">
+                    <label for="newPasswordConfirm">Confirm new password</label>
+                    <input type="password" class="login-input" id="newPasswordConfirm" placeholder="Re-enter your new password" autocomplete="new-password">
+                </div>
+                <button class="login-btn" id="newPassBtn" onclick="updatePassword()">Update password</button>
+                <div class="login-error" id="newPassError"></div>
             </div>
 
             <div class="login-foot">getliveque.com</div>
@@ -421,7 +452,7 @@
                 <div style="margin-bottom: 28px;"><div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.6;">Connection Status</div><p style="margin: 0;"><span style="color: #2ed573;">Green</span> means live. <span style="color: #ffd700;">Yellow</span> means reconnecting. <span style="color: #ff4757;">Red</span> means disconnected — refresh the page.</p></div>
             </div>
             <div style="margin-top: 30px; text-align: center;"><button class="auth-btn" onclick="closeHelpModal()" style="background: rgba(255,255,255,0.15); padding: 12px 40px;">Done</button></div>
-            <div style="margin-top: 24px; text-align: center; font-size: 11px; opacity: 0.4;">v6.9.23 · getliveque.com</div>
+            <div style="margin-top: 24px; text-align: center; font-size: 11px; opacity: 0.4;">v6.9.24 · getliveque.com</div>
         </div>
     </div>
     <div id="socialModal" class="modal"><div class="modal-content"><span class="close" onclick="closeSocialModal()">&times;</span><h2>Social Media Settings</h2><div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;"><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Instagram:</label><input type="text" id="instagramInput" class="auth-input" placeholder="username (without @)"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">X (Twitter):</label><input type="text" id="xInput" class="auth-input" placeholder="username (without @)"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">TikTok:</label><input type="text" id="tiktokInput" class="auth-input" placeholder="@username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Facebook:</label><input type="text" id="facebookInput" class="auth-input" placeholder="facebook.com/username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">YouTube:</label><input type="text" id="youtubeInput" class="auth-input" placeholder="@channelname"></div><button class="auth-btn" onclick="saveSocialMedia()">Update Social Profiles</button></div></div></div>
@@ -432,7 +463,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script>
-console.log('=== LIVEQUE ADMIN v6.9.23 ===');
+console.log('=== LIVEQUE ADMIN v6.9.24 ===');
 
 const SUPABASE_URL = 'https://jttswydixqeyyqvcohnq.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dHN3eWRpeHFleXlxdmNvaG5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNjE3ODYsImV4cCI6MjA3NDkzNzc4Nn0.WlvOfl11qVUVatSCIPy8t6u9-j4u1z5CpnBxXe50BdQ';
@@ -470,6 +501,9 @@ let currentGigSessionId = null;
 // ── AUTH ──────────────────────────────────────────────
 
 async function checkAuth() {
+    // A password-reset link returns here carrying a recovery token. Show the
+    // set-new-password form instead of dropping straight into the dashboard.
+    if (/type=recovery/.test(window.location.hash || '')) { showNewPassPanel(); return; }
     const { data: { session } } = await db.auth.getSession();
     if (session) {
         const loaded = await loadArtistId(session.user.id);
@@ -485,6 +519,9 @@ async function checkAuth() {
         showLogin();
     }
 }
+
+// Supabase fires this when a password-recovery link is opened.
+try { db.auth.onAuthStateChange(function(event){ if (event === 'PASSWORD_RECOVERY') { showNewPassPanel(); } }); } catch (_) {}
 
 async function loadArtistId(authUserId) {
     const { data, error } = await db
@@ -559,9 +596,68 @@ function showApp() {
     document.getElementById('loginOverlay').classList.add('hidden');
 }
 
+function hideAuthSubPanels() {
+    ['resetPanel','newPassPanel'].forEach(function(id){ var e=document.getElementById(id); if(e) e.classList.remove('active'); });
+    var lt = document.querySelector('.login-toggle'); if(lt) lt.style.display = '';
+}
+
+function showResetPanel() {
+    ['signInPanel','signUpPanel','newPassPanel'].forEach(function(id){ var e=document.getElementById(id); if(e) e.classList.remove('active'); });
+    var rp = document.getElementById('resetPanel'); if(rp) rp.classList.add('active');
+    var re = document.getElementById('resetError'); if(re){ re.textContent = ''; re.style.color = ''; }
+    var em = document.getElementById('resetEmail'); var li = document.getElementById('loginEmail');
+    if(em && li && li.value) em.value = li.value;
+    var lt = document.querySelector('.login-toggle'); if(lt) lt.style.display = 'none';
+}
+
+function showNewPassPanel() {
+    ['signInPanel','signUpPanel','resetPanel'].forEach(function(id){ var e=document.getElementById(id); if(e) e.classList.remove('active'); });
+    var np = document.getElementById('newPassPanel'); if(np) np.classList.add('active');
+    var ne = document.getElementById('newPassError'); if(ne){ ne.textContent = ''; ne.style.color = ''; }
+    var lt = document.querySelector('.login-toggle'); if(lt) lt.style.display = 'none';
+    var ov = document.getElementById('loginOverlay'); if(ov) ov.classList.remove('hidden');
+}
+
+async function sendPasswordReset() {
+    var email = document.getElementById('resetEmail').value.trim();
+    var btn = document.getElementById('resetBtn');
+    var err = document.getElementById('resetError');
+    err.textContent = ''; err.style.color = '';
+    if (!email) { err.textContent = 'Enter your email.'; return; }
+    btn.disabled = true; btn.textContent = 'Sending...';
+    try { await db.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + '/index.html' }); } catch (_) {}
+    // Always the same reply, so this never reveals whether an account exists.
+    err.style.color = '#4ecdc4';
+    err.textContent = 'If that email has an account, a reset link is on its way. Check your inbox (and spam).';
+    btn.disabled = false; btn.textContent = 'Send reset link';
+}
+
+async function updatePassword() {
+    var p1 = document.getElementById('newPassword').value;
+    var p2 = document.getElementById('newPasswordConfirm').value;
+    var btn = document.getElementById('newPassBtn');
+    var err = document.getElementById('newPassError');
+    err.textContent = ''; err.style.color = '';
+    if (p1.length < 6) { err.textContent = 'Password must be at least 6 characters.'; return; }
+    if (p1 !== p2) { err.textContent = "Passwords don't match."; return; }
+    btn.disabled = true; btn.textContent = 'Updating...';
+    var res; try { res = await db.auth.updateUser({ password: p1 }); } catch (e) { res = { error: e }; }
+    if (res && res.error) { err.textContent = res.error.message || 'Could not update password. The link may have expired — request a new one.'; btn.disabled = false; btn.textContent = 'Update password'; return; }
+    err.style.color = '#4ecdc4'; err.textContent = 'Password updated. Signing you in...';
+    try { history.replaceState(null, '', window.location.pathname); } catch (_) {}
+    var sess = null; try { sess = await db.auth.getSession(); } catch (_) {}
+    if (sess && sess.data && sess.data.session) {
+        var loaded = await loadArtistId(sess.data.session.user.id);
+        if (loaded) { showApp(); await initializeApp(); return; }
+    }
+    btn.disabled = false; btn.textContent = 'Update password';
+    showSignInPanel(); showLogin('Password updated — please sign in.');
+}
+
 function showSignInPanel() {
     document.getElementById('signInPanel').classList.add('active');
     document.getElementById('signUpPanel').classList.remove('active');
+    hideAuthSubPanels();
     document.getElementById('toggleSignIn').classList.add('active');
     document.getElementById('toggleSignUp').classList.remove('active');
     document.getElementById('loginError').textContent = '';
@@ -570,6 +666,7 @@ function showSignInPanel() {
 function showSignUpPanel() {
     document.getElementById('signUpPanel').classList.add('active');
     document.getElementById('signInPanel').classList.remove('active');
+    hideAuthSubPanels();
     document.getElementById('toggleSignUp').classList.add('active');
     document.getElementById('toggleSignIn').classList.remove('active');
     document.getElementById('signupError').textContent = '';
