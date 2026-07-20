@@ -1,13 +1,13 @@
-// liveque-email — transactional email via Resend (welcome + gig recap).
+// liveque-email -- transactional email via Resend (welcome + gig recap).
 //
 // THIS IS THE ONLY PLACE LIVEQUE EMAIL TEMPLATES LIVE. gig-recap-sweeper used to
 // carry its own copy of recapHtml() and the two drifted apart (differing closer
-// and footer copy), so the auto-sent recap — the one most performers actually
-// get, since forgetting to hit End Gig is the norm — did not match the manual
+// and footer copy), so the auto-sent recap -- the one most performers actually
+// get, since forgetting to hit End Gig is the norm -- did not match the manual
 // one. The sweeper calls this function now. Do not reintroduce a second copy.
 //
 // THESE EMAILS ARE DARK BECAUSE THE APP IS DARK.
-// Every value here is lifted from index.html — #080808 body, the glass card at
+// Every value here is lifted from index.html -- #080808 body, the glass card at
 // rgba(255,255,255,0.05) with a 0.08 border, .stat-item at radius 10 with a 24px
 // bold number and a 12px 0.8-opacity label, the .auth-btn teal gradient with
 // white text, the 28px/600 wordmark. rgba is precomputed to solid hex because
@@ -18,7 +18,7 @@
 // those users may see a lightened version. Matching the product was judged more
 // important than byte-identical rendering in every client.
 //
-// Security — two callers, two auth modes:
+// Security -- two callers, two auth modes:
 //   1. A performer's browser presents a Supabase auth JWT. The email always goes
 //      to that verified user's own address; the client cannot name a recipient.
 //   2. The sweeper (server-side cron) presents x-internal-secret matching
@@ -45,10 +45,10 @@ const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const SITE = "https://getliveque.com";
 
-// ── Palette ────────────────────────────────────────────────────────────
+// -- Palette ------------------------------------------------------------
 // These are index.html's values, not new ones. The app uses translucent white
 // over #080808; Outlook has no rgba, so each surface is precomputed to the
-// solid it resolves to over the known background — visually identical, works
+// solid it resolves to over the known background -- visually identical, works
 // everywhere.
 const C = {
   page: "#080808",       // body background, straight from the app
@@ -56,7 +56,7 @@ const C = {
   tile: "#202020",       // = the same 0.05 again, over the card
   line: "#1c1c1c",       // = rgba(255,255,255,0.08)
   soft: "#212121",       // = rgba(255,255,255,0.1), the .control-btn fill
-  white: "#fffffe",      // not pure #ffffff — dodges Apple Mail's invert heuristic
+  white: "#fffffe",      // not pure #ffffff -- dodges Apple Mail's invert heuristic
   body: "#d6d6d8",       // white at ~0.84, the app's body copy weight
   dim: "#a8a8ad",        // .stat-label / .song-artist at opacity 0.8
   faint: "#8d8d95",      // .requester-name at opacity 0.6
@@ -67,7 +67,7 @@ const C = {
   goldInk: "#1a1a2e",    // .priority-badge text on gold
 };
 
-// The app is 'Segoe UI' first — which also happens to be the one stack Outlook
+// The app is 'Segoe UI' first -- which also happens to be the one stack Outlook
 // renders correctly. A leading -apple-system makes the Word engine fall back to
 // Times New Roman for the whole message.
 const SANS = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
@@ -122,7 +122,7 @@ function shell(inner: string, preheader: string, title: string): string {
   <tr><td align="center" style="padding:20px 10px;">
     <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="width:100%; max-width:560px;">
 
-      <!-- Header: the app's .header — glass card, radius 20, centred wordmark. -->
+      <!-- Header: the app's .header -- glass card, radius 20, centred wordmark. -->
       <tr><td align="center" style="background-color:${C.card}; border:1px solid ${C.line}; border-radius:20px; padding:18px 16px;">
         <div style="font-size:28px; font-weight:600; color:${C.white}; letter-spacing:-0.5px; font-family:${SANS};">LiveQue<span style="font-size:12px; vertical-align:super;">&#8482;</span></div>
         <div style="font-size:12px; color:${C.dim}; margin-top:4px; font-family:${SANS};">Live song requests &amp; tipping for musicians</div>
@@ -144,10 +144,10 @@ function shell(inner: string, preheader: string, title: string): string {
 </html>`;
 }
 
-// ── Tiles ──────────────────────────────────────────────────────────────
+// -- Tiles --------------------------------------------------------------
 // .stat-item from index.html: centred, rgba(255,255,255,0.05) fill, 12px pad,
 // radius 10, number 24px bold in the metric's colour, label 12px at 0.8 opacity.
-// The hero is the same tile with the number scaled up — not a new component.
+// The hero is the same tile with the number scaled up -- not a new component.
 
 function card(inner: string, radius = 15): string {
   return `<tr><td style="background-color:${C.card}; border:1px solid ${C.line}; border-radius:${radius}px; padding:14px 16px;">${inner}</td></tr>
@@ -199,7 +199,7 @@ function ctaButton(href: string, text: string): string {
   <!--<![endif]-->`;
 }
 
-// ── Welcome ────────────────────────────────────────────────────────────
+// -- Welcome ------------------------------------------------------------
 function welcomeHtml(name: string): string {
   const hi = name ? `Welcome to LiveQue, ${esc(name)}` : "Welcome to LiveQue";
   const inner = card(`
@@ -249,14 +249,14 @@ Isaac & Glen Irvin
 Sent by LiveQue - getliveque.com`;
 }
 
-// ── Recap ──────────────────────────────────────────────────────────────
+// -- Recap --------------------------------------------------------------
 function recapHtml(name: string, s: Record<string, unknown>): string {
   const tips = money(s.tipsTotal);
   const rc = Number(s.ratingCount) || 0;
-  const dur = s.duration ? String(s.duration) : "—";
+  const dur = s.duration ? String(s.duration) : "--";
   const earned = Number(s.tipsTotal) > 0;
 
-  // A night with no tips should not open with a giant $0.00 — lead with what
+  // A night with no tips should not open with a giant $0.00 -- lead with what
   // they did do, and drop tips out of the grid rather than showing zero twice.
   const hero = earned
     ? heroTile(tips, "Tips collected", C.gold)
@@ -269,7 +269,7 @@ function recapHtml(name: string, s: Record<string, unknown>): string {
       + tileRow(statTile(num(s.requests), "Requests", C.teal), statTile(dur, "Set length", C.white))
     : tileRow(statTile(num(s.requests), "Requests", C.teal), statTile(dur, "Set length", C.white));
 
-  // .queue-item.priority — gold left border over a gold-tinted fill.
+  // .queue-item.priority -- gold left border over a gold-tinted fill.
   const top = s.topSong
     ? card(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#2a2410; border-left:4px solid ${C.gold}; border-radius:10px;">
         <tr><td style="padding:12px 14px;">
@@ -279,7 +279,7 @@ function recapHtml(name: string, s: Record<string, unknown>): string {
       </table>`)
     : "";
 
-  // U+2605/U+2606 text glyphs, not the emoji star — the app uses the same
+  // U+2605/U+2606 text glyphs, not the emoji star -- the app uses the same
   // entities, and a text glyph inherits colour and size.
   const rating = rc > 0
     ? (() => {
@@ -337,7 +337,7 @@ function recapText(name: string, s: Record<string, unknown>): string {
   return lines.join("\n");
 }
 
-// ── Send ───────────────────────────────────────────────────────────────
+// -- Send ---------------------------------------------------------------
 async function sendResend(to: string, subject: string, html: string, text: string, listUnsub: boolean) {
   const payload: Record<string, unknown> = { from: EMAIL_FROM, to: [to], subject, html, text };
   // getliveque.com has no inbound MX, so a reply to the From address bounces.
@@ -345,7 +345,7 @@ async function sendResend(to: string, subject: string, html: string, text: strin
   if (EMAIL_REPLY_TO) payload.reply_to = [EMAIL_REPLY_TO];
   // Password resets and the welcome are exempt from unsubscribe requirements; a
   // recurring stats digest is list-like, and a performer who doesn't want it
-  // will otherwise hit "spam" — which lands on the same domain reputation the
+  // will otherwise hit "spam" -- which lands on the same domain reputation the
   // password resets depend on.
   if (listUnsub && EMAIL_REPLY_TO) {
     payload.headers = { "List-Unsubscribe": `<mailto:${EMAIL_REPLY_TO}?subject=unsubscribe>` };

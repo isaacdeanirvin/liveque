@@ -1,11 +1,11 @@
-// gig-recap-sweeper — cron-triggered. Finds gigs that have gone quiet for 6+
+// gig-recap-sweeper -- cron-triggered. Finds gigs that have gone quiet for 6+
 // hours and emails the performer their recap, even if their dashboard is closed.
 //
 // Trigger: a scheduled pg_cron job POSTs here hourly with an x-sweep-secret
 // header (see sql/2026-07-20-recap-sweep.sql). Dedupe is shared with the client
 // via artist_settings.recap_sent_session, so a gig is never recapped twice.
 //
-// The recap template is NOT here — it lives in liveque-email, which this
+// The recap template is NOT here -- it lives in liveque-email, which this
 // function calls. Keeping one copy is deliberate; two copies drifted before.
 //
 // Secrets: SWEEP_SECRET, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY.
@@ -32,7 +32,7 @@ function fmtDate(ts: number): string {
   try {
     const d = new Date(ts);
     return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "America/Los_Angeles" }) +
-      " · " + d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: "America/Los_Angeles" });
+      " - " + d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: "America/Los_Angeles" });
   } catch (_) { return ""; }
 }
 // The recap template lives in liveque-email and ONLY there. This function used
@@ -101,7 +101,7 @@ serve(async (req) => {
 
       const stats = {
         gigDate: startMs ? fmtDate(startMs) : "",
-        duration: startMs ? fmtDur(lastMs - startMs) : "—",
+        duration: startMs ? fmtDur(lastMs - startMs) : "--",
         songsPlayed, requests, tipsTotal, tipsCount, topSong, ratingAvg, ratingCount,
       };
 
