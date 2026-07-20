@@ -51,6 +51,7 @@
       <div class="ver"><span class="num">v6.9.24</span> <span class="theme">Forgot your password?</span></div>
       <ul>
         <li><span class="tag t-new">New</span><b>Password reset.</b> A "Forgot your password?" link on the sign-in screen emails you a secure reset link; opening it brings up a "set a new password" screen and signs you right back in.</li>
+        <li><span class="tag t-fix">Fixed</span><b>Auth links pointed at localhost.</b> The project's Site URL was still the out-of-the-box default (<code>localhost:3000</code>) with no allowed redirects — which would have sent every password-reset link to a dead address. Now pointed at getliveque.com.</li>
       </ul>
     </div>
 
