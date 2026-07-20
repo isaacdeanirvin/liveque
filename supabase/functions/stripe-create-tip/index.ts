@@ -33,10 +33,17 @@ serve(async (req) => {
     const { artist_id, amount, song_title, song_artist, requester_name } = body;
 
     if (!artist_id) throw new Error("Missing artist");
-    const dollars = Math.round(Number(amount));
-    if (!dollars || dollars < 1 || dollars > 500) throw new Error("Invalid tip amount");
+
+    // Never trust the client with money math (front-end code cannot be hidden).
+    // Require a whole-dollar integer in a sane range: this rejects non-integers
+    // (e.g. 0.5), zero/negative, and absurd values before touching Stripe.
+    const dollars = Number(amount);
+    if (!Number.isInteger(dollars) || dollars < 1 || dollars > 500) {
+      throw new Error("Invalid tip amount");
+    }
 
     const admin = createClient(SUPABASE_URL, SERVICE_ROLE);
+
     const { data: artist, error } = await admin
       .from("artists")
       .select("id, stripe_account_id, stripe_onboarded")
@@ -47,11 +54,32 @@ serve(async (req) => {
       throw new Error("This performer isn't set up for in-app tips yet");
     }
 
+    // Bind the charge to one of the performer's own configured tip options, so a
+    // forged invoke cannot charge an arbitrary amount. If this performer has no
+    // configured amounts, fall back to the range check above.
+    const { data: settings } = await admin
+      .from("artist_settings")
+      .select("tip_amounts")
+      .eq("artist_id", artist_id)
+      .single();
+    const allowed = Array.isArray(settings?.tip_amounts)
+      ? settings.tip_amounts.map(Number).filter((n) => Number.isInteger(n) && n > 0)
+      : [];
+    if (allowed.length && !allowed.includes(dollars)) {
+      throw new Error("Invalid tip amount");
+    }
+
     const pi = await stripe("payment_intents", {
       amount: String(dollars * 100),
       currency: "usd",
+      // Card + wallets (Apple Pay / Google Pay ride the card rails) only.
+      // allow_redirects: never removes redirect-based methods, so the client's
+      // confirmPayment (redirect: 'if_required', no return_url) is correct by
+      // construction and can never throw at confirm time.
       "automatic_payment_methods[enabled]": "true",
+      "automatic_payment_methods[allow_redirects]": "never",
       "transfer_data[destination]": artist.stripe_account_id,
+      "statement_descriptor_suffix": "TIP",
       "metadata[artist_id]": artist_id,
       "metadata[song_title]": song_title || "",
       "metadata[song_artist]": song_artist || "",
