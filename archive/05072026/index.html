@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>LiveQue - Admin Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+        .search-bar, .auth-input { -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; user-select: text; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); color: white; min-height: 100vh; overflow-x: hidden; }
+        .container { max-width: 400px; margin: 0 auto; padding: 10px; min-height: 100vh; }
+        .header { text-align: center; margin-bottom: 12px; padding: 12px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .payment-section { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 12px; margin-bottom: 12px; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .section-title { font-size: 18px; font-weight: bold; margin-bottom: 12px; text-align: center; }
+        .tabs { display: flex; background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 5px; margin-bottom: 16px; }
+        .tab { flex: 1; padding: 10px 6px; text-align: center; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; font-size: 12px; }
+        .tab.active { background: rgba(255, 255, 255, 0.2); font-weight: bold; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .auth-input { width: 100%; padding: 12px; border: none; border-radius: 10px; background: rgba(255, 255, 255, 0.2); color: white; font-size: 16px; text-align: center; }
+        .auth-input::placeholder { color: rgba(255, 255, 255, 0.7); }
+        .auth-btn { background: linear-gradient(45deg, #4ecdc4, #44a08d); border: none; padding: 12px; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; }
+        .auth-btn:hover { transform: scale(1.05); }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+        .stat-item { text-align: center; background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 10px; }
+        .stat-number { font-size: 24px; font-weight: bold; margin-bottom: 4px; }
+        .stat-label { font-size: 12px; opacity: 0.8; }
+        .control-btn { background: rgba(255, 255, 255, 0.1); border: none; padding: 8px 12px; border-radius: 8px; color: white; cursor: pointer; font-size: 12px; transition: all 0.3s ease; }
+        .control-btn:hover { background: rgba(255, 255, 255, 0.2); }
+        .quick-add-item { background: rgba(255, 255, 255, 0.08); padding: 12px 8px; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.2s ease; font-size: 11px; border: 2px solid rgba(255, 255, 255, 0.1); touch-action: manipulation; }
+        .quick-add-item:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); }
+        .quick-add-item.favorite { border-color: rgba(255, 107, 107, 0.3); background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 71, 87, 0.1)); box-shadow: 0 4px 15px rgba(255, 107, 107, 0.2); }
+        .quick-add-item.favorite:hover { background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(255, 71, 87, 0.2)); box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4); transform: translateY(-3px); }
+        .quick-add-item:active { transform: scale(0.98); background: rgba(78, 205, 196, 0.3); }
+        .quick-add-item.adding { animation: addPulse 0.5s ease; }
+        @keyframes addPulse { 0% { transform: scale(1); } 50% { transform: scale(0.95); background: rgba(78, 205, 196, 0.5); } 100% { transform: scale(1); } }
+        .payment-info { font-size: 14px; margin-bottom: 12px; text-align: center; }
+        .payment-label { font-weight: bold; color: #4ecdc4; }
+        .tip-settings-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 12px 0; }
+        .tip-amount-input { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 8px; padding: 10px; color: white; text-align: center; font-size: 16px; font-weight: bold; }
+        .tip-amount-input:focus { outline: none; border-color: #4ecdc4; background: rgba(255, 255, 255, 0.15); }
+        .tip-label { font-size: 11px; opacity: 0.7; text-align: center; margin-bottom: 4px; }
+        .now-playing-card { background: linear-gradient(135deg, #2ed573, #26de81); border-radius: 16px; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; border: 2px solid rgba(46, 213, 115, 0.5); box-shadow: 0 4px 15px rgba(46, 213, 115, 0.3); animation: nowPlayingPulse 3s ease-in-out infinite; }
+        @keyframes nowPlayingPulse { 0%, 100% { box-shadow: 0 4px 15px rgba(46, 213, 115, 0.3); } 50% { box-shadow: 0 6px 25px rgba(46, 213, 115, 0.5); } }
+        @keyframes completePulse { 0%, 100% { transform: scale(1); box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4); } 50% { transform: scale(1.03); box-shadow: 0 6px 20px rgba(255, 71, 87, 0.6); } }
+        .queue-item { background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #ff6b6b; }
+        .queue-item.priority { border-left-color: #ffd700; background: rgba(255, 215, 0, 0.1); }
+        .song-info { flex: 1; }
+        .song-title { font-weight: bold; margin-bottom: 4px; }
+        .song-artist { font-size: 12px; opacity: 0.8; }
+        .requester-name { font-size: 10px; opacity: 0.6; font-style: italic; }
+        .priority-badge { background: #ffd700; color: #1a1a2e; padding: 4px 8px; border-radius: 15px; font-size: 10px; font-weight: bold; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: linear-gradient(135deg, #1a1a2e, #16213e); padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; text-align: center; border: 1px solid rgba(255, 255, 255, 0.2); position: relative; }
+        .modal-content::-webkit-scrollbar { width: 8px; }
+        .modal-content::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+        .modal-content::-webkit-scrollbar-thumb { background: rgba(78, 205, 196, 0.5); border-radius: 10px; }
+        .modal-content::-webkit-scrollbar-thumb:hover { background: rgba(78, 205, 196, 0.7); }
+        .modal-content h3 { font-size: 16px; margin-bottom: 12px; }
+        .modal-content p { font-size: 14px; line-height: 1.6; margin-bottom: 8px; opacity: 0.9; }
+        .close { position: absolute; right: 15px; top: 15px; font-size: 28px; font-weight: bold; cursor: pointer; opacity: 0.7; }
+        .close:hover { opacity: 1; }
+        .sync-status { position: fixed; top: 10px; left: 10px; background: rgba(46, 213, 115, 0.9); color: white; padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; display: flex; align-items: center; gap: 5px; z-index: 999; }
+        .sync-status.reconnecting { background: rgba(255, 215, 0, 0.9); }
+        .sync-status.error { background: rgba(255, 71, 87, 0.9); }
+        .sync-dot { width: 8px; height: 8px; background: white; border-radius: 50%; animation: syncPulse 2s infinite; }
+        @keyframes syncPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100%); background: linear-gradient(135deg, #2ed573, #26de81); color: white; padding: 12px 20px; border-radius: 30px; font-weight: 500; z-index: 10000; opacity: 0; animation: slideUp 0.3s ease forwards; font-size: 13px; }
+        .toast.error { background: linear-gradient(135deg, #ff4757, #ff6b6b); }
+        .toast.warning { background: linear-gradient(135deg, #ffd700, #ffa500); }
+        @keyframes slideUp { to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        .song-item { background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; transition: all 0.3s ease; border-left: 3px solid #4ecdc4; }
+        .song-item:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-2px); }
+        .song-item.unavailable { opacity: 0.5; background: rgba(255, 255, 255, 0.02); cursor: not-allowed; border-left-color: #ff6b6b; }
+        .shuffle-btn { background: linear-gradient(135deg, #ffd700, #ffed4e); color: #1a1a2e; font-weight: bold; font-size: 16px; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; min-width: 45px; }
+        .shuffle-btn:hover { transform: scale(1.1); box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4); }
+        .shuffle-btn:active { transform: rotate(180deg) scale(1.1); }
+        .cooldown-timer { font-size: 10px; color: #ff6b6b; margin-top: 2px; }
+        .version-info { font-size: 10px; opacity: 0.6; margin-top: 8px; }
+        .session-badge { background: rgba(78, 205, 196, 0.2); border: 1px solid #4ecdc4; color: #4ecdc4; padding: 4px 10px; border-radius: 12px; font-size: 9px; font-weight: bold; margin-top: 8px; display: inline-block; font-family: monospace; }
+        .scroll-top-btn { position: fixed; bottom: 25px; right: 15px; width: 44px; height: 44px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 998; opacity: 0; visibility: hidden; transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .scroll-top-btn.visible { opacity: 1; visibility: visible; }
+        .scroll-top-btn:hover { background: rgba(255, 255, 255, 0.25); transform: scale(1.05); }
+        .scroll-top-btn:active { transform: scale(0.95); }
+        .scroll-top-btn svg { width: 20px; height: 20px; fill: none; stroke: white; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+        .feedback-btn { position: fixed; bottom: 25px; left: 15px; height: 36px; padding: 0 14px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border-radius: 18px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; z-index: 998; opacity: 0; visibility: hidden; transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.2); text-decoration: none; color: white; font-size: 12px; font-weight: 500; }
+        .feedback-btn:hover { background: rgba(255, 255, 255, 0.25); transform: scale(1.02); }
+        .feedback-btn.visible { opacity: 1; visibility: visible; }
+        .feedback-btn svg { width: 14px; height: 14px; fill: none; stroke: white; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        /* ── LOGIN OVERLAY ── */
+        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .login-overlay.hidden { display: none; }
+        .login-card { width: 90%; max-width: 360px; background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 24px; padding: 40px 28px; text-align: center; }
+        .login-logo { font-size: 32px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 4px; }
+        .login-logo sup { font-size: 12px; vertical-align: super; font-weight: 400; opacity: 0.7; }
+        .login-subtitle { font-size: 13px; opacity: 0.5; margin-bottom: 32px; }
+        .login-field { margin-bottom: 14px; text-align: left; }
+        .login-field label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.6; margin-bottom: 6px; }
+        .login-input { width: 100%; padding: 13px 16px; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; background: rgba(255,255,255,0.1); color: white; font-size: 15px; outline: none; transition: border-color 0.2s; -webkit-user-select: text; user-select: text; }
+        .login-input:focus { border-color: #4ecdc4; background: rgba(255,255,255,0.15); }
+        .login-input::placeholder { color: rgba(255,255,255,0.35); }
+        .login-btn { width: 100%; padding: 14px; border: none; border-radius: 12px; background: linear-gradient(45deg, #4ecdc4, #44a08d); color: white; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; transition: all 0.3s ease; }
+        .login-btn:hover { transform: scale(1.02); box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4); }
+        .login-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .login-error { color: #ff6b6b; font-size: 13px; margin-top: 12px; min-height: 18px; }
+        .signout-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); font-size: 11px; padding: 4px 10px; border-radius: 8px; cursor: pointer; margin-top: 6px; }
+        .signout-btn:hover { background: rgba(255,71,87,0.2); border-color: rgba(255,71,87,0.4); color: #ff6b6b; }
+        .login-toggle { display: flex; background: rgba(255,255,255,0.08); border-radius: 10px; padding: 4px; margin-bottom: 24px; }
+        .login-toggle-btn { flex: 1; padding: 8px; border: none; background: transparent; color: rgba(255,255,255,0.5); font-size: 13px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .login-toggle-btn.active { background: rgba(255,255,255,0.15); color: white; }
+        .login-panel { display: none; }
+        .login-panel.active { display: block; }
+    </style>
+</head>
+<body>
+
+    <!-- ── LOGIN OVERLAY ── -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-card">
+            <div class="login-logo">LiveQue<sup>™</sup></div>
+            <div class="login-subtitle">Performer Dashboard</div>
+
+            <div class="login-toggle">
+                <button class="login-toggle-btn active" id="toggleSignIn" onclick="showSignInPanel()">Sign In</button>
+                <button class="login-toggle-btn" id="toggleSignUp" onclick="showSignUpPanel()">Create Account</button>
+            </div>
+
+            <!-- SIGN IN PANEL -->
+            <div class="login-panel active" id="signInPanel">
+                <div class="login-field">
+                    <label>Email</label>
+                    <input type="email" class="login-input" id="loginEmail" placeholder="you@example.com" autocomplete="email">
+                </div>
+                <div class="login-field">
+                    <label>Password</label>
+                    <input type="password" class="login-input" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+                </div>
+                <button class="login-btn" id="loginBtn" onclick="signIn()">Sign In</button>
+                <div class="login-error" id="loginError"></div>
+            </div>
+
+            <!-- SIGN UP PANEL -->
+            <div class="login-panel" id="signUpPanel">
+                <div class="login-field">
+                    <label>Your Artist / Performer Name</label>
+                    <input type="text" class="login-input" id="signupName" placeholder="Glen Irvin Jr." autocomplete="name">
+                </div>
+                <div class="login-field">
+                    <label>Email</label>
+                    <input type="email" class="login-input" id="signupEmail" placeholder="you@example.com" autocomplete="email">
+                </div>
+                <div class="login-field">
+                    <label>Password</label>
+                    <input type="password" class="login-input" id="signupPassword" placeholder="Min. 6 characters" autocomplete="new-password">
+                </div>
+                <div class="login-field">
+                    <label>Confirm Password</label>
+                    <input type="password" class="login-input" id="signupConfirm" placeholder="••••••••" autocomplete="new-password">
+                </div>
+                <button class="login-btn" id="signupBtn" onclick="signUp()">Create Account</button>
+                <div class="login-error" id="signupError"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── MAIN APP ── -->
+    <div class="sync-status" id="syncStatus"><div class="sync-dot"></div><span id="syncStatusText">Live Sync</span></div>
+    <div class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"></polyline></svg></div>
+    <a href="mailto:getliveque@gmail.com" class="feedback-btn"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>Feedback</a>
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 8px; padding: 4px 0;">
+            <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 28px; font-weight: 600; color: white; letter-spacing: -0.5px;">LiveQue<span style="font-size: 12px; vertical-align: super;">™</span></span>
+            <div class="version-info">Admin Dashboard v6.9.5</div>
+            <div class="session-badge" id="sessionBadge">Loading...</div>
+            <div style="margin-top: 6px;"><button class="signout-btn" onclick="signOut()">Sign out</button></div>
+        </div>
+        <div class="tabs"><div class="tab" onclick="switchTab(0)">Dashboard</div><div class="tab active" onclick="switchTab(1)">Live Queue</div><div class="tab" onclick="switchTab(2)">QR Code</div></div>
+        <div id="dashboardTab" class="tab-content">
+            <div class="payment-section"><div class="section-title">Live Stats</div><div class="stats-grid"><div class="stat-item"><div class="stat-number" style="color: #4ecdc4;" id="requestCount">0</div><div class="stat-label">Requests</div></div><div class="stat-item"><div class="stat-number" style="color: #ffd700;" id="tipCount">0 tips</div><div class="stat-label">Tips Today</div></div><div class="stat-item"><div class="stat-number" style="color: #ff6b6b;" id="songCount">0</div><div class="stat-label">Songs</div></div></div></div>
+            <div class="payment-section"><div class="section-title">Start New Gig</div><div style="margin-bottom: 12px; font-size: 12px; opacity: 0.7; text-align: center;">Prepare for a new performance. This will clear the queue, reset played songs, and reset daily tips.</div><div style="text-align: center;"><button class="auth-btn" onclick="startNewGig()" style="background: linear-gradient(45deg, #2ed573, #26de81); font-size: 16px; padding: 12px;">Start New Gig</button></div></div>
+            <div class="payment-section"><div class="section-title">Payment Settings</div><div id="paymentMethodsDisplay"></div><div style="text-align: center;"><button class="auth-btn" onclick="openPaymentSettings()">Configure Payment Methods</button></div></div>
+            <div class="payment-section"><div class="section-title">Social Media</div><div id="socialMediaDisplay"></div><div style="text-align: center;"><button class="auth-btn" onclick="openSocialSettings()">Update Social Profiles</button></div></div>
+            <div class="payment-section"><div class="section-title">Tip Options</div><div style="margin-bottom: 12px; font-size: 12px; opacity: 0.7; text-align: center;">Set the tip amounts that appear when fans request songs</div><div class="tip-settings-grid" id="tipSettingsGrid"></div><div style="text-align: center;"><button class="auth-btn" onclick="saveTipSettings()" style="background: linear-gradient(45deg, #ffd700, #ffa500);">Save Tip Settings</button></div><div style="margin-top: 12px; text-align: center;"><button class="control-btn" onclick="resetTipSettings()">Reset to Default (0, 2, 5, 10)</button></div></div>
+            <div class="payment-section">
+                <div class="section-title">Song Library</div>
+
+                <!-- Spotify Import -->
+                <div style="margin-bottom: 12px; padding: 14px; background: rgba(30,215,96,0.08); border: 1px solid rgba(30,215,96,0.25); border-radius: 12px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="#1ED760"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+                            <span style="font-size: 13px; font-weight: 600; color: #1ED760;">Import from Spotify</span>
+                        </div>
+                        <button class="auth-btn" onclick="startSpotifyOAuth()" style="width: auto; padding: 8px 16px; font-size: 13px; background: linear-gradient(45deg, #1ED760, #1aa34a);">Connect Spotify</button>
+                    </div>
+                    <div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 8px;">Sign in to Spotify and pick any playlist to import</div>
+                </div>
+
+                <!-- Artist Search Import -->
+                <div style="margin-bottom: 16px; padding: 14px; background: rgba(78,205,196,0.08); border: 1px solid rgba(78,205,196,0.25); border-radius: 12px;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                        <span style="font-size: 16px;">🎵</span>
+                        <span style="font-size: 13px; font-weight: 600; color: #4ecdc4;">Add Songs by Artist</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                        <input type="text" class="auth-input" id="artistSearchInput" placeholder="Search any artist..." style="font-size: 13px; text-align: left; padding: 10px 12px; flex: 1;" onkeydown="if(event.key==='Enter') searchArtistSongs()">
+                        <button class="auth-btn" onclick="searchArtistSongs()" id="artistSearchBtn" style="width: auto; padding: 10px 16px; font-size: 13px; white-space: nowrap;">Search</button>
+                    </div>
+                    <div id="artistSearchStatus" style="font-size: 12px; color: rgba(255,255,255,0.6); min-height: 16px;"></div>
+                    <div id="artistSearchResults" style="display: none; margin-top: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span id="artistResultsLabel" style="font-size: 12px; opacity: 0.7;"></span>
+                            <div style="display: flex; gap: 6px;">
+                                <button class="control-btn" onclick="selectAllArtistSongs()" style="font-size: 11px; padding: 4px 10px;">Select All</button>
+                                <button class="control-btn" onclick="clearArtistSelection()" style="font-size: 11px; padding: 4px 10px;">Clear</button>
+                            </div>
+                        </div>
+                        <div id="artistSongsList" style="max-height: 240px; overflow-y: auto; margin-bottom: 10px; border-radius: 8px; background: rgba(0,0,0,0.2);"></div>
+                        <button class="auth-btn" onclick="addSelectedArtistSongs()" id="addSelectedBtn" style="background: linear-gradient(45deg, #4ecdc4, #44a08d); font-size: 13px; padding: 10px;">Add Selected Songs</button>
+                    </div>
+                </div>
+
+                <!-- Manual Add -->
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.5; margin-bottom: 10px; text-align: center;">Or add manually</div>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <input type="text" class="auth-input" id="newSongTitle" placeholder="Song title">
+                    <input type="text" class="auth-input" id="newSongArtist" placeholder="Artist">
+                    <div style="text-align: center;"><button class="auth-btn" onclick="addNewSong()">Add Song</button></div>
+                </div>
+            </div>
+        </div>
+        <div id="livequeueTab" class="tab-content active">
+            <div class="payment-section"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;"><div class="section-title" style="margin: 0;">Live Queue</div><button class="control-btn" onclick="resetAllCooldowns()">Clear Recently Played</button></div><div style="margin-bottom: 16px;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;"><div style="font-size: 15px; font-weight: bold;">Quick Add</div><div style="display: flex; gap: 8px;"><button class="shuffle-btn" onclick="shuffleQuickAdd()">↻</button><button class="control-btn" onclick="showAllSongsModal()">View All Songs</button></div></div><div id="quickAddGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;"></div></div><div id="liveQueueList"></div></div>
+        </div>
+        <div id="qrcodeTab" class="tab-content">
+            <div class="payment-section">
+                <div class="section-title" style="margin-bottom: 16px;">QR Code</div>
+                <div id="qrCardPreview" style="background: white; border-radius: 12px; padding: 24px 20px; margin: 0 auto 16px; max-width: 240px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+                    <div style="text-align: center;">
+                        <div id="qrCodeContainer" style="margin: 0 auto 12px; width: 150px; height: 150px; display: flex; align-items: center; justify-content: center;"></div>
+                        <div style="color: #666; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.2px; margin-bottom: 4px;">Scan to Request a Song</div>
+                        <div id="qrArtistDisplay" style="color: #000; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 600; letter-spacing: -0.3px;">Glen Irvin Jr.</div>
+                        <div style="color: #aaa; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif; font-size: 8px; font-weight: 500; letter-spacing: 0.5px; margin-top: 12px; text-transform: uppercase;">Powered by LiveQue</div>
+                    </div>
+                </div>
+                <div style="max-width: 240px; margin: 0 auto 12px;">
+                    <input type="text" id="qrArtistName" class="auth-input" placeholder="Your name" value="Glen Irvin Jr." oninput="updateQRCardLive()" style="text-align: center; font-size: 14px; font-weight: 500; padding: 10px;">
+                </div>
+                <div style="max-width: 240px; margin: 0 auto;">
+                    <button class="auth-btn" onclick="downloadQRPDF()" style="width: 100%; background: white; color: #000; font-weight: 600; font-size: 14px; padding: 12px; border-radius: 10px;">Download for Print</button>
+                </div>
+                <div style="text-align: center; margin-top: 16px;">
+                    <a href="https://www.amazon.com/s?k=table+number+holder+stand+wire+clip" target="_blank" rel="noopener noreferrer" style="color: rgba(255,255,255,0.4); font-size: 11px; text-decoration: none;" onmouseover="this.style.color='rgba(255,255,255,0.6)'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Need a table stand? →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="position: fixed; top: 20px; right: 20px; width: 40px; height: 40px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 999; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); font-size: 18px; color: white; transition: all 0.3s ease;" onclick="openHelp()">?</div>
+    <div id="helpModal" class="modal">
+        <div class="modal-content" style="max-height: 90vh; overflow-y: auto; padding: 40px 30px; text-align: left;">
+            <span class="close" onclick="closeHelpModal()">&times;</span>
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div style="font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">LiveQue</div>
+                <div style="font-size: 12px; opacity: 0.5; margin-top: 4px;">Admin Dashboard</div>
+            </div>
+            <div style="font-size: 14px; line-height: 1.7; color: rgba(255,255,255,0.85);">
+                <div style="margin-bottom: 28px;"><div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.6;">The Basics</div><p style="margin: 0;">Fans scan your QR code, browse your songs, and submit requests. You see them here in real-time. Tip requests rise to the top. Tap Play, then Complete when you're done.</p></div>
+                <div style="margin-bottom: 28px;"><div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.6;">Before Each Gig</div><p style="margin: 0;">Tap "Start New Gig" on the Dashboard. This clears your queue and resets cooldowns so you're starting fresh.</p></div>
+                <div style="margin-bottom: 28px;"><div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.6;">Live Queue</div><p style="margin: 0;">Quick Add gives you four random available songs — tap to add instantly. Shuffle for new options. Songs have a 2-hour cooldown after being played.</p></div>
+                <div style="margin-bottom: 28px;"><div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.6;">QR Code</div><p style="margin: 0;">Generate and download a print-ready card for your venue tables. 4×6 inches — fits standard photo holders.</p></div>
+                <div style="margin-bottom: 28px;"><div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.6;">Connection Status</div><p style="margin: 0;"><span style="color: #2ed573;">Green</span> means live. <span style="color: #ffd700;">Yellow</span> means reconnecting. <span style="color: #ff4757;">Red</span> means disconnected — refresh the page.</p></div>
+            </div>
+            <div style="margin-top: 30px; text-align: center;"><button class="auth-btn" onclick="closeHelpModal()" style="background: rgba(255,255,255,0.15); padding: 12px 40px;">Done</button></div>
+            <div style="margin-top: 24px; text-align: center; font-size: 11px; opacity: 0.4;">v6.9.5 · getliveque.com</div>
+        </div>
+    </div>
+    <div id="socialModal" class="modal"><div class="modal-content"><span class="close" onclick="closeSocialModal()">&times;</span><h2>Social Media Settings</h2><div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;"><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Instagram:</label><input type="text" id="instagramInput" class="auth-input" placeholder="username (without @)"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">X (Twitter):</label><input type="text" id="xInput" class="auth-input" placeholder="username (without @)"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">TikTok:</label><input type="text" id="tiktokInput" class="auth-input" placeholder="@username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Facebook:</label><input type="text" id="facebookInput" class="auth-input" placeholder="facebook.com/username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">YouTube:</label><input type="text" id="youtubeInput" class="auth-input" placeholder="@channelname"></div><button class="auth-btn" onclick="saveSocialMedia()">Update Social Profiles</button></div></div></div>
+    <div id="paymentModal" class="modal"><div class="modal-content"><span class="close" onclick="closePaymentModal()">&times;</span><h2>Payment Settings</h2><div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;"><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Venmo:</label><input type="text" id="venmoInput" class="auth-input" placeholder="@username or phone"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">PayPal:</label><input type="text" id="paypalInput" class="auth-input" placeholder="paypal.me/username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">CashApp:</label><input type="text" id="cashappInput" class="auth-input" placeholder="$username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Zelle:</label><input type="text" id="zelleInput" class="auth-input" placeholder="email@example.com or phone"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Apple Pay:</label><input type="text" id="applepayInput" class="auth-input" placeholder="email@example.com or phone"></div><button class="auth-btn" onclick="savePaymentMethods()">Save Payment Methods</button></div></div></div>
+    <div id="allSongsModal" class="modal"><div class="modal-content"><span class="close" onclick="closeAllSongsModal()">&times;</span><h2>All Songs</h2><input type="text" class="auth-input" placeholder="Search songs..." oninput="searchAllSongs(this.value)" style="margin: 20px 0;"><div id="allSongsList" style="text-align: left; max-height: 50vh; overflow-y: auto;"></div></div></div>
+
+    <!-- SPOTIFY PLAYLIST MODAL -->
+    <div id="spotifyModal" class="modal">
+        <div class="modal-content" style="max-width: 480px; text-align: left;">
+            <span class="close" onclick="closeSpotifyModal()">&times;</span>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="#1ED760"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+                <h2 style="font-size: 18px; margin: 0;">Import from Spotify</h2>
+            </div>
+            <div id="spotifyStep1" style="display:none;">
+                <p style="opacity: 0.7; margin-bottom: 16px; font-size: 14px;">Choose a playlist to import songs from:</p>
+                <div id="spotifyPlaylistList" style="max-height: 320px; overflow-y: auto; margin-bottom: 16px;"></div>
+            </div>
+            <div id="spotifyStep2" style="display:none;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                    <button class="control-btn" onclick="backToSpotifyPlaylists()" style="font-size: 12px;">← Back</button>
+                    <span id="spotifyPlaylistName" style="font-size: 14px; font-weight: 600;"></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span id="spotifyTrackCount" style="font-size: 12px; opacity: 0.6;"></span>
+                    <div style="display: flex; gap: 6px;">
+                        <button class="control-btn" onclick="selectAllSpotifyTracks()" style="font-size: 11px; padding: 4px 10px;">Select All</button>
+                        <button class="control-btn" onclick="clearSpotifySelection()" style="font-size: 11px; padding: 4px 10px;">Clear</button>
+                    </div>
+                </div>
+                <div id="spotifyTrackList" style="max-height: 300px; overflow-y: auto; margin-bottom: 12px; border-radius: 8px; background: rgba(0,0,0,0.2);"></div>
+                <button class="auth-btn" id="spotifyAddBtn" onclick="addSelectedSpotifyTracks()" style="background: linear-gradient(45deg, #1ED760, #1aa34a); font-size: 14px; padding: 12px;">Add Selected Songs</button>
+            </div>
+            <div id="spotifyLoading" style="text-align: center; padding: 40px; display: none;">
+                <div class="typing-dots"><span></span><span></span><span></span></div>
+                <div style="margin-top: 12px; font-size: 13px; opacity: 0.6;" id="spotifyLoadingText">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script>
+console.log('=== LIVEQUE ADMIN v6.9.5 ===');
+
+const SUPABASE_URL = 'https://jttswydixqeyyqvcohnq.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dHN3eWRpeHFleXlxdmNvaG5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNjE3ODYsImV4cCI6MjA3NDkzNzc4Nn0.WlvOfl11qVUVatSCIPy8t6u9-j4u1z5CpnBxXe50BdQ';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ARTIST_ID is now dynamic — set after login
+let ARTIST_ID = null;
+
+let currentSort = 'artist';
+let currentSong = null;
+let requestQueue = [];
+let playedSongs = {};
+let paymentMethods = {};
+let socialMediaHandles = {};
+let showingDollarAmount = false;
+let totalTipsCollected = 0;
+let dailyTipsCount = 0;
+let lastResetDate = new Date().toDateString();
+let showingAllSongs = false;
+let tipAmounts = [0, 2, 5, 10];
+let artistSettings = null;
+let realtimeChannel = null;
+let broadcastChannel = null;
+let allSongsFiltered = [];
+let songLibrary = [];
+let currentGigSessionId = null;
+
+// ── AUTH ──────────────────────────────────────────────
+
+async function checkAuth() {
+    const { data: { session } } = await db.auth.getSession();
+    if (session) {
+        const loaded = await loadArtistId(session.user.id);
+        if (loaded) {
+            showApp();
+            await initializeApp();
+            await handleSpotifyCallback();
+        } else {
+            showLogin('Account not linked to an artist profile. Contact support.');
+        }
+    } else {
+        showLogin();
+    }
+}
+
+async function loadArtistId(authUserId) {
+    const { data, error } = await db
+        .from('artists')
+        .select('id')
+        .eq('auth_user_id', authUserId)
+        .single();
+    if (error || !data) {
+        console.error('Artist lookup failed:', error);
+        return false;
+    }
+    ARTIST_ID = data.id;
+    console.log('✅ ARTIST_ID set:', ARTIST_ID);
+    return true;
+}
+
+async function signIn() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const btn = document.getElementById('loginBtn');
+    const errorEl = document.getElementById('loginError');
+
+    errorEl.textContent = '';
+    if (!email || !password) { errorEl.textContent = 'Please enter your email and password.'; return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Signing in...';
+
+    const { data, error } = await db.auth.signInWithPassword({ email, password });
+
+    if (error) {
+        errorEl.textContent = error.message;
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+        return;
+    }
+
+    const loaded = await loadArtistId(data.user.id);
+    if (!loaded) {
+        errorEl.textContent = 'Account not linked to an artist profile. Contact support.';
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+        await db.auth.signOut();
+        return;
+    }
+
+    showApp();
+    await initializeApp();
+}
+
+async function signOut() {
+    await db.auth.signOut();
+    ARTIST_ID = null;
+    requestQueue = [];
+    playedSongs = {};
+    songLibrary = [];
+    if (realtimeChannel) { try { db.removeChannel(realtimeChannel); } catch(e) {} }
+    if (broadcastChannel) { try { db.removeChannel(broadcastChannel); } catch(e) {} }
+    showLogin();
+}
+
+function showLogin(errorMsg) {
+    document.getElementById('loginOverlay').classList.remove('hidden');
+    document.getElementById('loginBtn').disabled = false;
+    document.getElementById('loginBtn').textContent = 'Sign In';
+    document.getElementById('loginEmail').value = '';
+    document.getElementById('loginPassword').value = '';
+    document.getElementById('loginError').textContent = errorMsg || '';
+}
+
+function showApp() {
+    document.getElementById('loginOverlay').classList.add('hidden');
+}
+
+function showSignInPanel() {
+    document.getElementById('signInPanel').classList.add('active');
+    document.getElementById('signUpPanel').classList.remove('active');
+    document.getElementById('toggleSignIn').classList.add('active');
+    document.getElementById('toggleSignUp').classList.remove('active');
+    document.getElementById('loginError').textContent = '';
+}
+
+function showSignUpPanel() {
+    document.getElementById('signUpPanel').classList.add('active');
+    document.getElementById('signInPanel').classList.remove('active');
+    document.getElementById('toggleSignUp').classList.add('active');
+    document.getElementById('toggleSignIn').classList.remove('active');
+    document.getElementById('signupError').textContent = '';
+}
+
+async function signUp() {
+    const name = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    const confirm = document.getElementById('signupConfirm').value;
+    const btn = document.getElementById('signupBtn');
+    const errorEl = document.getElementById('signupError');
+
+    errorEl.textContent = '';
+    if (!name) { errorEl.textContent = 'Enter your performer name.'; return; }
+    if (!email) { errorEl.textContent = 'Enter your email.'; return; }
+    if (password.length < 6) { errorEl.textContent = 'Password must be at least 6 characters.'; return; }
+    if (password !== confirm) { errorEl.textContent = "Passwords don't match."; return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Creating account...';
+
+    const { data, error } = await db.auth.signUp({ email, password });
+    if (error) { errorEl.textContent = error.message; btn.disabled = false; btn.textContent = 'Create Account'; return; }
+
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Date.now();
+    const { error: artistError } = await db.from('artists').insert([{
+        auth_user_id: data.user.id,
+        name: name,
+        email: email,
+        slug: slug
+    }]);
+
+    if (artistError) {
+        console.error('Artist insert error:', artistError);
+        errorEl.textContent = 'Account created but profile setup failed: ' + artistError.message;
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+        return;
+    }
+
+    const loaded = await loadArtistId(data.user.id);
+    if (loaded) {
+        showApp();
+        await initializeApp();
+        await handleSpotifyCallback();
+    } else {
+        errorEl.textContent = 'Profile created but could not load. Try signing in.';
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+        showSignInPanel();
+    }
+}
+
+// Allow Enter key on login forms
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !document.getElementById('loginOverlay').classList.contains('hidden')) {
+        const signUpActive = document.getElementById('signUpPanel').classList.contains('active');
+        if (signUpActive) { signUp(); } else { signIn(); }
+    }
+});
+
+// ── APP INIT ──────────────────────────────────────────
+
+function showToast(message, type) { const toast = document.createElement('div'); toast.className = 'toast' + (type ? ' ' + type : ''); toast.textContent = message; document.body.appendChild(toast); setTimeout(function() { toast.style.opacity = '0'; setTimeout(function() { toast.remove(); }, 300); }, 2500); }
+
+function updateSyncStatus(status) { const syncStatus = document.getElementById('syncStatus'); const syncText = document.getElementById('syncStatusText'); if (status === 'SUBSCRIBED') { syncStatus.className = 'sync-status'; syncText.textContent = 'Live Sync'; } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') { syncStatus.className = 'sync-status error'; syncText.textContent = 'Disconnected'; } else { syncStatus.className = 'sync-status reconnecting'; syncText.textContent = 'Connecting...'; } }
+
+function updateSessionBadge() { const badge = document.getElementById('sessionBadge'); if (currentGigSessionId) { badge.textContent = 'Session: ' + currentGigSessionId.substring(0, 20) + '...'; } else { badge.textContent = 'No Session'; } }
+
+document.addEventListener('DOMContentLoaded', function() {
+    checkAuth().then(function() {
+        // Only init timers/scroll after auth check
+        startCooldownTimers();
+        setupScrollButton();
+    });
+});
+
+let lastScrollY = window.scrollY;
+function setupScrollButton() {
+    const scrollBtn = document.getElementById('scrollTopBtn');
+    const feedbackBtn = document.querySelector('.feedback-btn');
+    window.addEventListener('scroll', function() {
+        const currentScrollY = window.scrollY;
+        if (currentScrollY < 100) { scrollBtn.classList.remove('visible'); feedbackBtn.classList.remove('visible'); lastScrollY = currentScrollY; return; }
+        if (currentScrollY < lastScrollY) { scrollBtn.classList.add('visible'); feedbackBtn.classList.add('visible'); }
+        else if (currentScrollY > lastScrollY) { scrollBtn.classList.remove('visible'); feedbackBtn.classList.remove('visible'); }
+        lastScrollY = currentScrollY;
+    });
+}
+
+function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+async function loadFromSupabase() {
+    const reqResult = await db.from('requests').select('*').eq('artist_id', ARTIST_ID).order('tip_amount', { ascending: false });
+    if (reqResult.data && !reqResult.error) { requestQueue = reqResult.data.map(function(r) { return { id: r.id, title: r.song_title || 'Unknown', artist: r.song_artist || 'Unknown', tip: r.tip_amount || 0, requesterName: r.requester_name || 'Guest', timestamp: new Date(r.requested_at).getTime(), status: r.status || 'queued', created_at: r.created_at, gig_session_id: r.gig_session_id, spanish: r.spanish || false }; }); sortRequestQueue(); }
+    const playedResult = await db.from('played_songs').select('*').eq('artist_id', ARTIST_ID);
+    if (playedResult.data && !playedResult.error) { playedSongs = {}; playedResult.data.forEach(function(p) { const songKey = p.song_title + '-' + p.song_artist; playedSongs[songKey] = new Date(p.played_at).getTime(); }); }
+    const settingsResult = await db.from('artist_settings').select('*').eq('artist_id', ARTIST_ID).single();
+    if (settingsResult.data && !settingsResult.error) { artistSettings = settingsResult.data; paymentMethods = settingsResult.data.payment_methods || {}; socialMediaHandles = settingsResult.data.social_handles || {}; tipAmounts = settingsResult.data.tip_amounts || [0, 2, 5, 10]; currentGigSessionId = settingsResult.data.current_gig_session_id || null; console.log('🎯 Loaded session:', currentGigSessionId); updateSessionBadge(); }
+    const songsResult = await db.from('songs').select('*').eq('artist_id', ARTIST_ID).order('title', { ascending: true });
+    if (songsResult.data && !songsResult.error && songsResult.data.length > 0) { songLibrary = songsResult.data.map(function(s) { return { id: s.id, title: s.title, artist: s.artist_name, spanish: s.spanish || false }; }); }
+}
+
+function setupRealtimeSubscription() {
+    if (realtimeChannel) { try { db.removeChannel(realtimeChannel); } catch(e) {} }
+    const channelName = 'liveque-sync-' + ARTIST_ID;
+    realtimeChannel = db.channel(channelName, { config: { broadcast: { self: false } } });
+    realtimeChannel.on('postgres_changes', { event: '*', schema: 'public', table: 'requests', filter: 'artist_id=eq.' + ARTIST_ID }, function(payload) { if (payload.eventType === 'INSERT') { handleRequestInsert(payload.new); } else if (payload.eventType === 'UPDATE') { handleRequestUpdate(payload.new); } else if (payload.eventType === 'DELETE') { handleRequestDelete(payload.old); } }).on('postgres_changes', { event: '*', schema: 'public', table: 'played_songs', filter: 'artist_id=eq.' + ARTIST_ID }, function(payload) { if (payload.eventType === 'INSERT') { handlePlayedSongInsert(payload.new); } else if (payload.eventType === 'DELETE') { handlePlayedSongDelete(payload.old); } }).subscribe(function(status, err) { updateSyncStatus(status); if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') { setTimeout(function() { setupRealtimeSubscription(); }, 3000); } });
+    if (broadcastChannel) { try { db.removeChannel(broadcastChannel); } catch(e) {} }
+    const broadcastChannelName = 'queue-clear-broadcast-' + ARTIST_ID;
+    broadcastChannel = db.channel(broadcastChannelName, { config: { broadcast: { self: false } } });
+    broadcastChannel.subscribe();
+}
+
+function handleRequestInsert(newRecord) { const newRequest = { id: newRecord.id, title: newRecord.song_title, artist: newRecord.song_artist, tip: newRecord.tip_amount || 0, requesterName: newRecord.requester_name || 'Guest', status: newRecord.status || 'queued', created_at: newRecord.created_at, gig_session_id: newRecord.gig_session_id, spanish: newRecord.spanish || false }; requestQueue.push(newRequest); sortRequestQueue(); renderQueues(); renderQuickAdd(); updateStats(); }
+function handleRequestUpdate(newRecord) { const index = requestQueue.findIndex(function(r) { return r.id === newRecord.id; }); if (index !== -1) { requestQueue[index] = { id: newRecord.id, title: newRecord.song_title, artist: newRecord.song_artist, tip: newRecord.tip_amount || 0, requesterName: newRecord.requester_name || 'Guest', status: newRecord.status || 'queued', created_at: newRecord.created_at, gig_session_id: newRecord.gig_session_id, spanish: newRecord.spanish || false }; sortRequestQueue(); renderQueues(); } }
+function handleRequestDelete(oldRecord) { requestQueue = requestQueue.filter(function(r) { return r.id !== oldRecord.id; }); renderQueues(); renderQuickAdd(); updateStats(); }
+function handlePlayedSongInsert(newRecord) { const key = newRecord.song_title + '-' + newRecord.song_artist; playedSongs[key] = new Date(newRecord.played_at).getTime(); renderQuickAdd(); }
+function handlePlayedSongDelete(oldRecord) { const key = oldRecord.song_title + '-' + oldRecord.song_artist; delete playedSongs[key]; renderQuickAdd(); }
+function sortRequestQueue() { const playing = requestQueue.filter(function(r) { return r.status === 'playing'; }); const queued = requestQueue.filter(function(r) { return r.status !== 'playing'; }); queued.sort(function(a, b) { if (b.tip !== a.tip) return b.tip - a.tip; return new Date(a.created_at) - new Date(b.created_at); }); requestQueue = playing.concat(queued); }
+function startCooldownTimers() { setInterval(function() { songLibrary.forEach(function(song) { const key = song.title + '-' + song.artist; const playedTime = playedSongs[key]; if (playedTime) { const elapsed = Date.now() - playedTime; const cooldown = 2 * 60 * 60 * 1000; const remaining = cooldown - elapsed; if (remaining > 0 && remaining <= cooldown) { const timerEl = document.getElementById('timer-' + song.id); if (timerEl) { const remainingSeconds = Math.ceil(remaining / 1000); const hours = Math.floor(remainingSeconds / 3600); const minutes = Math.floor((remainingSeconds % 3600) / 60); const seconds = remainingSeconds % 60; if (hours > 0) { timerEl.textContent = hours + 'h ' + minutes + 'm ' + seconds + 's'; } else if (minutes > 0) { timerEl.textContent = minutes + 'm ' + seconds + 's'; } else { timerEl.textContent = seconds + 's'; } } } else if (remaining <= 0) { const timerEl = document.getElementById('timer-' + song.id); if (timerEl && timerEl.textContent !== 'Available') { renderQuickAdd(); } } } }); }, 1000); }
+
+async function initializeApp() {
+    await loadFromSupabase();
+    renderQueues();
+    renderQuickAdd();
+    updateStats();
+    renderPaymentMethods();
+    renderSocialMedia();
+    renderTipSettings();
+    setupRealtimeSubscription();
+    const savedTab = localStorage.getItem('liveque-active-tab');
+    if (savedTab !== null && parseInt(savedTab) < 2) { switchTab(parseInt(savedTab)); } else { switchTab(1); }
+    if (songLibrary.length > 0) { showToast('Admin loaded! ' + songLibrary.length + ' songs ready'); }
+}
+
+function renderSocialMedia() { const display = document.getElementById('socialMediaDisplay'); if (display) { display.innerHTML = ''; const platforms = ['instagram', 'x', 'tiktok', 'facebook', 'youtube']; const labels = { instagram: 'Instagram', x: 'X (Twitter)', tiktok: 'TikTok', facebook: 'Facebook', youtube: 'YouTube' }; platforms.forEach(function(platform) { if (socialMediaHandles[platform]) { const info = document.createElement('div'); info.className = 'payment-info'; const prefix = (platform === 'facebook' || platform === 'youtube') ? '' : '@'; info.innerHTML = '<span class="payment-label">' + labels[platform] + ':</span> ' + prefix + socialMediaHandles[platform]; display.appendChild(info); } }); } }
+function openSocialSettings() { document.getElementById('instagramInput').value = socialMediaHandles.instagram || ''; document.getElementById('xInput').value = socialMediaHandles.x || ''; document.getElementById('tiktokInput').value = socialMediaHandles.tiktok || ''; document.getElementById('facebookInput').value = socialMediaHandles.facebook || ''; document.getElementById('youtubeInput').value = socialMediaHandles.youtube || ''; document.getElementById('socialModal').classList.add('show'); }
+async function saveSocialMedia() { socialMediaHandles = { instagram: document.getElementById('instagramInput').value.trim().replace('@', ''), x: document.getElementById('xInput').value.trim().replace('@', ''), tiktok: document.getElementById('tiktokInput').value.trim().replace('@', ''), facebook: document.getElementById('facebookInput').value.trim(), youtube: document.getElementById('youtubeInput').value.trim() }; const result = await db.from('artist_settings').upsert({ artist_id: ARTIST_ID, payment_methods: paymentMethods, social_handles: socialMediaHandles, tip_amounts: tipAmounts, current_gig_session_id: currentGigSessionId, updated_at: new Date().toISOString() }); if (!result.error) { renderSocialMedia(); closeSocialModal(); showToast('Social media handles updated!'); } else { showToast('Error saving social media settings', 'error'); } }
+function closeSocialModal() { document.getElementById('socialModal').classList.remove('show'); }
+
+async function startNewGig() { const confirmMessage = 'START NEW GIG?\n\nThis will:\n• Clear the current queue\n• Reset recently played songs\n• Clear ALL tips (total & daily)\n• Start fresh for your performance\n\nAre you ready?'; if (confirm(confirmMessage)) { const newSessionId = 'gig-' + Date.now() + '-' + Math.random().toString(36).substring(2, 9); try { const sessionUpdate = await db.from('artist_settings').update({ current_gig_session_id: newSessionId }).eq('artist_id', ARTIST_ID); if (sessionUpdate.error) throw sessionUpdate.error; const reqDelete = await db.from('requests').delete().eq('artist_id', ARTIST_ID); if (reqDelete.error) throw reqDelete.error; const playedDelete = await db.from('played_songs').delete().eq('artist_id', ARTIST_ID); if (playedDelete.error) throw playedDelete.error; await new Promise(function(resolve) { setTimeout(resolve, 500); }); await broadcastChannel.send({ type: 'broadcast', event: 'clear', payload: { timestamp: new Date().toISOString(), artist_id: ARTIST_ID, gig_session_id: newSessionId, random: Math.random() } }); currentGigSessionId = newSessionId; requestQueue = []; playedSongs = {}; totalTipsCollected = 0; dailyTipsCount = 0; lastResetDate = new Date().toDateString(); updateSessionBadge(); renderQueues(); renderQuickAdd(); updateStats(); showToast('New gig started. Break a leg!'); switchTab(1); } catch(error) { showToast('Error: ' + error.message, 'error'); } } }
+
+function renderTipSettings() { const grid = document.getElementById('tipSettingsGrid'); if (!grid) return; grid.innerHTML = ''; for (let i = 0; i < 4; i++) { const container = document.createElement('div'); const label = i === 0 ? 'Free Request' : 'Option ' + (i + 1); if (i === 0) { container.innerHTML = '<div class="tip-label">' + label + '</div><input type="number" class="tip-amount-input" id="tipAmount' + i + '" value="0" min="0" max="0" disabled style="opacity: 0.6; cursor: not-allowed;" placeholder="$">'; } else { container.innerHTML = '<div class="tip-label">' + label + '</div><input type="number" class="tip-amount-input" id="tipAmount' + i + '" value="' + tipAmounts[i] + '" min="0" max="999" placeholder="$">'; } grid.appendChild(container); } }
+async function saveTipSettings() { const newAmounts = []; for (let i = 0; i < 4; i++) { const input = document.getElementById('tipAmount' + i); if (input) { newAmounts.push(Math.max(0, Math.min(999, parseInt(input.value) || 0))); } } newAmounts.sort(function(a, b) { return a - b; }); tipAmounts = newAmounts; const result = await db.from('artist_settings').upsert({ artist_id: ARTIST_ID, payment_methods: paymentMethods, social_handles: socialMediaHandles, tip_amounts: tipAmounts, current_gig_session_id: currentGigSessionId, updated_at: new Date().toISOString() }); if (!result.error) { renderTipSettings(); showToast('Tip options updated: ' + tipAmounts.join(', ')); } else { showToast('Error saving tip settings', 'error'); } }
+async function resetTipSettings() { if (confirm('Reset tip amounts to default ($0, $2, $5, $10)?')) { tipAmounts = [0, 2, 5, 10]; const result = await db.from('artist_settings').upsert({ artist_id: ARTIST_ID, payment_methods: paymentMethods, social_handles: socialMediaHandles, tip_amounts: tipAmounts, current_gig_session_id: currentGigSessionId, updated_at: new Date().toISOString() }); if (!result.error) { renderTipSettings(); showToast('Tip amounts reset to default!'); } else { showToast('Error resetting tip settings', 'error'); } } }
+
+function switchTab(index) { const tabs = document.querySelectorAll('.tab'); const contents = document.querySelectorAll('.tab-content'); tabs.forEach(function(tab) { tab.classList.remove('active'); }); contents.forEach(function(content) { content.classList.remove('active'); }); const tabNames = ['dashboardTab', 'livequeueTab', 'qrcodeTab']; tabs[index].classList.add('active'); document.getElementById(tabNames[index]).classList.add('active'); if (index < 2) { localStorage.setItem('liveque-active-tab', index); } if (index === 1) { renderQuickAdd(); } if (index === 2) { initQRCode(); } }
+function shuffleQuickAdd() { renderQuickAdd(); showToast('Songs shuffled'); }
+
+function renderQuickAdd() { const quickAddGrid = document.getElementById('quickAddGrid'); if (!quickAddGrid) return; quickAddGrid.innerHTML = ''; const availableSongs = songLibrary.filter(function(song) { const availability = isSongAvailable(song); return availability.available; }); if (availableSongs.length === 0) { quickAddGrid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; opacity: 0.7; padding: 20px;">No available songs. Try clearing played songs or add more songs to library.</div>'; return; } const shuffled = availableSongs.slice().sort(function() { return Math.random() - 0.5; }); const songsToShow = shuffled.slice(0, 4); songsToShow.forEach(function(song) { const quickItem = document.createElement('div'); quickItem.className = 'quick-add-item favorite'; const spanishFlag = song.spanish ? ' 🇪🇸' : ''; quickItem.innerHTML = '<div style="font-size: 9px; opacity: 0.8; margin-bottom: 4px; font-weight: bold;">⭐ Quick Add</div><div style="font-weight: bold; margin-bottom: 4px; font-size: 12px;">' + song.title + spanishFlag + '</div><div style="font-size: 10px; opacity: 0.8;">' + song.artist + '</div>'; quickItem.onclick = function() { quickItem.classList.add('adding'); setTimeout(function() { quickItem.classList.remove('adding'); }, 500); quickAddToQueue(song); }; quickAddGrid.appendChild(quickItem); }); }
+
+function isSongAvailable(song) { const inQueue = requestQueue.find(function(r) { return r.title === song.title && r.artist === song.artist; }); if (inQueue) { return { available: false, reason: 'in-queue' }; } const songKey = song.title + '-' + song.artist; const playedTime = playedSongs[songKey]; if (!playedTime) return { available: true }; const now = Date.now(); const timeSincePlayed = now - playedTime; const cooldownMs = 2 * 60 * 60 * 1000; if (timeSincePlayed >= cooldownMs) { return { available: true }; } else { const remainingMs = cooldownMs - timeSincePlayed; const remainingSeconds = Math.ceil(remainingMs / 1000); const hours = Math.floor(remainingSeconds / 3600); const minutes = Math.floor((remainingSeconds % 3600) / 60); const seconds = remainingSeconds % 60; const timeString = hours > 0 ? hours + 'h ' + minutes + 'm ' + seconds + 's' : minutes > 0 ? minutes + 'm ' + seconds + 's' : seconds + 's'; return { available: false, timeRemaining: timeString, reason: 'recently-played', songId: song.id }; } }
+
+async function quickAddToQueue(song) { const existingRequest = requestQueue.find(function(r) { return r.title === song.title && r.artist === song.artist; }); if (existingRequest) { showToast('"' + song.title + '" is already in the queue!', 'warning'); return; } showToast('Adding "' + song.title + '"...', 'warning'); try { const insertData = { artist_id: ARTIST_ID, song_title: song.title, song_artist: song.artist, requester_name: 'Glen (Manual Add)', tip_amount: 0, status: 'queued', gig_session_id: currentGigSessionId, spanish: song.spanish || false }; const result = await db.from('requests').insert([insertData]).select().single(); if (result.error) throw result.error; if (result.data) { showToast('✓ "' + song.title + '" added to queue!'); } } catch(error) { showToast('Failed: ' + (error.message || 'Unknown error'), 'error'); } }
+
+function renderQueues() { renderLiveQueue(); updateStats(); }
+function renderLiveQueue() { const queueDiv = document.getElementById('liveQueueList'); if (!queueDiv) return; if (requestQueue.length === 0) { queueDiv.innerHTML = '<div style="text-align: center; opacity: 0.7; padding: 40px;">No requests in queue</div>'; return; } queueDiv.innerHTML = ''; const playingSong = requestQueue.find(function(r) { return r.status === 'playing'; }); if (playingSong) { const nowPlayingDiv = document.createElement('div'); nowPlayingDiv.className = 'now-playing-card'; const spanishFlag = playingSong.spanish ? ' 🇪🇸' : ''; nowPlayingDiv.innerHTML = '<div style="flex: 1;"><div style="font-size: 12px; opacity: 0.9; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 1px;">NOW PLAYING</div><div style="font-size: 18px; font-weight: bold; margin-bottom: 3px;">' + playingSong.title + spanishFlag + '</div><div style="font-size: 14px; opacity: 0.9;">' + playingSong.artist + '</div><div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Requested by ' + playingSong.requesterName + '</div></div><button class="control-btn" onclick="markAsComplete(\'' + playingSong.id + '\')" style="background: linear-gradient(45deg, #ff4757, #ff6b6b); color: white; font-weight: bold; padding: 15px 25px; font-size: 16px; border-radius: 12px; box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4); border: 2px solid rgba(255, 255, 255, 0.3); cursor: pointer; transition: all 0.3s ease; animation: completePulse 2s ease-in-out infinite;">✓ COMPLETE<br><span style="font-size: 11px; font-weight: normal; opacity: 0.9;">Click when done</span></button>'; queueDiv.appendChild(nowPlayingDiv); } requestQueue.forEach(function(request) { if (request.status === 'playing') return; const queueItem = document.createElement('div'); queueItem.className = 'queue-item' + (request.tip > 0 ? ' priority' : ''); const spanishFlag = request.spanish ? ' 🇪🇸' : ''; const tipBadge = request.tip > 0 ? '<div class="priority-badge">$' + request.tip + '</div>' : ''; queueItem.innerHTML = '<div class="song-info"><div class="song-title">' + request.title + spanishFlag + '</div><div class="song-artist">' + request.artist + '</div><div class="requester-name">by ' + request.requesterName + '</div></div><div style="display: flex; flex-direction: column; gap: 5px;">' + tipBadge + '<button class="control-btn" onclick="markAsPlaying(\'' + request.id + '\')">▶ Play</button><button class="control-btn" onclick="markAsComplete(\'' + request.id + '\')">✓ Done</button></div>'; queueDiv.appendChild(queueItem); }); }
+
+async function markAsPlaying(songId) { const request = requestQueue.find(function(r) { return r.id === songId; }); if (!request) { showToast('Song not found', 'error'); return; } try { await db.from('requests').update({ status: 'queued' }).eq('artist_id', ARTIST_ID).neq('id', songId); const updatePlayingResult = await db.from('requests').update({ status: 'playing' }).eq('id', songId); if (updatePlayingResult.error) throw updatePlayingResult.error; showToast('▶ Now playing: "' + request.title + '"'); } catch(error) { showToast('Failed to start playing: ' + error.message, 'error'); } }
+
+async function markAsComplete(songId) { const completedSong = requestQueue.find(function(r) { return r.id === songId; }); if (!completedSong) { showToast('Song not found in queue', 'error'); return; } try { const playedResult = await db.from('played_songs').insert([{ artist_id: ARTIST_ID, song_title: completedSong.title, song_artist: completedSong.artist, played_at: new Date().toISOString() }]); if (playedResult.error) throw playedResult.error; const deleteResult = await db.from('requests').delete().eq('id', songId); if (deleteResult.error) throw deleteResult.error; await realtimeChannel.send({ type: 'broadcast', event: 'song-deleted', payload: { id: songId } }); requestQueue = requestQueue.filter(function(r) { return r.id !== songId; }); renderLiveQueue(); renderQuickAdd(); showToast('✓ "' + completedSong.title + '" completed!'); } catch(error) { showToast('Failed: ' + error.message, 'error'); } }
+
+function updateStats() { document.getElementById('requestCount').textContent = requestQueue.length; document.getElementById('songCount').textContent = songLibrary.length; const tipsInQueue = requestQueue.filter(function(r) { return r.tip > 0; }).length; const totalTipsAmount = requestQueue.reduce(function(sum, r) { return sum + r.tip; }, 0); const tipElement = document.getElementById('tipCount'); if (!showingDollarAmount) { tipElement.textContent = tipsInQueue + ' tips'; } tipElement.style.cursor = 'pointer'; tipElement.onclick = function() { if (!showingDollarAmount) { showingDollarAmount = true; tipElement.textContent = '$' + totalTipsAmount; setTimeout(function() { showingDollarAmount = false; tipElement.textContent = tipsInQueue + ' tips'; }, 3000); } }; }
+
+function openPaymentSettings() { document.getElementById('venmoInput').value = paymentMethods.venmo || ''; document.getElementById('paypalInput').value = paymentMethods.paypal || ''; document.getElementById('cashappInput').value = paymentMethods.cashapp || ''; document.getElementById('zelleInput').value = paymentMethods.zelle || ''; document.getElementById('applepayInput').value = paymentMethods.applepay || ''; document.getElementById('paymentModal').classList.add('show'); }
+async function savePaymentMethods() { paymentMethods = { venmo: document.getElementById('venmoInput').value.trim(), paypal: document.getElementById('paypalInput').value.trim(), cashapp: document.getElementById('cashappInput').value.trim(), zelle: document.getElementById('zelleInput').value.trim(), applepay: document.getElementById('applepayInput').value.trim() }; const result = await db.from('artist_settings').upsert({ artist_id: ARTIST_ID, payment_methods: paymentMethods, social_handles: socialMediaHandles, tip_amounts: tipAmounts, current_gig_session_id: currentGigSessionId, updated_at: new Date().toISOString() }); if (!result.error) { renderPaymentMethods(); closePaymentModal(); showToast('Payment methods updated!'); } }
+function closePaymentModal() { document.getElementById('paymentModal').classList.remove('show'); }
+function renderPaymentMethods() { const display = document.getElementById('paymentMethodsDisplay'); if (display) { display.innerHTML = ''; const methods = ['venmo', 'paypal', 'cashapp', 'zelle', 'applepay']; const labels = { venmo: 'Venmo', paypal: 'PayPal', cashapp: 'CashApp', zelle: 'Zelle', applepay: 'Apple Pay' }; methods.forEach(function(method) { if (paymentMethods[method]) { const info = document.createElement('div'); info.className = 'payment-info'; info.innerHTML = '<span class="payment-label">' + labels[method] + ':</span> ' + paymentMethods[method]; display.appendChild(info); } }); } }
+
+async function resetAllCooldowns() { if (confirm('Clear all recently played songs? Songs will be immediately available again.')) { await db.from('played_songs').delete().eq('artist_id', ARTIST_ID); showToast('Recently played list has been cleared!'); } }
+async function addNewSong() { const title = document.getElementById('newSongTitle').value.trim(); const artist = document.getElementById('newSongArtist').value.trim(); if (!title || !artist) { showToast('Please enter both song title and artist', 'warning'); return; } const exists = songLibrary.some(function(s) { return s.title.toLowerCase() === title.toLowerCase() && s.artist.toLowerCase() === artist.toLowerCase(); }); if (exists) { showToast('This song is already in the library', 'warning'); return; } const result = await db.from('songs').insert([{ artist_id: ARTIST_ID, title: title, artist_name: artist }]); if (!result.error) { document.getElementById('newSongTitle').value = ''; document.getElementById('newSongArtist').value = ''; await loadFromSupabase(); updateStats(); showToast('"' + title + '" by ' + artist + ' added to library!'); } }
+
+function showAllSongsModal() { allSongsFiltered = songLibrary.slice(); renderAllSongs(); document.getElementById('allSongsModal').classList.add('show'); }
+function closeAllSongsModal() { document.getElementById('allSongsModal').classList.remove('show'); }
+function searchAllSongs(query) { const searchTerm = query.toLowerCase(); allSongsFiltered = songLibrary.filter(function(song) { return song.title.toLowerCase().includes(searchTerm) || song.artist.toLowerCase().includes(searchTerm); }); renderAllSongs(); }
+function renderAllSongs() { const container = document.getElementById('allSongsList'); if (!container) return; container.innerHTML = ''; const songsToShow = allSongsFiltered.filter(function(song) { const inQueue = requestQueue.find(function(r) { return r.title === song.title && r.artist === song.artist; }); return !inQueue; }); if (songsToShow.length === 0) { container.innerHTML = '<div style="text-align: center; opacity: 0.7; padding: 20px;">No songs available</div>'; return; } songsToShow.forEach(function(song) { const availability = isSongAvailable(song); const songItem = document.createElement('div'); songItem.className = 'song-item' + (!availability.available ? ' unavailable' : ''); const spanishFlag = song.spanish ? ' 🇪🇸' : ''; let timerHtml = ''; if (!availability.available && availability.timeRemaining) { timerHtml = '<div class="cooldown-timer" id="timer-' + song.id + '">' + availability.timeRemaining + '</div>'; } songItem.innerHTML = '<div style="display: flex; justify-content: space-between; align-items: center;"><div><div class="song-title">' + song.title + spanishFlag + '</div><div class="song-artist">' + song.artist + '</div>' + timerHtml + '</div>' + (availability.available ? '<button class="control-btn" onclick="quickAddFromModal(\'' + song.title.replace(/'/g, "\\'") + '\', \'' + song.artist.replace(/'/g, "\\'") + '\')">+ Add</button>' : '<span style="font-size: 11px; color: #ff6b6b;">Unavailable</span>') + '</div>'; container.appendChild(songItem); }); }
+async function quickAddFromModal(title, artist) { const song = songLibrary.find(function(s) { return s.title === title && s.artist === artist; }); if (song) { await quickAddToQueue(song); renderAllSongs(); } }
+
+function openHelp() { document.getElementById('helpModal').classList.add('show'); }
+function closeHelpModal() { document.getElementById('helpModal').classList.remove('show'); }
+
+
+// ── ARTIST SONG SEARCH (iTunes API) ──────────────────────────────────
+
+let artistSearchResults = [];
+let selectedArtistSongs = new Set();
+
+async function searchArtistSongs() {
+    const query = document.getElementById('artistSearchInput').value.trim();
+    const status = document.getElementById('artistSearchStatus');
+    const btn = document.getElementById('artistSearchBtn');
+    const resultsDiv = document.getElementById('artistSearchResults');
+
+    if (!query) { status.textContent = 'Enter an artist name first.'; return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Searching...';
+    status.textContent = '';
+    resultsDiv.style.display = 'none';
+    artistSearchResults = [];
+    selectedArtistSongs = new Set();
+
+    try {
+        const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=200&country=US`);
+        const data = await res.json();
+
+        if (!data.results || data.results.length === 0) {
+            status.textContent = 'No songs found. Try a different artist name.';
+            btn.disabled = false; btn.textContent = 'Search';
+            return;
+        }
+
+        // Deduplicate by song title (keep first occurrence)
+        const seen = new Set();
+        artistSearchResults = data.results.filter(function(track) {
+            const key = track.trackName.toLowerCase();
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
+
+        document.getElementById('artistResultsLabel').textContent = artistSearchResults.length + ' songs found for "' + query + '"';
+        renderArtistSearchResults();
+        resultsDiv.style.display = 'block';
+        status.textContent = '';
+
+    } catch(err) {
+        status.textContent = 'Search failed. Check your connection.';
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Search';
+}
+
+function renderArtistSearchResults() {
+    const list = document.getElementById('artistSongsList');
+    list.innerHTML = '';
+
+    artistSearchResults.forEach(function(track, index) {
+        const alreadyInLibrary = songLibrary.some(function(s) {
+            return s.title.toLowerCase() === track.trackName.toLowerCase();
+        });
+
+        const row = document.createElement('div');
+        row.style.cssText = 'display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;' + (alreadyInLibrary ? 'opacity: 0.4;' : '');
+        row.onclick = function() { if (!alreadyInLibrary) toggleArtistSong(index, row); };
+
+        const isSelected = selectedArtistSongs.has(index);
+        row.innerHTML = `
+            <div style="width: 18px; height: 18px; border-radius: 4px; border: 2px solid ${isSelected ? '#4ecdc4' : 'rgba(255,255,255,0.3)'}; background: ${isSelected ? '#4ecdc4' : 'transparent'}; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s;">
+                ${isSelected ? '<svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#1a1a2e" stroke-width="2" fill="none" stroke-linecap="round"/></svg>' : ''}
+            </div>
+            <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${track.trackName}${alreadyInLibrary ? ' <span style="font-size: 10px; color: #4ecdc4;">✓ In library</span>' : ''}</div>
+                <div style="font-size: 11px; opacity: 0.6;">${track.artistName}</div>
+            </div>
+        `;
+        list.appendChild(row);
+    });
+}
+
+function toggleArtistSong(index, row) {
+    if (selectedArtistSongs.has(index)) {
+        selectedArtistSongs.delete(index);
+    } else {
+        selectedArtistSongs.add(index);
+    }
+    renderArtistSearchResults();
+    document.getElementById('addSelectedBtn').textContent = selectedArtistSongs.size > 0
+        ? `Add ${selectedArtistSongs.size} Song${selectedArtistSongs.size > 1 ? 's' : ''}`
+        : 'Add Selected Songs';
+}
+
+function selectAllArtistSongs() {
+    artistSearchResults.forEach(function(track, index) {
+        const inLib = songLibrary.some(function(s) { return s.title.toLowerCase() === track.trackName.toLowerCase(); });
+        if (!inLib) selectedArtistSongs.add(index);
+    });
+    renderArtistSearchResults();
+    document.getElementById('addSelectedBtn').textContent = `Add ${selectedArtistSongs.size} Songs`;
+}
+
+function clearArtistSelection() {
+    selectedArtistSongs.clear();
+    renderArtistSearchResults();
+    document.getElementById('addSelectedBtn').textContent = 'Add Selected Songs';
+}
+
+async function addSelectedArtistSongs() {
+    if (selectedArtistSongs.size === 0) { showToast('Select at least one song first.', 'warning'); return; }
+
+    const btn = document.getElementById('addSelectedBtn');
+    btn.disabled = true;
+    btn.textContent = 'Adding...';
+
+    const toInsert = [];
+    selectedArtistSongs.forEach(function(index) {
+        const track = artistSearchResults[index];
+        if (track) toInsert.push({ artist_id: ARTIST_ID, title: track.trackName, artist_name: track.artistName });
+    });
+
+    try {
+        const batchSize = 50;
+        for (let i = 0; i < toInsert.length; i += batchSize) {
+            const { error } = await db.from('songs').insert(toInsert.slice(i, i + batchSize));
+            if (error) throw error;
+        }
+        await loadFromSupabase();
+        updateStats();
+        renderQuickAdd();
+        showToast(`✓ ${toInsert.length} songs added to library!`);
+        selectedArtistSongs.clear();
+        document.getElementById('artistSearchInput').value = '';
+        document.getElementById('artistSearchResults').style.display = 'none';
+        document.getElementById('artistSearchStatus').textContent = '';
+    } catch(err) {
+        showToast('Error adding songs: ' + err.message, 'error');
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Add Selected Songs';
+}
+
+
+
+
+// ── SPOTIFY OAUTH (PKCE) ──────────────────────────────
+
+const SPOTIFY_CLIENT_ID = '0c1c62521be14885a12676f810e5b8c7';
+const SPOTIFY_REDIRECT_URI = 'https://soft-nasturtium-c51aac.netlify.app/index.html';
+let spotifyAccessToken = null;
+let spotifyPlaylists = [];
+let spotifyTracks = [];
+let selectedSpotifyTracks = new Set();
+let currentSpotifyPlaylist = null;
+
+function generateCodeVerifier() {
+    const array = new Uint8Array(64);
+    crypto.getRandomValues(array);
+    return Array.from(array, b => ('0' + b.toString(16)).slice(-2)).join('');
+}
+
+async function generateCodeChallenge(verifier) {
+    const data = new TextEncoder().encode(verifier);
+    const digest = await crypto.subtle.digest('SHA-256', data);
+    return btoa(String.fromCharCode(...new Uint8Array(digest))).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+}
+
+async function startSpotifyOAuth() {
+    const verifier = generateCodeVerifier();
+    const challenge = await generateCodeChallenge(verifier);
+    localStorage.setItem('spotify_pkce_verifier', verifier);
+    const params = new URLSearchParams({ client_id: SPOTIFY_CLIENT_ID, response_type: 'code', redirect_uri: SPOTIFY_REDIRECT_URI, scope: 'playlist-read-private playlist-read-collaborative', code_challenge_method: 'S256', code_challenge: challenge });
+    window.location.href = 'https://accounts.spotify.com/authorize?' + params.toString();
+}
+
+async function handleSpotifyCallback() {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const error = params.get('error');
+    if (error) { window.history.replaceState({}, document.title, window.location.pathname); showToast('Spotify connection cancelled.', 'warning'); return; }
+    if (!code) return;
+    const verifier = localStorage.getItem('spotify_pkce_verifier');
+    if (!verifier) return;
+    window.history.replaceState({}, document.title, window.location.pathname);
+    document.getElementById('spotifyModal').classList.add('show');
+    showSpotifyLoading('Connecting to Spotify...');
+    try {
+        const res = await fetch('https://accounts.spotify.com/api/token', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ client_id: SPOTIFY_CLIENT_ID, grant_type: 'authorization_code', code: code, redirect_uri: SPOTIFY_REDIRECT_URI, code_verifier: verifier }) });
+        const data = await res.json();
+        if (!data.access_token) throw new Error(data.error_description || 'Token exchange failed');
+        spotifyAccessToken = data.access_token;
+        localStorage.removeItem('spotify_pkce_verifier');
+        await loadSpotifyPlaylists();
+    } catch(err) { hideSpotifyLoading(); showToast('Spotify error: ' + err.message, 'error'); closeSpotifyModal(); }
+}
+
+async function loadSpotifyPlaylists() {
+    showSpotifyLoading('Loading your playlists...');
+    try {
+        let playlists = []; let url = 'https://api.spotify.com/v1/me/playlists?limit=50';
+        while (url) { const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + spotifyAccessToken } }); if (!res.ok) throw new Error('Could not load playlists'); const data = await res.json(); playlists = playlists.concat(data.items || []); url = data.next; }
+        spotifyPlaylists = playlists.filter(function(p) { return p && p.name; });
+        hideSpotifyLoading(); renderSpotifyPlaylists();
+    } catch(err) { hideSpotifyLoading(); showToast('Could not load playlists: ' + err.message, 'error'); closeSpotifyModal(); }
+}
+
+function renderSpotifyPlaylists() {
+    document.getElementById('spotifyStep1').style.display = 'block';
+    document.getElementById('spotifyStep2').style.display = 'none';
+    const list = document.getElementById('spotifyPlaylistList');
+    list.innerHTML = '';
+    if (spotifyPlaylists.length === 0) { list.innerHTML = '<div style="text-align:center;opacity:0.6;padding:20px;">No playlists found.</div>'; return; }
+    spotifyPlaylists.forEach(function(playlist) {
+        const item = document.createElement('div');
+        item.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;cursor:pointer;margin-bottom:4px;transition:background 0.2s;';
+        item.onmouseover = function() { item.style.background = 'rgba(255,255,255,0.08)'; };
+        item.onmouseout = function() { item.style.background = 'transparent'; };
+        const img = playlist.images && playlist.images[0] ? `<img src="${playlist.images[0].url}" style="width:44px;height:44px;border-radius:6px;object-fit:cover;flex-shrink:0;">` : `<div style="width:44px;height:44px;border-radius:6px;background:rgba(255,255,255,0.1);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;">🎵</div>`;
+        item.innerHTML = img + `<div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${playlist.name}</div><div style="font-size:11px;opacity:0.5;">${playlist.items ? playlist.items.total : '?'} songs</div></div><div style="opacity:0.4;font-size:16px;">›</div>`;
+        item.onclick = function() { selectSpotifyPlaylist(playlist); };
+        list.appendChild(item);
+    });
+}
+
+async function selectSpotifyPlaylist(playlist) {
+    currentSpotifyPlaylist = playlist;
+    document.getElementById('spotifyStep1').style.display = 'none';
+    showSpotifyLoading('Loading tracks...');
+    try {
+        let tracks = []; let url = (playlist.items && playlist.items.href) ? playlist.items.href : `https://api.spotify.com/v1/playlists/${playlist.id}/items`;
+        let firstFetch = true;
+        while (url) { const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + spotifyAccessToken } }); if (!res.ok) throw new Error('Could not load tracks'); const data = await res.json(); if (firstFetch) { console.log('TRACK SAMPLE:', JSON.stringify(data.items ? data.items[0] : data, null, 2)); firstFetch = false; } tracks = tracks.concat((data.items || []).filter(function(i) { return i && i.item && i.item.name && i.item.type === 'track'; })); url = data.next; }
+        const seen = new Set();
+        spotifyTracks = tracks.filter(function(item) { const key = item.item.name.toLowerCase(); if (seen.has(key)) return false; seen.add(key); return true; });
+        selectedSpotifyTracks = new Set();
+        hideSpotifyLoading(); renderSpotifyTracks(playlist.name);
+    } catch(err) { hideSpotifyLoading(); showToast('Could not load tracks: ' + err.message, 'error'); renderSpotifyPlaylists(); }
+}
+
+function renderSpotifyTracks(playlistName) {
+    document.getElementById('spotifyStep2').style.display = 'block';
+    document.getElementById('spotifyPlaylistName').textContent = playlistName;
+    document.getElementById('spotifyTrackCount').textContent = spotifyTracks.length + ' songs';
+    const list = document.getElementById('spotifyTrackList');
+    list.innerHTML = '';
+    spotifyTracks.forEach(function(item, index) {
+        const track = item.item;
+        const inLibrary = songLibrary.some(function(s) { return s.title.toLowerCase() === track.name.toLowerCase(); });
+        const isSelected = selectedSpotifyTracks.has(index);
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;' + (inLibrary ? 'opacity:0.4;' : '');
+        row.onclick = function() { if (!inLibrary) { if (selectedSpotifyTracks.has(index)) selectedSpotifyTracks.delete(index); else selectedSpotifyTracks.add(index); renderSpotifyTracks(playlistName); } };
+        row.innerHTML = `<div style="width:18px;height:18px;border-radius:4px;border:2px solid ${isSelected ? '#1ED760' : 'rgba(255,255,255,0.3)'};background:${isSelected ? '#1ED760' : 'transparent'};flex-shrink:0;display:flex;align-items:center;justify-content:center;">${isSelected ? '<svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#000" stroke-width="2" fill="none" stroke-linecap="round"/></svg>' : ''}</div><div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${track.name}${inLibrary ? ' <span style="font-size:10px;color:#1ED760;">✓ In library</span>' : ''}</div><div style="font-size:11px;opacity:0.6;">${track.artists[0]?.name || ''}</div></div>`;
+        list.appendChild(row);
+    });
+    const btn = document.getElementById('spotifyAddBtn');
+    btn.textContent = selectedSpotifyTracks.size > 0 ? `Add ${selectedSpotifyTracks.size} Song${selectedSpotifyTracks.size > 1 ? 's' : ''} to Library` : 'Add Selected Songs';
+}
+
+function selectAllSpotifyTracks() { spotifyTracks.forEach(function(item, index) { const inLib = songLibrary.some(function(s) { return s.title.toLowerCase() === item.item.name.toLowerCase(); }); if (!inLib) selectedSpotifyTracks.add(index); }); renderSpotifyTracks(currentSpotifyPlaylist.name); }
+function clearSpotifySelection() { selectedSpotifyTracks.clear(); renderSpotifyTracks(currentSpotifyPlaylist.name); }
+function backToSpotifyPlaylists() { document.getElementById('spotifyStep2').style.display = 'none'; renderSpotifyPlaylists(); }
+function showSpotifyLoading(msg) { document.getElementById('spotifyStep1').style.display = 'none'; document.getElementById('spotifyStep2').style.display = 'none'; document.getElementById('spotifyLoading').style.display = 'block'; document.getElementById('spotifyLoadingText').textContent = msg || 'Loading...'; }
+function hideSpotifyLoading() { document.getElementById('spotifyLoading').style.display = 'none'; }
+function closeSpotifyModal() { document.getElementById('spotifyModal').classList.remove('show'); document.getElementById('spotifyStep1').style.display = 'none'; document.getElementById('spotifyStep2').style.display = 'none'; hideSpotifyLoading(); }
+
+async function addSelectedSpotifyTracks() {
+    if (selectedSpotifyTracks.size === 0) { showToast('Select at least one song.', 'warning'); return; }
+    const btn = document.getElementById('spotifyAddBtn');
+    btn.disabled = true; btn.textContent = 'Adding...';
+    const toInsert = [];
+    selectedSpotifyTracks.forEach(function(index) { const track = spotifyTracks[index].item; toInsert.push({ artist_id: ARTIST_ID, title: track.name, artist_name: track.artists?.[0]?.name || 'Unknown' }); });
+    try {
+        for (let i = 0; i < toInsert.length; i += 50) { const { error } = await db.from('songs').insert(toInsert.slice(i, i + 50)); if (error) throw error; }
+        await loadFromSupabase(); updateStats(); renderQuickAdd();
+        showToast('✓ ' + toInsert.length + ' songs imported from Spotify!');
+        closeSpotifyModal();
+    } catch(err) { showToast('Error: ' + err.message, 'error'); btn.disabled = false; btn.textContent = 'Add Selected Songs'; }
+}
+
+const QR_TARGET_URL = 'https://jolly-nougat-c7d3f5.netlify.app/customer.html';
+let qrCodeInstance = null;
+
+function initQRCode() {
+    if (typeof QRCode === 'undefined') { setTimeout(initQRCode, 500); return; }
+    const container = document.getElementById('qrCodeContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    try {
+        qrCodeInstance = new QRCode(container, { text: QR_TARGET_URL, width: 150, height: 150, colorDark: '#000000', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H });
+    } catch(error) { console.error('QR generation error:', error); }
+}
+
+function updateQRCardLive() { const artistName = document.getElementById('qrArtistName').value.trim() || 'Your Name'; document.getElementById('qrArtistDisplay').textContent = artistName; }
+
+async function downloadQRPDF() {
+    const artistName = document.getElementById('qrArtistName').value.trim() || 'Artist Name';
+    if (typeof window.jspdf === 'undefined') { showToast('PDF library not ready, try again', 'warning'); return; }
+    try {
+        const container = document.getElementById('qrCodeContainer');
+        const img = container.querySelector('img');
+        const canvas = container.querySelector('canvas');
+        let qrDataUrl;
+        if (canvas) { qrDataUrl = canvas.toDataURL('image/png'); }
+        else if (img) { const tempCanvas = document.createElement('canvas'); tempCanvas.width = 600; tempCanvas.height = 600; const ctx = tempCanvas.getContext('2d'); ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 600, 600); ctx.drawImage(img, 0, 0, 600, 600); qrDataUrl = tempCanvas.toDataURL('image/png'); }
+        else { showToast('QR code not ready', 'warning'); return; }
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'in', format: [4, 6] });
+        pdf.setFillColor(255, 255, 255); pdf.rect(0, 0, 4, 6, 'F');
+        const qrSize = 2.4; const qrX = (4 - qrSize) / 2; const qrY = 1.1;
+        pdf.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
+        pdf.setFont('helvetica', 'normal'); pdf.setFontSize(13); pdf.setTextColor(102, 102, 102); pdf.text('Scan to Request a Song', 2, 3.85, { align: 'center' });
+        pdf.setFont('helvetica', 'bold'); pdf.setFontSize(20); pdf.setTextColor(0, 0, 0); pdf.text(artistName, 2, 4.35, { align: 'center' });
+        pdf.setFont('helvetica', 'normal'); pdf.setFontSize(9); pdf.setTextColor(170, 170, 170); pdf.text('POWERED BY LIVEQUE', 2, 5.5, { align: 'center' });
+        pdf.save('LiveQue_' + artistName.replace(/\s+/g, '_') + '.pdf');
+        showToast('Downloaded');
+    } catch(error) { showToast('Failed to generate PDF', 'error'); }
+}
+    </script>
+</body>
+</html>
