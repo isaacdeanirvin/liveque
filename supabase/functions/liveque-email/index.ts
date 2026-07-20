@@ -208,7 +208,7 @@ function welcomeHtml(name: string): string {
       We're <b style="color:${C.white};">Isaac &amp; Glen Irvin</b> &mdash; two brothers who play out, same as you.
       We built LiveQue because we wanted a better way to connect a room to the person on stage:
       let people <b style="color:${C.white};">request songs</b>, <b style="color:${C.white};">tip to bump their pick</b>,
-      and let you keep every cent of it.
+      and we don't take a cut of it.
     </p>
     <p style="margin:0 0 20px; font-size:15px; line-height:1.6; color:${C.body}; font-family:${SANS};">
       You're all set. Add your songs, put your QR code on the tables, and start your first gig whenever you're ready.
@@ -231,8 +231,8 @@ function welcomeText(name: string): string {
 
 We're Isaac & Glen Irvin - two brothers who play out, same as you. We built
 LiveQue because we wanted a better way to connect a room to the person on
-stage: let people request songs, tip to bump their pick, and let you keep
-every cent of it.
+stage: let people request songs, tip to bump their pick, and we don't take a cut
+of it.
 
 You're all set. Add your songs, put your QR code on the tables, and start your
 first gig whenever you're ready.
