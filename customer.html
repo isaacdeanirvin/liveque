@@ -1004,7 +1004,7 @@ async function startTipPayment(amount){
         if(expressContainer){ expressContainer.innerHTML=''; }
         if(payDivider){ payDivider.style.display='none'; }
         try{
-            const ece=elements.create('expressCheckout',{ buttonHeight:48 });
+            const ece=elements.create('expressCheckout',{ buttonHeight:48, paymentMethods:{ link:'never' } });
             ece.on('availablepaymentmethodschange',function(ev){
                 if(payDivider){ payDivider.style.display=ev.availablePaymentMethods?'flex':'none'; }
             });
