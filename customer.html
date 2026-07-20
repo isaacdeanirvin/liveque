@@ -156,6 +156,7 @@ let songLibrary=[];
 let popularSongsShuffled=[];
 let currentGigSessionId=null;
 let stripeChargesEnabled=false;
+let pendingTip=null;
 
 // Payment icons as SVG strings
 const paymentIcons = {
@@ -491,6 +492,10 @@ function handleRequestInsert(nr){
     renderNowPlaying();
     renderAudienceQueue();
     renderSongLibrary();
+    // F7: if this row is the tip we are waiting on, celebrate now that it shows.
+    if(pendingTip && !pendingTip.done && nr.tip_amount>0 && nr.song_title===pendingTip.title && (nr.requester_name||'Anonymous')===pendingTip.requester){
+        resolvePendingTip(false);
+    }
 }
 
 function handleRequestUpdate(nr){
@@ -1059,9 +1064,19 @@ async function confirmTipPayment(){
             return;
         }
         if(paymentIntent && paymentIntent.status==='succeeded'){
-            showToast('\u2713 $'+stripeTipState.amount+' tip sent \u2014 your request is in the queue!');
+            // The tipped request row arrives via webhook -> insert -> realtime,
+            // typically 1-5s later. Hold a pending state until it appears so the
+            // audience never sees a queue without their song (F7).
+            const nameInput=document.getElementById('requesterNameInput');
+            const who=nameInput&&nameInput.value.trim()?nameInput.value.trim():'Anonymous';
+            if(pendingTip&&pendingTip.timer) clearTimeout(pendingTip.timer);
+            pendingTip={title:currentSong.title,requester:who,amount:stripeTipState.amount,done:false,timer:null};
+            pendingTip.timer=setTimeout(function(){resolvePendingTip(true);},10000);
             stripeTipState=null;
-            closeModal();
+            payBtn.disabled=true;
+            payBtn.textContent='Locking in…';
+            msg.style.color='rgba(255,255,255,0.7)';
+            msg.textContent='Locking in your request…';
         }else{
             msg.style.color='#ffd700';
             msg.textContent='Payment processing\u2026';
@@ -1074,6 +1089,18 @@ async function confirmTipPayment(){
         payBtn.disabled=false;
         payBtn.textContent='Pay $'+stripeTipState.amount;
     }
+}
+
+function resolvePendingTip(timedOut){
+    if(!pendingTip||pendingTip.done) return;
+    pendingTip.done=true;
+    if(pendingTip.timer) clearTimeout(pendingTip.timer);
+    const amt=pendingTip.amount;
+    pendingTip=null;
+    showToast(timedOut
+        ? '✓ $'+amt+' tip received — your request will appear shortly!'
+        : '✓ $'+amt+' tip sent — your request is in the queue!');
+    closeModal();
 }
 
 function searchSongs(q){
@@ -1095,6 +1122,7 @@ function searchSongs(q){
 
 function closeModal(){
     document.getElementById('requestModal').classList.remove('show');
+    if(pendingTip){ if(pendingTip.timer) clearTimeout(pendingTip.timer); pendingTip=null; }
     stripeTipState=null;
     const pa=document.getElementById('paymentArea');
     if(pa){ pa.style.display='none'; document.getElementById('paymentElementContainer').innerHTML=''; document.getElementById('paymentMessage').textContent=''; }
