@@ -35,6 +35,10 @@ serve(async (req) => {
     if (artistErr || !artist) throw new Error("Artist profile not found");
 
     if (!artist.stripe_account_id) {
+      // Keep the audience-facing readiness flag in sync (F2).
+      await admin.from("artist_settings")
+        .update({ stripe_charges_enabled: false })
+        .eq("artist_id", artist.id);
       return new Response(JSON.stringify({ has_account: false, onboarded: false }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -50,6 +54,11 @@ serve(async (req) => {
     if (onboarded !== artist.stripe_onboarded) {
       await admin.from("artists").update({ stripe_onboarded: onboarded }).eq("id", artist.id);
     }
+    // Mirror readiness onto artist_settings so the anonymous audience page can
+    // gate its tip buttons without reading the artists table (F2).
+    await admin.from("artist_settings")
+      .update({ stripe_charges_enabled: onboarded })
+      .eq("artist_id", artist.id);
 
     return new Response(JSON.stringify({
       has_account: true,
