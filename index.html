@@ -103,35 +103,47 @@
         .feedback-btn.visible { opacity: 1; visibility: visible; }
         .feedback-btn svg { width: 14px; height: 14px; fill: none; stroke: white; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-        /* ── LOGIN OVERLAY ── */
-        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #080808; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        /* ── LOGIN ── */
+        .login-overlay { position: fixed; inset: 0; background: radial-gradient(130% 130% at 50% -10%, #12191a 0%, #080808 58%); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 24px; }
         .login-overlay.hidden { display: none; }
-        .login-card { width: 90%; max-width: 360px; background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 24px; padding: 40px 28px; text-align: center; }
-        .login-logo { font-size: 32px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 4px; }
-        .login-logo sup { font-size: 12px; vertical-align: super; font-weight: 400; opacity: 0.7; }
-        .login-subtitle { font-size: 13px; opacity: 0.5; margin-bottom: 32px; }
+        .login-card { width: 100%; max-width: 384px; background: rgba(255,255,255,0.045); backdrop-filter: blur(24px) saturate(140%); -webkit-backdrop-filter: blur(24px) saturate(140%); border: 1px solid rgba(255,255,255,0.09); border-radius: 22px; padding: 40px 30px 30px; box-shadow: 0 24px 70px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06); animation: loginRise 0.55s cubic-bezier(0.22,1,0.36,1) both; }
+        @keyframes loginRise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+        .login-logo { font-size: 30px; font-weight: 650; letter-spacing: -0.7px; text-align: center; color: #fff; }
+        .login-logo sup { font-size: 11px; vertical-align: super; font-weight: 400; opacity: 0.5; letter-spacing: 0; }
+        .login-subtitle { font-size: 13.5px; color: rgba(255,255,255,0.5); text-align: center; margin-top: 6px; margin-bottom: 26px; }
+        .login-toggle { display: flex; gap: 4px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 4px; margin-bottom: 22px; }
+        .login-toggle-btn { flex: 1; padding: 10px; border: none; background: transparent; color: rgba(255,255,255,0.55); font-size: 13.5px; font-weight: 600; border-radius: 9px; cursor: pointer; transition: all 0.2s ease; }
+        .login-toggle-btn.active { background: rgba(255,255,255,0.12); color: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.25); }
         .login-field { margin-bottom: 14px; text-align: left; }
-        .login-field label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.6; margin-bottom: 6px; }
-        .login-input { width: 100%; padding: 13px 16px; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; background: rgba(255,255,255,0.1); color: white; font-size: 15px; outline: none; transition: border-color 0.2s; -webkit-user-select: text; user-select: text; }
-        .login-input:focus { border-color: #4ecdc4; background: rgba(255,255,255,0.15); }
-        .login-input::placeholder { color: rgba(255,255,255,0.35); }
-        .login-btn { width: 100%; padding: 14px; border: none; border-radius: 12px; background: linear-gradient(45deg, #4ecdc4, #44a08d); color: white; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; transition: all 0.3s ease; }
-        .login-btn:hover { transform: scale(1.02); box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4); }
-        .login-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        .login-error { color: #ff6b6b; font-size: 13px; margin-top: 12px; min-height: 18px; }
+        .login-field label { display: block; font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,0.72); margin-bottom: 7px; }
+        .login-input-wrap { position: relative; }
+        .login-input { width: 100%; height: 52px; padding: 0 16px; border: 1px solid rgba(255,255,255,0.13); border-radius: 12px; background: rgba(255,255,255,0.05); color: #fff; font-size: 16px; outline: none; transition: border-color 0.15s, box-shadow 0.15s, background 0.15s; -webkit-user-select: text; user-select: text; }
+        .login-input:focus { border-color: #4ecdc4; background: rgba(255,255,255,0.08); box-shadow: 0 0 0 3px rgba(78,205,196,0.18); }
+        .login-input::placeholder { color: rgba(255,255,255,0.32); }
+        .login-input-wrap .login-input { padding-right: 48px; }
+        .pw-toggle { position: absolute; top: 0; right: 0; height: 52px; width: 46px; display: flex; align-items: center; justify-content: center; background: none; border: none; color: rgba(255,255,255,0.4); cursor: pointer; padding: 0; }
+        .pw-toggle:hover { color: rgba(255,255,255,0.78); }
+        .pw-toggle svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        .pw-toggle .eye-off { display: none; }
+        .pw-toggle.on .eye-on { display: none; }
+        .pw-toggle.on .eye-off { display: block; }
+        .login-btn { width: 100%; height: 52px; border: none; border-radius: 12px; background: #4ecdc4; color: #06251f; font-size: 16px; font-weight: 700; letter-spacing: 0.1px; cursor: pointer; margin-top: 10px; transition: filter 0.2s, transform 0.08s, box-shadow 0.2s; box-shadow: 0 8px 24px rgba(78,205,196,0.22); }
+        .login-btn:hover { filter: brightness(1.05); box-shadow: 0 10px 30px rgba(78,205,196,0.32); }
+        .login-btn:active { transform: scale(0.99); }
+        .login-btn:disabled { opacity: 0.45; cursor: not-allowed; filter: none; box-shadow: none; }
+        .login-error { color: #ff7a7a; font-size: 13px; text-align: center; margin-top: 12px; min-height: 18px; }
+        .login-foot { text-align: center; font-size: 11.5px; color: rgba(255,255,255,0.3); margin-top: 22px; letter-spacing: 0.2px; }
         .signout-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); font-size: 11px; padding: 4px 10px; border-radius: 8px; cursor: pointer; margin-top: 6px; }
         .signout-btn:hover { background: rgba(255,71,87,0.2); border-color: rgba(255,71,87,0.4); color: #ff6b6b; }
         .liquid-glass-live { box-shadow: 0 0 0 1px rgba(78,205,196,0.3), 0 0 30px rgba(78,205,196,0.08); animation: glassBreath 4s ease-in-out infinite; }
         @keyframes glassBreath { 0%,100%{ box-shadow: 0 0 0 1px rgba(78,205,196,0.2), 0 0 20px rgba(78,205,196,0.06); } 50%{ box-shadow: 0 0 0 1px rgba(78,205,196,0.45), 0 0 40px rgba(78,205,196,0.14); } }
-        .login-toggle-btn { flex: 1; padding: 8px; border: none; background: transparent; color: rgba(255,255,255,0.5); font-size: 13px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
-        .login-toggle-btn.active { background: rgba(255,255,255,0.15); color: white; }
         .login-panel { display: none; }
         .login-panel.active { display: block; }
     </style>
 </head>
 <body>
 
-    <!-- ── LOGIN OVERLAY ── -->
+    <!-- ── LOGIN ── -->
     <div class="login-overlay" id="loginOverlay">
         <div class="login-card">
             <div class="login-logo">LiveQue<sup>™</sup></div>
@@ -145,12 +157,15 @@
             <!-- SIGN IN PANEL -->
             <div class="login-panel active" id="signInPanel">
                 <div class="login-field">
-                    <label>Email</label>
-                    <input type="email" class="login-input" id="loginEmail" placeholder="you@example.com" autocomplete="email">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" class="login-input" id="loginEmail" placeholder="you@example.com" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false">
                 </div>
                 <div class="login-field">
-                    <label>Password</label>
-                    <input type="password" class="login-input" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+                    <label for="loginPassword">Password</label>
+                    <div class="login-input-wrap">
+                        <input type="password" class="login-input" id="loginPassword" placeholder="Enter your password" autocomplete="current-password">
+                        <button type="button" class="pw-toggle" aria-label="Show password" onclick="var w=this.parentNode,i=w.querySelector('input'),s=i.type==='password';i.type=s?'text':'password';this.classList.toggle('on',s);this.setAttribute('aria-label',s?'Hide password':'Show password')"><svg class="eye-on" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20C5 20 1 12 1 12a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
+                    </div>
                 </div>
                 <button class="login-btn" id="loginBtn" onclick="signIn()">Sign In</button>
                 <div class="login-error" id="loginError"></div>
@@ -159,24 +174,29 @@
             <!-- SIGN UP PANEL -->
             <div class="login-panel" id="signUpPanel">
                 <div class="login-field">
-                    <label>Your Artist / Performer Name</label>
-                    <input type="text" class="login-input" id="signupName" placeholder="Glen Irvin Jr." autocomplete="name">
+                    <label for="signupName">Performer name</label>
+                    <input type="text" class="login-input" id="signupName" placeholder="e.g. Glen Irvin Jr." autocomplete="name">
                 </div>
                 <div class="login-field">
-                    <label>Email</label>
-                    <input type="email" class="login-input" id="signupEmail" placeholder="you@example.com" autocomplete="email">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" class="login-input" id="signupEmail" placeholder="you@example.com" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false">
                 </div>
                 <div class="login-field">
-                    <label>Password</label>
-                    <input type="password" class="login-input" id="signupPassword" placeholder="Min. 6 characters" autocomplete="new-password">
+                    <label for="signupPassword">Password</label>
+                    <div class="login-input-wrap">
+                        <input type="password" class="login-input" id="signupPassword" placeholder="At least 6 characters" autocomplete="new-password">
+                        <button type="button" class="pw-toggle" aria-label="Show password" onclick="var w=this.parentNode,i=w.querySelector('input'),s=i.type==='password';i.type=s?'text':'password';this.classList.toggle('on',s);this.setAttribute('aria-label',s?'Hide password':'Show password')"><svg class="eye-on" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20C5 20 1 12 1 12a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
+                    </div>
                 </div>
                 <div class="login-field">
-                    <label>Confirm Password</label>
-                    <input type="password" class="login-input" id="signupConfirm" placeholder="••••••••" autocomplete="new-password">
+                    <label for="signupConfirm">Confirm password</label>
+                    <input type="password" class="login-input" id="signupConfirm" placeholder="Re-enter your password" autocomplete="new-password">
                 </div>
                 <button class="login-btn" id="signupBtn" onclick="signUp()">Create Account</button>
                 <div class="login-error" id="signupError"></div>
             </div>
+
+            <div class="login-foot">getliveque.com</div>
         </div>
     </div>
 
