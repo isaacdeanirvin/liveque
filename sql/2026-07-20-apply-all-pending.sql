@@ -58,6 +58,23 @@ drop policy if exists "feedback_auth_insert" on public.feedback;
 create policy "feedback_auth_insert" on public.feedback for insert to authenticated
   with check (char_length(message) between 1 and 2000);
 
+-- ── 4. gigs (durable per-gig stats) ─────────────────────────────────────────
+create table if not exists public.gigs (
+  id uuid primary key default gen_random_uuid(),
+  artist_id uuid not null references public.artists(id) on delete cascade,
+  gig_session_id text, gig_date timestamptz, duration_minutes integer,
+  songs_played integer not null default 0, requests integer not null default 0,
+  tips_total integer not null default 0, tips_count integer not null default 0,
+  top_song text, rating_avg numeric(3,1), rating_count integer not null default 0,
+  ended_via text, created_at timestamptz not null default now()
+);
+create index if not exists gigs_artist_created_idx on public.gigs (artist_id, created_at desc);
+alter table public.gigs enable row level security;
+drop policy if exists "gigs_perform_all" on public.gigs;
+create policy "gigs_perform_all" on public.gigs for all to authenticated
+  using      (artist_id in (select id from public.artists where auth_user_id = auth.uid()))
+  with check (artist_id in (select id from public.artists where auth_user_id = auth.uid()));
+
 -- ── verify ──────────────────────────────────────────────────────────────────
 select 'reviews' as t, count(*) as policies from pg_policies where schemaname='public' and tablename='reviews'
 union all

@@ -129,8 +129,18 @@ serve(async (req) => {
         songsPlayed, requests, tipsTotal, tipsCount, topSong, ratingAvg, ratingCount,
       };
 
-      await sendResend(artist.email, "Your LiveQue gig recap", recapHtml(artist.name || "", stats));
+      // Capture the gig + mark finalized BEFORE emailing, so a send failure never
+      // double-captures or re-sends on the next sweep.
+      await supabase.from("gigs").insert([{
+        artist_id: s.artist_id, gig_session_id: sid,
+        gig_date: startMs ? new Date(startMs).toISOString() : null,
+        duration_minutes: startMs ? Math.max(0, Math.floor((lastMs - startMs) / 60000)) : null,
+        songs_played: songsPlayed, requests, tips_total: tipsTotal, tips_count: tipsCount,
+        top_song: topSong || null, rating_avg: ratingAvg ? Number(ratingAvg) : null,
+        rating_count: ratingCount, ended_via: "auto",
+      }]);
       await supabase.from("artist_settings").update({ recap_sent_session: sid }).eq("artist_id", s.artist_id);
+      try { await sendResend(artist.email, "Your LiveQue gig recap", recapHtml(artist.name || "", stats)); } catch (_) { /* captured; will not retry */ }
       sent++;
     }
     return new Response(JSON.stringify({ ok: true, checked, sent }), { headers: { "Content-Type": "application/json" } });
