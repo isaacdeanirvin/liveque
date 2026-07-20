@@ -132,6 +132,9 @@ console.log('=== LIVEQUE CUSTOMER v6.9.10 ===');
 const SUPABASE_URL='https://jttswydixqeyyqvcohnq.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dHN3eWRpeHFleXlxdmNvaG5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNjE3ODYsImV4cCI6MjA3NDkzNzc4Nn0.WlvOfl11qVUVatSCIPy8t6u9-j4u1z5CpnBxXe50BdQ';
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+// Escape user-originated strings before they enter innerHTML (F8). requester_name
+// is audience-typed; song_title/song_artist can be set via crafted anon inserts.
+function escapeHTML(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 const _urlParams = new URLSearchParams(window.location.search);
 const ARTIST_ID = _urlParams.get('artist');
 if (!ARTIST_ID) {
@@ -730,7 +733,7 @@ function renderNowPlaying(){
     if(ps&&np){
         np.style.display='block';
         const sf=ps.spanish?' 🇪🇸':'';
-        np.innerHTML='<div class="now-playing-card"><div style="flex: 1;"><div style="font-size: 12px; opacity: 0.9; margin-bottom: 3px;">NOW PLAYING</div><div style="font-size: 18px; font-weight: bold; margin-bottom: 3px;">'+ps.title+sf+'</div><div style="font-size: 14px; opacity: 0.9;">'+ps.artist+'</div><div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">by '+ps.requesterName+'</div></div><div style="font-size: 20px;">♪ LIVE</div></div>';
+        np.innerHTML='<div class="now-playing-card"><div style="flex: 1;"><div style="font-size: 12px; opacity: 0.9; margin-bottom: 3px;">NOW PLAYING</div><div style="font-size: 18px; font-weight: bold; margin-bottom: 3px;">'+escapeHTML(ps.title)+sf+'</div><div style="font-size: 14px; opacity: 0.9;">'+escapeHTML(ps.artist)+'</div><div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">by '+escapeHTML(ps.requesterName)+'</div></div><div style="font-size: 20px;">♪ LIVE</div></div>';
     }else if(np){
         np.style.display='none';
     }
@@ -762,7 +765,7 @@ function renderAudienceQueue(){
         const ud=document.createElement('div');
         ud.className='up-next-bubble';
         const sf=un.spanish?' 🇪🇸':'';
-        ud.innerHTML='<div style="flex: 1;"><div style="font-size: 12px; opacity: 0.9; margin-bottom: 3px;">UP NEXT</div><div style="font-size: 16px; font-weight: bold; margin-bottom: 3px;">'+un.title+sf+'</div><div style="font-size: 13px; opacity: 0.9;">'+un.artist+'</div></div><div style="font-size: 16px; font-weight: 600; opacity: 0.8;">NEXT</div>';
+        ud.innerHTML='<div style="flex: 1;"><div style="font-size: 12px; opacity: 0.9; margin-bottom: 3px;">UP NEXT</div><div style="font-size: 16px; font-weight: bold; margin-bottom: 3px;">'+escapeHTML(un.title)+sf+'</div><div style="font-size: 13px; opacity: 0.9;">'+escapeHTML(un.artist)+'</div></div><div style="font-size: 16px; font-weight: 600; opacity: 0.8;">NEXT</div>';
         qd.appendChild(ud);
     }
     
@@ -770,7 +773,7 @@ function renderAudienceQueue(){
         const qi=document.createElement('div');
         qi.className='queue-item'+(r.tip>0?' priority':'');
         const sf=r.spanish?' 🇪🇸':'';
-        qi.innerHTML='<div class="song-info"><div class="song-title">'+r.title+sf+'</div><div class="song-artist">'+r.artist+'</div><div class="requester-name">by '+r.requesterName+'</div></div>'+(r.tip>0?'<div class="priority-badge">Priority</div>':'');
+        qi.innerHTML='<div class="song-info"><div class="song-title">'+escapeHTML(r.title)+sf+'</div><div class="song-artist">'+escapeHTML(r.artist)+'</div><div class="requester-name">by '+escapeHTML(r.requesterName)+'</div></div>'+(r.tip>0?'<div class="priority-badge">Priority</div>':'');
         qd.appendChild(qi);
     });
 }
@@ -838,7 +841,7 @@ function renderSongLibrary(){
                 var cd=document.createElement('div');
                 cd.className='top-song-card';
                 var sf=s.spanish?' 🇪🇸':'';
-                cd.innerHTML='<div class="top-song-number">'+(i+1)+'</div><div style="font-weight: bold; margin-bottom: 4px;">'+s.title+sf+'</div><div style="font-size: 12px; opacity: 0.8; margin-bottom: 8px;">'+s.artist+'</div><div style="font-size: 11px; color: #4ecdc4;">Quick Request</div>';
+                cd.innerHTML='<div class="top-song-number">'+(i+1)+'</div><div style="font-weight: bold; margin-bottom: 4px;">'+escapeHTML(s.title)+sf+'</div><div style="font-size: 12px; opacity: 0.8; margin-bottom: 8px;">'+escapeHTML(s.artist)+'</div><div style="font-size: 11px; color: #4ecdc4;">Quick Request</div>';
                 cd.onclick=function(){openRequestModal(s.title,s.artist,s.spanish);};
                 gd.appendChild(cd);
             }
@@ -866,7 +869,7 @@ function renderSongLibrary(){
             }else if(!av.available&&av.reason==='in-queue'){
                 th='<div class="unavailable-text">In queue</div>';
             }
-            sd.innerHTML='<div class="song-info"><div class="song-title">'+s.title+sf+'</div><div class="song-artist">'+s.artist+'</div>'+th+'</div><button class="request-btn" '+(!av.available?'disabled':'')+'>'+(av.available?'Request':'Unavailable')+'</button>';
+            sd.innerHTML='<div class="song-info"><div class="song-title">'+escapeHTML(s.title)+sf+'</div><div class="song-artist">'+escapeHTML(s.artist)+'</div>'+th+'</div><button class="request-btn" '+(!av.available?'disabled':'')+'>'+(av.available?'Request':'Unavailable')+'</button>';
             if(av.available){
                 const btn=sd.querySelector('.request-btn');
                 btn.onclick=function(){openRequestModal(s.title,s.artist,s.spanish);};
@@ -913,7 +916,7 @@ function isSongAvailable(s){
 function openRequestModal(t,a,sp){
     currentSong={title:t,artist:a,spanish:sp};
     const sf=sp?' 🇪🇸':'';
-    document.getElementById('modalSongInfo').innerHTML='<div style="font-size: 18px; font-weight: bold;">'+t+sf+'</div><div style="opacity: 0.8;">'+a+'</div>';
+    document.getElementById('modalSongInfo').innerHTML='<div style="font-size: 18px; font-weight: bold;">'+escapeHTML(t)+sf+'</div><div style="opacity: 0.8;">'+escapeHTML(a)+'</div>';
     
     const tc=document.getElementById('tipButtonsContainer');
     tc.innerHTML='';
