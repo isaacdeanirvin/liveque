@@ -37,7 +37,7 @@ for (const f of files) {
   check('<title> present', /<title>[^<]+<\/title>/.test(h));
   check('format-detection meta', /name="format-detection"/.test(h));
   check('x-apple-disable-message-reformatting', /x-apple-disable-message-reformatting/.test(h));
-  check('color-scheme = light only', /content="light only"/.test(h));
+  check('color-scheme declared', /name="color-scheme"/.test(h));
   check('MSO PixelsPerInch', /PixelsPerInch/.test(h));
   check('MSO font override (else Outlook->Times)', /\[if mso\]><style>\* \{ font-family/.test(h));
   check('mso-line-height-rule', /mso-line-height-rule:exactly/.test(h));
@@ -74,16 +74,18 @@ for (const f of files) {
 
 console.log('\n── contrast (WCAG AA: 4.5:1 body, 3:1 large)');
 const pairs = [
-  ['label teal on tile', '#0d5f55', '#f7f8fa'],
-  ['label gold on tile', '#8a6a00', '#f7f8fa'],
-  ['label coral on tile', '#b3373c', '#f7f8fa'],
-  ['numeral ink on tile', '#101014', '#f7f8fa'],
-  ['body text on card', '#3c3c46', '#fffffe'],
-  ['muted on card', '#667085', '#fffffe'],
-  ['gold on dark hero', '#ffd700', '#12433a'],
-  ['button ink on teal', '#06251f', '#4ecdc4'],
-  ['footer link on card', '#0d5f55', '#fffffe'],
-  ['star gold on rating tile', '#8a6a00', '#fdf7e3'],
+  // Dark palette, taken from index.html. Surfaces are the solid equivalents of
+  // the app's rgba(255,255,255,x) over #080808.
+  ['body copy on card', '#d6d6d8', '#141414'],
+  ['stat label on tile', '#a8a8ad', '#202020'],
+  ['footer text on card', '#8d8d95', '#141414'],
+  ['white heading on card', '#fffffe', '#141414'],
+  ['teal number on tile', '#4ecdc4', '#202020'],
+  ['gold number on tile', '#ffd700', '#202020'],
+  ['coral number on tile', '#ff6b6b', '#202020'],
+  ['gold hero on tile', '#ffd700', '#202020'],
+  ['teal link on card', '#4ecdc4', '#141414'],
+  ['ink on teal button', '#06251f', '#4ecdc4'],
 ];
 for (const [name, fg, bg] of pairs) {
   const r = contrast(fg, bg);

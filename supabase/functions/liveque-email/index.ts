@@ -6,13 +6,17 @@
 // get, since forgetting to hit End Gig is the norm — did not match the manual
 // one. The sweeper calls this function now. Do not reintroduce a second copy.
 //
-// WHY THESE EMAILS ARE LIGHT WHEN THE APP IS DARK:
-// Gmail's iOS/Android apps and classic Outlook on Windows force-invert every
-// message for dark-mode users, and ignore prefers-color-scheme while doing it.
-// A dark email arrives light for those users and stays dark in Apple Mail and
-// Yahoo — the same email, two opposite looks, no override available. So the
-// canvas is light and the brand is carried where we DO control it: the #12433a
-// header band, the dark hero stat tile, Georgia numerals, teal and gold accents.
+// THESE EMAILS ARE DARK BECAUSE THE APP IS DARK.
+// Every value here is lifted from index.html — #080808 body, the glass card at
+// rgba(255,255,255,0.05) with a 0.08 border, .stat-item at radius 10 with a 24px
+// bold number and a 12px 0.8-opacity label, the .auth-btn teal gradient with
+// white text, the 28px/600 wordmark. rgba is precomputed to solid hex because
+// Outlook has no rgba; over a known background it resolves identically.
+//
+// Known tradeoff, accepted deliberately: Gmail's mobile apps and classic Outlook
+// force-invert dark mail for dark-mode users and ignore prefers-color-scheme, so
+// those users may see a lightened version. Matching the product was judged more
+// important than byte-identical rendering in every client.
 //
 // Security — two callers, two auth modes:
 //   1. A performer's browser presents a Supabase auth JWT. The email always goes
@@ -42,31 +46,31 @@ const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const SITE = "https://getliveque.com";
 
 // ── Palette ────────────────────────────────────────────────────────────
-// Never pure #ffffff or #000000 — Apple Mail's inversion heuristic keys on the
-// exact values, so off-white and near-black dodge it outright.
+// These are index.html's values, not new ones. The app uses translucent white
+// over #080808; Outlook has no rgba, so each surface is precomputed to the
+// solid it resolves to over the known background — visually identical, works
+// everywhere.
 const C = {
-  page: "#f4f5f7",
-  card: "#fffffe",
-  ink: "#101014",
-  body: "#3c3c46",
-  muted: "#667085",
-  line: "#e4e6ec",
-  band: "#12433a",       // the LiveQue header band, same as every doc page
-  bandTo: "#0f3a32",
-  teal: "#4ecdc4",       // button fill
-  tealInk: "#06251f",    // text ON teal — never white
-  gold: "#ffd700",       // gold only ever sits on the dark hero tile
-  // Accessible ink versions of the dashboard's stat colours. The raw teal/gold
-  // fail WCAG on a light card, so labels use darkened variants (all ≥4.5:1).
-  tealText: "#0d5f55",
-  goldText: "#8a6a00",
-  coralText: "#b3373c",
+  page: "#080808",       // body background, straight from the app
+  card: "#141414",       // = rgba(255,255,255,0.05) over #080808
+  tile: "#202020",       // = the same 0.05 again, over the card
+  line: "#1c1c1c",       // = rgba(255,255,255,0.08)
+  soft: "#212121",       // = rgba(255,255,255,0.1), the .control-btn fill
+  white: "#fffffe",      // not pure #ffffff — dodges Apple Mail's invert heuristic
+  body: "#d6d6d8",       // white at ~0.84, the app's body copy weight
+  dim: "#a8a8ad",        // .stat-label / .song-artist at opacity 0.8
+  faint: "#8d8d95",      // .requester-name at opacity 0.6
+  teal: "#4ecdc4",       // Requests + brand
+  tealTo: "#44a08d",     // the .auth-btn gradient partner
+  gold: "#ffd700",       // Tips Today + money + ratings
+  coral: "#ff6b6b",      // Songs + the default .queue-item left border
+  goldInk: "#1a1a2e",    // .priority-badge text on gold
 };
 
-// Georgia for numerals: web-safe, so no webfont, and it reads as designed
-// rather than default. Sans everywhere else.
-const NUM = "Georgia,'Times New Roman',Times,serif";
-const SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif";
+// The app is 'Segoe UI' first — which also happens to be the one stack Outlook
+// renders correctly. A leading -apple-system makes the Word engine fall back to
+// Times New Roman for the whole message.
+const SANS = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
 
 function esc(v: unknown): string {
   return String(v == null ? "" : v).replace(/[&<>"']/g, (c) =>
@@ -97,17 +101,17 @@ function shell(inner: string, preheader: string, title: string): string {
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes" />
 <meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no" />
 <meta name="x-apple-disable-message-reformatting" />
-<meta name="color-scheme" content="light only" />
-<meta name="supported-color-schemes" content="light only" />
+<meta name="color-scheme" content="dark" />
+<meta name="supported-color-schemes" content="dark" />
 <title>${esc(title)}</title>
 <!--[if gte mso 9]><xml><o:OfficeDocumentSettings><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->
-<!--[if mso]><style>* { font-family: 'Segoe UI', Arial, Helvetica, sans-serif !important; } .num { font-family: Georgia, serif !important; }</style><![endif]-->
+<!--[if mso]><style>* { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important; }</style><![endif]-->
 <style>
   table { border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt; }
   td { mso-line-height-rule:exactly; }
   img { border:0; display:block; -ms-interpolation-mode:bicubic; }
   body { -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
-  h1 { margin:0 0 14px; font-size:26px; line-height:1.25; font-weight:700; }
+  h1 { margin:0 0 6px; font-size:22px; line-height:1.3; font-weight:700; }
   a[x-apple-data-detectors] { color:inherit !important; text-decoration:none !important; font-size:inherit !important; font-family:inherit !important; font-weight:inherit !important; line-height:inherit !important; }
 </style>
 </head>
@@ -115,15 +119,21 @@ function shell(inner: string, preheader: string, title: string): string {
 <div style="display:none; max-height:0; overflow:hidden; mso-hide:all; font-size:1px; line-height:1px; color:${C.page}; opacity:0;">${esc(preheader)}${PREHEAD_PAD}</div>
 <div role="article" aria-roledescription="email" aria-label="${esc(title)}" lang="en" dir="ltr" style="font-family:${SANS}; font-size:medium; font-size:max(16px,1rem);">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${C.page};">
-  <tr><td align="center" style="padding:24px 12px;">
-    <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%; max-width:600px; background-color:${C.card}; border-radius:16px; overflow:hidden; border:1px solid ${C.line};">
-      <tr><td align="center" style="padding:26px 32px; background:linear-gradient(135deg,${C.band},${C.bandTo}); background-color:${C.band};">
-        <div style="font-size:26px; font-weight:700; color:#fffffe; letter-spacing:-0.5px; font-family:${SANS};">LiveQue<span style="font-size:11px; color:${C.teal}; vertical-align:super;">TM</span></div>
-        <div style="font-size:13px; color:#9fd8d1; margin-top:4px; font-family:${SANS};">Live song requests &amp; tipping for musicians</div>
+  <tr><td align="center" style="padding:20px 10px;">
+    <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="width:100%; max-width:560px;">
+
+      <!-- Header: the app's .header — glass card, radius 20, centred wordmark. -->
+      <tr><td align="center" style="background-color:${C.card}; border:1px solid ${C.line}; border-radius:20px; padding:18px 16px;">
+        <div style="font-size:28px; font-weight:600; color:${C.white}; letter-spacing:-0.5px; font-family:${SANS};">LiveQue<span style="font-size:12px; vertical-align:super;">&#8482;</span></div>
+        <div style="font-size:12px; color:${C.dim}; margin-top:4px; font-family:${SANS};">Live song requests &amp; tipping for musicians</div>
       </td></tr>
+      <tr><td style="height:12px; font-size:0; line-height:0;">&nbsp;</td></tr>
+
       ${inner}
-      <tr><td style="padding:22px 32px; border-top:1px solid ${C.line}; font-size:12px; line-height:1.6; color:${C.muted}; font-family:${SANS};">
-        Sent by LiveQue &middot; <a href="${SITE}" style="color:${C.tealText};">getliveque.com</a><br />
+
+      <tr><td style="height:12px; font-size:0; line-height:0;">&nbsp;</td></tr>
+      <tr><td style="background-color:${C.card}; border:1px solid ${C.line}; border-radius:15px; padding:14px 16px; font-size:11px; line-height:1.6; color:${C.faint}; font-family:${SANS}; text-align:center;">
+        Sent by LiveQue &middot; <a href="${SITE}" style="color:${C.teal}; text-decoration:none;">getliveque.com</a><br />
         Reply to this email with any feedback &mdash; we read every one.
       </td></tr>
     </table>
@@ -135,33 +145,31 @@ function shell(inner: string, preheader: string, title: string): string {
 }
 
 // ── Tiles ──────────────────────────────────────────────────────────────
-// The hero is the one dark tile on a light page. That single inversion carries
-// the hierarchy on its own — the old email painted five numbers the same gold
-// and nothing led.
-function heroTile(value: string, label: string, color: string): string {
-  return `<tr><td style="padding:0 32px 16px;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${C.band}; border-radius:14px;">
-      <tr><td align="center" style="padding:26px 20px;">
-        <div style="font-size:11px; color:#9fd8d1; text-transform:uppercase; letter-spacing:1.5px; font-family:${SANS};">${esc(label)}</div>
-        <div class="num" style="font-family:${NUM}; font-size:44px; font-weight:700; color:${color}; line-height:1.1; letter-spacing:-0.02em; margin-top:8px; white-space:nowrap;">${esc(value)}</div>
-      </td></tr>
-    </table>
-  </td></tr>`;
+// .stat-item from index.html: centred, rgba(255,255,255,0.05) fill, 12px pad,
+// radius 10, number 24px bold in the metric's colour, label 12px at 0.8 opacity.
+// The hero is the same tile with the number scaled up — not a new component.
+
+function card(inner: string, radius = 15): string {
+  return `<tr><td style="background-color:${C.card}; border:1px solid ${C.line}; border-radius:${radius}px; padding:14px 16px;">${inner}</td></tr>
+  <tr><td style="height:10px; font-size:0; line-height:0;">&nbsp;</td></tr>`;
 }
 
-// Fluid-hybrid: inline-block + max-width so the tiles stack on narrow screens
-// with no media query (Gmail's apps honour neither), plus an MSO ghost table
-// because the Word engine ignores max-width on a div.
-function statTile(value: string, label: string, labelColor: string): string {
-  // The inner div supplies the gutter: font-size:0 on the row kills the natural
-  // whitespace between inline-blocks, and padding on the outer div would fight
-  // width:100% + max-width.
-  return `<div style="display:inline-block; width:100%; max-width:264px; vertical-align:top; font-size:16px;">
+function heroTile(value: string, label: string, color: string): string {
+  return card(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr><td align="center" style="background-color:${C.tile}; border-radius:10px; padding:22px 12px;">
+      <div style="font-size:40px; font-weight:700; color:${color}; line-height:1.1; font-family:${SANS}; white-space:nowrap;">${esc(value)}</div>
+      <div style="font-size:12px; color:${C.dim}; margin-top:6px; font-family:${SANS};">${esc(label)}</div>
+    </td></tr>
+  </table>`);
+}
+
+function statTile(value: string, label: string, color: string): string {
+  return `<div style="display:inline-block; width:100%; max-width:250px; vertical-align:top; font-size:16px;">
     <div style="padding:0 5px 10px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f7f8fa; border:1px solid ${C.line}; border-radius:12px;">
-        <tr><td align="center" style="padding:18px 12px;">
-          <div class="num" style="font-family:${NUM}; font-size:30px; font-weight:700; color:${C.ink}; line-height:1.1; letter-spacing:-0.02em; white-space:nowrap;">${esc(value)}</div>
-          <div style="font-size:10px; color:${labelColor}; text-transform:uppercase; letter-spacing:1px; margin-top:8px; font-family:${SANS}; font-weight:600;">${esc(label)}</div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${C.tile}; border-radius:10px;">
+        <tr><td align="center" style="padding:14px 10px;">
+          <div style="font-size:24px; font-weight:700; color:${color}; line-height:1.15; font-family:${SANS}; white-space:nowrap;">${esc(value)}</div>
+          <div style="font-size:12px; color:${C.dim}; margin-top:4px; font-family:${SANS};">${esc(label)}</div>
         </td></tr>
       </table>
     </div>
@@ -169,53 +177,52 @@ function statTile(value: string, label: string, labelColor: string): string {
 }
 
 function tileRow(a: string, b: string): string {
-  return `<tr><td style="padding:0 27px 0;">
-    <div style="text-align:center; font-size:0;">
-      <!--[if mso]><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td width="268" valign="top"><![endif]-->
+  return `<div style="text-align:center; font-size:0;">
+      <!--[if mso]><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td width="250" valign="top"><![endif]-->
       ${a}
-      <!--[if mso]></td><td width="268" valign="top"><![endif]-->
+      <!--[if mso]></td><td width="250" valign="top"><![endif]-->
       ${b}
       <!--[if mso]></td></tr></table><![endif]-->
-    </div>
-  </td></tr>`;
+    </div>`;
 }
 
-// VML so classic Outlook gets a real rounded button instead of bare link text.
+// .auth-btn: teal gradient, radius 10, white bold. Gradient with a solid
+// fallback underneath so Outlook still gets a filled teal button.
 function ctaButton(href: string, text: string): string {
   return `<!--[if mso]>
-  <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${href}" style="height:48px;v-text-anchor:middle;width:260px;" arcsize="25%" stroke="f" fillcolor="${C.teal}">
-    <w:anchorlock/><center style="color:${C.tealInk};font-family:'Segoe UI',Arial,sans-serif;font-size:15px;font-weight:700;">${esc(text)}</center>
+  <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${href}" style="height:44px;v-text-anchor:middle;width:240px;" arcsize="23%" stroke="f" fillcolor="${C.teal}">
+    <w:anchorlock/><center style="color:#06251f;font-family:'Segoe UI',Tahoma,sans-serif;font-size:15px;font-weight:700;">${esc(text)}</center>
   </v:roundrect>
   <![endif]-->
   <!--[if !mso]><!-- -->
-  <a href="${href}" style="background-color:${C.teal}; border-radius:12px; color:${C.tealInk}; display:inline-block; font-family:${SANS}; font-size:15px; font-weight:700; line-height:48px; text-align:center; text-decoration:none; width:260px; mso-hide:all;">${esc(text)}</a>
+  <a href="${href}" style="background-color:${C.teal}; background:linear-gradient(45deg,${C.teal},${C.tealTo}); border-radius:10px; color:#06251f; display:inline-block; font-family:${SANS}; font-size:15px; font-weight:700; line-height:44px; text-align:center; text-decoration:none; width:240px; mso-hide:all;">${esc(text)}</a>
   <!--<![endif]-->`;
 }
 
 // ── Welcome ────────────────────────────────────────────────────────────
 function welcomeHtml(name: string): string {
   const hi = name ? `Welcome to LiveQue, ${esc(name)}` : "Welcome to LiveQue";
-  const inner = `<tr><td style="padding:32px 32px 6px;">
-    <h1 style="font-family:${NUM}; color:${C.ink};">${hi}</h1>
-    <p style="margin:0 0 14px; font-size:16px; line-height:1.6; color:${C.body}; font-family:${SANS};">
-      We're <b style="color:${C.ink};">Isaac &amp; Glen Irvin</b> &mdash; two brothers who play out, same as you.
+  const inner = card(`
+    <h1 style="color:${C.white}; font-family:${SANS};">${hi}</h1>
+    <p style="margin:12px 0 12px; font-size:15px; line-height:1.6; color:${C.body}; font-family:${SANS};">
+      We're <b style="color:${C.white};">Isaac &amp; Glen Irvin</b> &mdash; two brothers who play out, same as you.
       We built LiveQue because we wanted a better way to connect a room to the person on stage:
-      let people <b style="color:${C.ink};">request songs</b>, <b style="color:${C.ink};">tip to bump their pick</b>,
+      let people <b style="color:${C.white};">request songs</b>, <b style="color:${C.white};">tip to bump their pick</b>,
       and let you keep every cent of it.
     </p>
-    <p style="margin:0 0 26px; font-size:16px; line-height:1.6; color:${C.body}; font-family:${SANS};">
+    <p style="margin:0 0 20px; font-size:15px; line-height:1.6; color:${C.body}; font-family:${SANS};">
       You're all set. Add your songs, put your QR code on the tables, and start your first gig whenever you're ready.
     </p>
-  </td></tr>
-  <tr><td align="center" style="padding:0 32px 28px;">${ctaButton(SITE, "Open your dashboard")}</td></tr>
-  <tr><td style="padding:0 32px 30px;">
-    <p style="margin:0 0 16px; font-size:15px; line-height:1.6; color:${C.body}; font-family:${SANS};">
+    <div style="text-align:center; padding-bottom:6px;">${ctaButton(SITE, "Open your dashboard")}</div>
+  `)
+  + card(`
+    <p style="margin:0 0 12px; font-size:14px; line-height:1.6; color:${C.body}; font-family:${SANS};">
       We'd genuinely love your feedback &mdash; tell us what you love and what we can make better. Just reply to this email.
     </p>
-    <p style="margin:0; font-size:15px; line-height:1.6; color:${C.body}; font-family:${SANS};">
-      Thanks for playing with us,<br /><b style="color:${C.ink};">Isaac &amp; Glen Irvin</b>
+    <p style="margin:0; font-size:14px; line-height:1.6; color:${C.body}; font-family:${SANS};">
+      Thanks for playing with us,<br /><b style="color:${C.white};">Isaac &amp; Glen Irvin</b>
     </p>
-  </td></tr>`;
+  `);
   return shell(inner, "You're set up. Add your songs, print your QR code, and start your first gig.", "Welcome to LiveQue");
 }
 
@@ -249,67 +256,63 @@ function recapHtml(name: string, s: Record<string, unknown>): string {
   const dur = s.duration ? String(s.duration) : "—";
   const earned = Number(s.tipsTotal) > 0;
 
-  // A night with no tips should not open with a giant $0.00. Lead with what
-  // they did do; tips drop out of the grid rather than showing a zero twice.
+  // A night with no tips should not open with a giant $0.00 — lead with what
+  // they did do, and drop tips out of the grid rather than showing zero twice.
   const hero = earned
     ? heroTile(tips, "Tips collected", C.gold)
-    : heroTile(num(s.songsPlayed), "Songs played", "#fffffe");
+    : heroTile(num(s.songsPlayed), "Songs played", C.coral);
 
-  const grid = earned
-    ? tileRow(statTile(num(s.songsPlayed), "Songs played", C.coralText), statTile(num(s.tipsCount), "Tips", C.goldText))
-      + tileRow(statTile(num(s.requests), "Requests", C.tealText), statTile(dur, "Set length", C.muted))
-    : tileRow(statTile(num(s.requests), "Requests", C.tealText), statTile(dur, "Set length", C.muted));
+  // Colours are the dashboard's Live Stats, unchanged: Requests teal, Tips
+  // gold, Songs coral.
+  const rows = earned
+    ? tileRow(statTile(num(s.songsPlayed), "Songs played", C.coral), statTile(num(s.tipsCount), "Tips", C.gold))
+      + tileRow(statTile(num(s.requests), "Requests", C.teal), statTile(dur, "Set length", C.white))
+    : tileRow(statTile(num(s.requests), "Requests", C.teal), statTile(dur, "Set length", C.white));
 
+  // .queue-item.priority — gold left border over a gold-tinted fill.
   const top = s.topSong
-    ? `<tr><td style="padding:6px 32px 10px;">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#eef8f7; border:1px solid #cfe9e6; border-radius:12px;">
-          <tr><td style="padding:16px 18px;">
-            <div style="font-size:10px; color:${C.tealText}; text-transform:uppercase; letter-spacing:1.2px; font-weight:600; font-family:${SANS};">Crowd favorite</div>
-            <div style="font-size:17px; font-weight:700; color:${C.ink}; margin-top:5px; font-family:${SANS};">${esc(s.topSong)}</div>
-          </td></tr>
-        </table>
-      </td></tr>`
+    ? card(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#2a2410; border-left:4px solid ${C.gold}; border-radius:10px;">
+        <tr><td style="padding:12px 14px;">
+          <div style="font-size:12px; color:${C.dim}; font-family:${SANS};">Crowd favorite</div>
+          <div style="font-size:16px; font-weight:700; color:${C.white}; margin-top:3px; font-family:${SANS};">${esc(s.topSong)}</div>
+        </td></tr>
+      </table>`)
     : "";
 
-  // U+2605/U+2606, not the emoji star — a text glyph inherits colour and size.
-  // aria-hidden with a real numeric equivalent beside it, so it is not the only
-  // way the rating is conveyed.
+  // U+2605/U+2606 text glyphs, not the emoji star — the app uses the same
+  // entities, and a text glyph inherits colour and size.
   const rating = rc > 0
     ? (() => {
         const r = Math.max(0, Math.min(5, Math.round(Number(s.ratingAvg) || 0)));
         const glyphs = "&#9733;".repeat(r) + "&#9734;".repeat(5 - r);
-        return `<tr><td style="padding:6px 32px 10px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#fdf7e3; border:1px solid #f0e2b0; border-radius:12px;">
-            <tr><td align="center" style="padding:16px 18px;">
-              <div style="font-size:22px; color:${C.goldText}; letter-spacing:3px; line-height:1.2;" aria-hidden="true">${glyphs}</div>
-              <div style="font-size:13px; color:${C.body}; margin-top:8px; font-family:${SANS};">${esc(s.ratingAvg)} average from ${rc} rating${rc === 1 ? "" : "s"}</div>
-            </td></tr>
-          </table>
-        </td></tr>`;
+        return card(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${C.tile}; border-radius:10px;">
+          <tr><td align="center" style="padding:14px 12px;">
+            <div style="font-size:22px; color:${C.gold}; letter-spacing:3px; line-height:1.2;" aria-hidden="true">${glyphs}</div>
+            <div style="font-size:12px; color:${C.dim}; margin-top:6px; font-family:${SANS};">${esc(s.ratingAvg)} average from ${rc} rating${rc === 1 ? "" : "s"}</div>
+          </td></tr>
+        </table>`)
       })()
     : "";
 
-  const inner = `<tr><td style="padding:30px 32px 6px;">
-      <div style="font-size:11px; color:${C.tealText}; text-transform:uppercase; letter-spacing:2.5px; font-weight:600; font-family:${SANS};">Your night</div>
-      <h1 style="margin:8px 0 4px; font-family:${NUM}; color:${C.ink};">That's a wrap${name ? ", " + esc(name) : ""}.</h1>
-      <div style="font-size:13px; color:${C.muted}; margin-bottom:20px; font-family:${SANS};">${esc(s.gigDate || "")}</div>
-    </td></tr>
-    ${hero}
-    ${grid}
-    ${top}
-    ${rating}
-    <tr><td align="center" style="padding:18px 32px 6px;">${ctaButton(SITE, "See all your gigs")}</td></tr>
-    <tr><td style="padding:20px 32px 30px;">
-      <p style="margin:0 0 14px; font-size:15px; line-height:1.6; color:${C.body}; font-family:${SANS};">
-        Nicely done. Your queue and tips reset for next time &mdash; break a leg out there.
-      </p>
-      <p style="margin:0; font-size:15px; color:${C.muted}; font-family:${SANS};">&mdash; Isaac &amp; Glen, LiveQue</p>
-    </td></tr>`;
+  const head = card(`
+    <h1 style="color:${C.white}; font-family:${SANS};">That's a wrap${name ? ", " + esc(name) : ""}.</h1>
+    <div style="font-size:12px; color:${C.faint}; font-family:${SANS};">${esc(s.gigDate || "")}</div>
+  `);
+
+  const grid = card(`<div style="margin-bottom:-10px;">${rows}</div>`);
+
+  const foot = card(`
+    <p style="margin:0 0 14px; font-size:14px; line-height:1.6; color:${C.body}; font-family:${SANS};">
+      Nicely done. Your queue and tips reset for next time &mdash; break a leg out there.
+    </p>
+    <div style="text-align:center; padding-bottom:8px;">${ctaButton(SITE, "See all your gigs")}</div>
+    <p style="margin:0; font-size:13px; color:${C.faint}; font-family:${SANS}; text-align:center;">&mdash; Isaac &amp; Glen, LiveQue</p>
+  `);
 
   const pre = earned
     ? `${tips} in tips${s.songsPlayed ? `, ${num(s.songsPlayed)} songs played` : ""}${s.topSong ? `. Crowd favorite: ${s.topSong}` : ""}`
     : `${num(s.songsPlayed)} songs played${s.duration ? `, ${s.duration} on stage` : ""}`;
-  return shell(inner, pre, "Your LiveQue gig recap");
+  return shell(head + hero + grid + top + rating + foot, pre, "Your LiveQue gig recap");
 }
 
 function recapText(name: string, s: Record<string, unknown>): string {
