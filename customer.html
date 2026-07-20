@@ -102,6 +102,10 @@
         .feedback-btn:hover { background: rgba(255, 255, 255, 0.25); transform: scale(1.02); }
         .feedback-btn.visible { opacity: 1; visibility: visible; }
         .feedback-btn svg { width: 14px; height: 14px; fill: none; stroke: white; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .pay-divider{display:flex;align-items:center;text-align:center;color:rgba(255,255,255,0.42);font-size:12px;letter-spacing:0.2px;margin:12px 0 10px;}
+        .pay-divider::before,.pay-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.14);}
+        .pay-divider::before{margin-right:10px;}
+        .pay-divider::after{margin-left:10px;}
     </style>
 </head>
 <body>
@@ -123,7 +127,7 @@
         <div class="payment-section"><div class="section-title">Current Queue</div><div id="audienceQueue"></div></div>
         <div class="payment-section"><div class="section-title">Request a Song</div><input type="text" class="search-bar" placeholder="Search LiveQue..." oninput="searchSongs(this.value)"><div id="songsList"></div></div>
     </div>
-    <div id="requestModal" class="modal"><div class="modal-content"><span class="close" onclick="closeModal()">&times;</span><h2>Request Song</h2><div id="modalSongInfo" style="margin: 20px 0;"></div><div id="tipButtonsContainer"></div><div id="paymentArea" style="display:none; margin-top:16px; text-align:left;"><div id="paymentElementContainer" style="margin-bottom:12px;"></div><button id="payNowBtn" class="tip-btn" style="width:100%; margin:0;" onclick="confirmTipPayment()">Pay</button><div id="paymentMessage" style="margin-top:10px; font-size:13px; min-height:16px; text-align:center;"></div></div></div></div>
+    <div id="requestModal" class="modal"><div class="modal-content"><span class="close" onclick="closeModal()">&times;</span><h2>Request Song</h2><div id="modalSongInfo" style="margin: 20px 0;"></div><div id="tipButtonsContainer"></div><div id="paymentArea" style="display:none; margin-top:16px; text-align:left;"><div id="expressCheckoutContainer" style="margin-bottom:8px;"></div><div id="payDivider" class="pay-divider" style="display:none;">or pay with card</div><div id="paymentElementContainer" style="margin-bottom:12px;"></div><button id="payNowBtn" class="tip-btn" style="width:100%; margin:0;" onclick="confirmTipPayment()">Pay</button><div id="paymentMessage" style="margin-top:10px; font-size:13px; min-height:16px; text-align:center;"></div></div></div></div>
     <div id="helpModal" class="modal"><div class="modal-content" style="max-height: 90vh; overflow-y: auto; padding: 24px;"><span class="close" onclick="closeHelpModal()">&times;</span><div style="margin-bottom: 24px;"><div style="font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">LiveQue</div><div style="font-size: 14px; opacity: 0.6; margin-top: 4px;">How It Works</div></div><div style="text-align: left; font-size: 14px; line-height: 1.7;"><div style="margin-bottom: 16px;"><div style="font-weight: 600; margin-bottom: 8px;">Requesting a Song</div><div style="opacity: 0.85;">Tap any song to request it. Your request goes straight to the artist's live queue. Add your name if you'd like a shoutout.</div></div><div style="margin-bottom: 16px;"><div style="font-weight: 600; margin-bottom: 8px;">The Queue</div><div style="opacity: 0.85;">Watch the queue update in real-time. Green means now playing. Songs with tips get priority.</div></div><div style="margin-bottom: 16px;"><div style="font-weight: 600; margin-bottom: 8px;">Cooldowns</div><div style="opacity: 0.85;">Recently played songs show a timer. When it expires, the song can be requested again.</div></div></div><button style="margin-top: 16px; width: 100%; padding: 12px; background: rgba(255,255,255,0.15); border: none; border-radius: 10px; color: white; font-size: 16px; cursor: pointer;" onclick="closeHelpModal()">Done</button><div style="margin-top: 16px; font-size: 11px; opacity: 0.4; text-align: center;">getliveque.com</div></div></div>
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://js.stripe.com/v3/"></script>
     <script>
@@ -994,6 +998,19 @@ async function startTipPayment(amount){
 
         const stripe=Stripe(data.publishable_key);
         const elements=stripe.elements({ clientSecret:data.client_secret, appearance:{ theme:'night' } });
+        // Wallets-first: Apple Pay / Google Pay / Link one-tap above the card form.
+        const expressContainer=document.getElementById('expressCheckoutContainer');
+        const payDivider=document.getElementById('payDivider');
+        if(expressContainer){ expressContainer.innerHTML=''; }
+        if(payDivider){ payDivider.style.display='none'; }
+        try{
+            const ece=elements.create('expressCheckout',{ buttonHeight:48 });
+            ece.on('availablepaymentmethodschange',function(ev){
+                if(payDivider){ payDivider.style.display=ev.availablePaymentMethods?'flex':'none'; }
+            });
+            ece.on('confirm',function(){ confirmTipPayment(); });
+            ece.mount('#expressCheckoutContainer');
+        }catch(_){ /* wallets unavailable on this device/browser; the card form still works */ }
         const paymentElement=elements.create('payment');
         document.getElementById('paymentElementContainer').innerHTML='';
         paymentElement.mount('#paymentElementContainer');
