@@ -26,6 +26,9 @@ for (const f of files) {
   const p = dir + '/' + f;
   if (!fs.existsSync(p)) { console.log(`\n${f}: MISSING`); fails++; continue; }
   const h = fs.readFileSync(p, 'utf8');
+  // Supabase strips HTML comments from auth templates, so the reset email
+  // deliberately carries no MSO conditional blocks - exempt it from those two.
+  const isReset = f.includes('reset');
   console.log(`\n── ${f} (${(h.length / 1024).toFixed(1)} KB)`);
 
   check('under 80KB (Gmail clips ~102KB)', h.length < 80 * 1024, `${(h.length/1024).toFixed(1)} KB`);
@@ -38,11 +41,12 @@ for (const f of files) {
   check('format-detection meta', /name="format-detection"/.test(h));
   check('x-apple-disable-message-reformatting', /x-apple-disable-message-reformatting/.test(h));
   check('color-scheme declared', /name="color-scheme"/.test(h));
-  check('MSO PixelsPerInch', /PixelsPerInch/.test(h));
-  check('MSO font override (else Outlook->Times)', /\[if mso\]><style>\* \{ font-family/.test(h));
+  if (!isReset) check('MSO PixelsPerInch', /PixelsPerInch/.test(h));
+  if (!isReset) check('MSO font override (else Outlook->Times)', /\[if mso\]><style>\* \{ font-family/.test(h));
   check('mso-line-height-rule', /mso-line-height-rule:exactly/.test(h));
   check('preheader padded', /&shy;/.test(h));
-  check('VML button for Outlook', /v:roundrect/.test(h));
+  check(isReset ? 'bgcolor button (no VML: comments stripped)' : 'VML button for Outlook',
+        isReset ? /bgcolor="#4ecdc4"/.test(h) : /v:roundrect/.test(h));
 
   // every layout table carries role=presentation
   const tables = (h.match(/<table/g) || []).length;

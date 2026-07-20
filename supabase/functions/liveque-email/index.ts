@@ -149,8 +149,8 @@ function shell(inner: string, preheader: string, title: string): string {
 // radius 10, number 24px bold in the metric's colour, label 12px at 0.8 opacity.
 // The hero is the same tile with the number scaled up -- not a new component.
 
-function card(inner: string, radius = 15): string {
-  return `<tr><td style="background-color:${C.card}; border:1px solid ${C.line}; border-radius:${radius}px; padding:14px 16px;">${inner}</td></tr>
+function card(inner: string, radius = 15, pad = "14px 16px"): string {
+  return `<tr><td style="background-color:${C.card}; border:1px solid ${C.line}; border-radius:${radius}px; padding:${pad};">${inner}</td></tr>
   <tr><td style="height:10px; font-size:0; line-height:0;">&nbsp;</td></tr>`;
 }
 
@@ -299,7 +299,9 @@ function recapHtml(name: string, s: Record<string, unknown>): string {
     <div style="font-size:12px; color:${C.faint}; font-family:${SANS};">${esc(s.gigDate || "")}</div>
   `);
 
-  const grid = card(`<div style="margin-bottom:-10px;">${rows}</div>`);
+  // Tiles carry a 10px bottom gutter, so the grid card trims its own bottom
+  // padding rather than pulling content up with a negative margin.
+  const grid = card(rows, 15, "14px 11px 4px");
 
   const foot = card(`
     <p style="margin:0 0 14px; font-size:14px; line-height:1.6; color:${C.body}; font-family:${SANS};">
