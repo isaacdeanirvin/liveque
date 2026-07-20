@@ -152,6 +152,7 @@ let pendingRequest=null;
 let songLibrary=[];
 let popularSongsShuffled=[];
 let currentGigSessionId=null;
+let stripeChargesEnabled=false;
 
 // Payment icons as SVG strings
 const paymentIcons = {
@@ -250,6 +251,7 @@ async function loadFromSupabase(){
             paymentMethods=st.data.payment_methods||{};
             socialMediaHandles=st.data.social_handles||{};
             tipAmounts=st.data.tip_amounts||[0,2,5,10];
+            stripeChargesEnabled=st.data.stripe_charges_enabled===true;
             console.log('🎯 Loaded session:',currentGigSessionId);
             console.log('💳 Payment methods:',paymentMethods);
             console.log('📱 Social handles:',socialMediaHandles);
@@ -928,7 +930,10 @@ function openRequestModal(t,a,sp){
     freeBtn.onclick=function(){requestSong(0);};
     tc.appendChild(freeBtn);
 
-    tipAmounts.filter(function(am){return am>0;}).forEach(function(am){
+    // Only show paid tip buttons when the performer's Stripe is ready to charge
+    // (F2). Otherwise the audience gets the free request plus the external
+    // tip-jar links as a graceful fallback — never a mid-payment error.
+    (stripeChargesEnabled?tipAmounts.filter(function(am){return am>0;}):[]).forEach(function(am){
         const b=document.createElement('button');
         b.className='tip-btn';
         b.style.cssText='display:block; width:100%; margin:6px 0; background:linear-gradient(45deg,#ffd700,#ffa500); color:#1a1a2e; border-color:#ffd700;';
