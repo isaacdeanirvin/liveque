@@ -238,6 +238,18 @@
         </div>
     </div>
 
+    <!-- ── FEEDBACK ── -->
+    <div class="wiz-overlay" id="feedbackOverlay">
+        <div class="wiz-card">
+            <div class="wiz-logo">Tell us what you think</div>
+            <div class="wiz-sub">What do you love? What can we make better? We read every note. — Isaac &amp; Glen</div>
+            <textarea id="feedbackText" class="auth-input" maxlength="2000" placeholder="Your feedback..." style="width:100%; min-height:120px; height:auto; resize:vertical; text-align:left;"></textarea>
+            <div id="feedbackMsg" style="font-size:12px; min-height:16px; margin:8px 0; text-align:center; color:rgba(255,255,255,0.7);"></div>
+            <button class="wiz-pay-btn" onclick="submitFeedback()">Send feedback</button>
+            <button class="wiz-done" onclick="closeFeedback()" style="margin-top:8px;">Close</button>
+        </div>
+    </div>
+
     <!-- ── MAIN APP ── -->
     <div class="sync-status" id="syncStatus"><div class="sync-dot"></div><span id="syncStatusText">Live Sync</span></div>
     <div class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"></polyline></svg></div>
@@ -267,7 +279,7 @@
             <div class="tab" onclick="switchTab(2)" style="font-size: 12px; opacity: 0.7;">Card</div>
         </div>
         <div id="dashboardTab" class="tab-content">
-            <div style="text-align:center;margin-bottom:8px;"><button class="wiz-reopen" onclick="showOnboardWizard()">Getting Started guide</button></div>
+            <div style="text-align:center;margin-bottom:8px;"><button class="wiz-reopen" onclick="showOnboardWizard()">Getting Started guide</button><span style="opacity:0.35;"> &middot; </span><button class="wiz-reopen" onclick="openFeedback()">Send feedback</button></div>
             <div class="payment-section"><div class="section-title">Live Stats</div><div class="stats-grid"><div class="stat-item"><div class="stat-number" style="color: #4ecdc4;" id="requestCount">0</div><div class="stat-label">Requests</div></div><div class="stat-item"><div class="stat-number" style="color: #ffd700;" id="tipCount">0 tips</div><div class="stat-label">Tips Today</div></div><div class="stat-item"><div class="stat-number" style="color: #ff6b6b;" id="songCount">0</div><div class="stat-label">Songs</div></div></div></div>
             <div class="payment-section"><div class="section-title">Start New Gig</div><div style="margin-bottom: 12px; font-size: 12px; opacity: 0.7; text-align: center;">Prepare for a new performance. This will clear the queue, reset played songs, and reset daily tips.</div><div style="text-align: center;"><button class="auth-btn" onclick="startNewGig()" style="background: linear-gradient(45deg, #2ed573, #26de81); font-size: 16px; padding: 12px;">Start New Gig</button></div></div>
             <div class="payment-section">
@@ -405,7 +417,7 @@
                 <div style="margin-bottom: 28px;"><div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.6;">Connection Status</div><p style="margin: 0;"><span style="color: #2ed573;">Green</span> means live. <span style="color: #ffd700;">Yellow</span> means reconnecting. <span style="color: #ff4757;">Red</span> means disconnected — refresh the page.</p></div>
             </div>
             <div style="margin-top: 30px; text-align: center;"><button class="auth-btn" onclick="closeHelpModal()" style="background: rgba(255,255,255,0.15); padding: 12px 40px;">Done</button></div>
-            <div style="margin-top: 24px; text-align: center; font-size: 11px; opacity: 0.4;">v6.9.16 · getliveque.com</div>
+            <div style="margin-top: 24px; text-align: center; font-size: 11px; opacity: 0.4;">v6.9.17 · getliveque.com</div>
         </div>
     </div>
     <div id="socialModal" class="modal"><div class="modal-content"><span class="close" onclick="closeSocialModal()">&times;</span><h2>Social Media Settings</h2><div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;"><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Instagram:</label><input type="text" id="instagramInput" class="auth-input" placeholder="username (without @)"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">X (Twitter):</label><input type="text" id="xInput" class="auth-input" placeholder="username (without @)"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">TikTok:</label><input type="text" id="tiktokInput" class="auth-input" placeholder="@username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Facebook:</label><input type="text" id="facebookInput" class="auth-input" placeholder="facebook.com/username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">YouTube:</label><input type="text" id="youtubeInput" class="auth-input" placeholder="@channelname"></div><button class="auth-btn" onclick="saveSocialMedia()">Update Social Profiles</button></div></div></div>
@@ -416,7 +428,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script>
-console.log('=== LIVEQUE ADMIN v6.9.16 ===');
+console.log('=== LIVEQUE ADMIN v6.9.17 ===');
 
 const SUPABASE_URL = 'https://jttswydixqeyyqvcohnq.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dHN3eWRpeHFleXlxdmNvaG5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNjE3ODYsImV4cCI6MjA3NDkzNzc4Nn0.WlvOfl11qVUVatSCIPy8t6u9-j4u1z5CpnBxXe50BdQ';
@@ -709,6 +721,10 @@ async function sendGigRecap(force){
 async function emailRecapNow(){ var btn = document.getElementById('recapNowBtn'); if(btn) btn.disabled = true; showToast('Building your recap...'); var ok = await sendGigRecap(true); showToast(ok ? 'Recap sent to your email!' : 'Nothing to recap yet (or email not set up).', ok ? '' : 'warning'); if(btn) btn.disabled = false; }
 function startRecapWatcher(){ if(recapCheckInterval) return; recapCheckInterval = setInterval(function(){ if(!currentGigSessionId) return; if(Date.now() - lastActivityTs > 45*60000){ sendGigRecap(false); } }, 5*60000); }
 function recapInit(){ var latest = 0; (requestQueue||[]).forEach(function(r){ if(r.timestamp && r.timestamp > latest) latest = r.timestamp; }); lastActivityTs = latest || gigStartMs(currentGigSessionId) || Date.now(); startRecapWatcher(); }
+
+function openFeedback(){ var el=document.getElementById('feedbackOverlay'); if(el) el.classList.add('show'); var m=document.getElementById('feedbackMsg'); if(m) m.textContent=''; }
+function closeFeedback(){ var el=document.getElementById('feedbackOverlay'); if(el) el.classList.remove('show'); }
+async function submitFeedback(){ var ta=document.getElementById('feedbackText'); var msg=document.getElementById('feedbackMsg'); var text=ta?ta.value.trim():''; if(!text){ if(msg) msg.textContent='Type a little something first.'; return; } if(msg) msg.textContent='Sending...'; var row={ artist_id:(ARTIST_ID||null), message:text.slice(0,2000) }; var res; try{ res=await db.from('feedback').insert([row]); }catch(e){ res={error:e}; } if(res&&res.error){ if(msg) msg.textContent='Could not send — please try again.'; return; } if(ta) ta.value=''; if(msg) msg.textContent='Thank you! We got it.'; setTimeout(closeFeedback,1200); }
 
 function updateSyncStatus(status) { const syncStatus = document.getElementById('syncStatus'); const syncText = document.getElementById('syncStatusText'); if (status === 'SUBSCRIBED') { syncStatus.className = 'sync-status'; syncText.textContent = 'Live Sync'; } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') { syncStatus.className = 'sync-status error'; syncText.textContent = 'Disconnected'; } else { syncStatus.className = 'sync-status reconnecting'; syncText.textContent = 'Connecting...'; } }
 
