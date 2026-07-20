@@ -106,6 +106,11 @@
         .pay-divider::before,.pay-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.14);}
         .pay-divider::before{margin-right:10px;}
         .pay-divider::after{margin-left:10px;}
+        .review-stars{display:flex;justify-content:center;gap:6px;margin:2px 0 10px;}
+        .review-star{font-size:34px;line-height:1;cursor:pointer;color:rgba(255,255,255,0.28);background:none;border:none;padding:2px 4px;transition:transform .12s ease,color .12s ease;}
+        .review-star.on{color:#ffd700;}
+        .review-star:active{transform:scale(1.12);}
+        .review-agg-star{color:#ffd700;}
     </style>
 </head>
 <body>
@@ -118,7 +123,7 @@
         <div class="header">
             <div class="artist-avatar" id="artistAvatar">…</div>
             <div class="artist-name" id="artistNameDisplay">Loading…</div>
-            <div class="version-info">v6.9.12</div>
+            <div class="version-info">v6.9.13</div>
             <div class="live-indicator"><div class="live-dot"></div>Live</div>
             <div class="social-links" id="socialLinksContainer"></div>
         </div>
@@ -126,12 +131,22 @@
         <div class="payment-section"><div class="section-title">🥃 Feeling Tipsy?</div><div class="payment-buttons" id="paymentButtonsContainer"></div></div>
         <div class="payment-section"><div class="section-title">Current Queue</div><div id="audienceQueue"></div></div>
         <div class="payment-section"><div class="section-title">Request a Song</div><input type="text" class="search-bar" placeholder="Search LiveQue..." oninput="searchSongs(this.value)"><div id="songsList"></div></div>
+        <div class="payment-section" id="reviewSection" style="display:none;">
+            <div class="section-title">Rate the show</div>
+            <div id="reviewAggregate" style="text-align:center; font-size:13px; opacity:0.8; margin-bottom:10px;"></div>
+            <div id="reviewStars" class="review-stars" role="radiogroup" aria-label="Rate the performer"></div>
+            <textarea id="reviewNote" class="search-bar" maxlength="500" placeholder="Add a note (optional)" style="display:none; resize:vertical; min-height:52px;"></textarea>
+            <input type="text" id="reviewName" class="search-bar" maxlength="80" placeholder="Your name (optional)" style="display:none; margin-top:8px;">
+            <button id="reviewSubmit" class="tip-btn" style="width:100%; margin-top:10px; display:none;" onclick="submitReview()">Submit rating</button>
+            <div id="reviewThanks" style="display:none; text-align:center; font-weight:600; padding:6px 0;">Thanks for rating the show.</div>
+            <div id="reviewMsg" style="text-align:center; font-size:12px; min-height:14px; margin-top:6px; opacity:0.85;"></div>
+        </div>
     </div>
     <div id="requestModal" class="modal"><div class="modal-content"><span class="close" onclick="closeModal()">&times;</span><h2>Request Song</h2><div id="modalSongInfo" style="margin: 20px 0;"></div><div id="tipButtonsContainer"></div><div id="paymentArea" style="display:none; margin-top:16px; text-align:left;"><div id="expressCheckoutContainer" style="margin-bottom:8px;"></div><div id="payDivider" class="pay-divider" style="display:none;">or pay with card</div><div id="paymentElementContainer" style="margin-bottom:12px;"></div><button id="payNowBtn" class="tip-btn" style="width:100%; margin:0;" onclick="confirmTipPayment()">Pay</button><div id="paymentMessage" style="margin-top:10px; font-size:13px; min-height:16px; text-align:center;"></div></div></div></div>
     <div id="helpModal" class="modal"><div class="modal-content" style="max-height: 90vh; overflow-y: auto; padding: 24px;"><span class="close" onclick="closeHelpModal()">&times;</span><div style="margin-bottom: 24px;"><div style="font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">LiveQue</div><div style="font-size: 14px; opacity: 0.6; margin-top: 4px;">How It Works</div></div><div style="text-align: left; font-size: 14px; line-height: 1.7;"><div style="margin-bottom: 16px;"><div style="font-weight: 600; margin-bottom: 8px;">Requesting a Song</div><div style="opacity: 0.85;">Tap any song to request it. Your request goes straight to the artist's live queue. Add your name if you'd like a shoutout.</div></div><div style="margin-bottom: 16px;"><div style="font-weight: 600; margin-bottom: 8px;">The Queue</div><div style="opacity: 0.85;">Watch the queue update in real-time. Green means now playing. Songs with tips get priority.</div></div><div style="margin-bottom: 16px;"><div style="font-weight: 600; margin-bottom: 8px;">Cooldowns</div><div style="opacity: 0.85;">Recently played songs show a timer. When it expires, the song can be requested again.</div></div></div><button style="margin-top: 16px; width: 100%; padding: 12px; background: rgba(255,255,255,0.15); border: none; border-radius: 10px; color: white; font-size: 16px; cursor: pointer;" onclick="closeHelpModal()">Done</button><div style="margin-top: 16px; font-size: 11px; opacity: 0.4; text-align: center;">getliveque.com</div></div></div>
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://js.stripe.com/v3/"></script>
     <script>
-console.log('=== LIVEQUE CUSTOMER v6.9.12 ===');
+console.log('=== LIVEQUE CUSTOMER v6.9.13 ===');
 
 const SUPABASE_URL='https://jttswydixqeyyqvcohnq.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dHN3eWRpeHFleXlxdmNvaG5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNjE3ODYsImV4cCI6MjA3NDkzNzc4Nn0.WlvOfl11qVUVatSCIPy8t6u9-j4u1z5CpnBxXe50BdQ';
@@ -139,6 +154,15 @@ const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 // Escape user-originated strings before they enter innerHTML (F8). requester_name
 // is audience-typed; song_title/song_artist can be set via crafted anon inserts.
 function escapeHTML(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+// Post-gig reviews (graceful: stays hidden if the reviews table is absent)
+let reviewSelectedRating=0;
+let reviewBusy=false;
+function reviewRatedKey(){ return 'liveque-rated-'+ARTIST_ID+'-'+(currentGigSessionId||'none'); }
+function hasRated(){ try{ return !!localStorage.getItem(reviewRatedKey()); }catch(_){ return false; } }
+function renderReviewStars(){ const wrap=document.getElementById('reviewStars'); if(!wrap) return; let h=''; for(let i=1;i<=5;i++){ h+='<button type="button" class="review-star'+(i<=reviewSelectedRating?' on':'')+'" aria-label="'+i+' star'+(i>1?'s':'')+'" onclick="setReviewRating('+i+')">'+(i<=reviewSelectedRating?'★':'☆')+'</button>'; } wrap.innerHTML=h; }
+function setReviewRating(n){ reviewSelectedRating=n; renderReviewStars(); ['reviewNote','reviewName','reviewSubmit'].forEach(function(id){ const el=document.getElementById(id); if(el) el.style.display=''; }); }
+async function loadReviews(){ if(!ARTIST_ID) return; let res; try{ res=await db.from('reviews').select('stars').eq('artist_id',ARTIST_ID); }catch(_){ return; } if(!res||res.error||!res.data) return; const section=document.getElementById('reviewSection'); if(!section) return; const rows=res.data; const agg=document.getElementById('reviewAggregate'); if(agg){ if(rows.length){ const avg=rows.reduce(function(a,r){return a+(r.stars||0);},0)/rows.length; agg.innerHTML='<span class="review-agg-star">★</span> '+avg.toFixed(1)+' · '+rows.length+' rating'+(rows.length===1?'':'s'); }else{ agg.textContent='Be the first to rate the show.'; } } if(hasRated()){ const st=document.getElementById('reviewStars'); if(st) st.style.display='none'; const th=document.getElementById('reviewThanks'); if(th) th.style.display=''; }else{ renderReviewStars(); } section.style.display=''; }
+async function submitReview(){ if(reviewBusy) return; const msg=document.getElementById('reviewMsg'); if(!reviewSelectedRating){ if(msg) msg.textContent='Tap a star first.'; return; } reviewBusy=true; const btn=document.getElementById('reviewSubmit'); if(btn){ btn.disabled=true; btn.textContent='Sending…'; } const noteEl=document.getElementById('reviewNote'); const nameEl=document.getElementById('reviewName'); const note=noteEl&&noteEl.value?noteEl.value.trim().slice(0,500):null; const name=nameEl&&nameEl.value?nameEl.value.trim().slice(0,80):null; const row={ artist_id:ARTIST_ID, gig_session_id:currentGigSessionId||null, stars:reviewSelectedRating, note:note||null, reviewer_name:name||null }; let res; try{ res=await db.from('reviews').insert([row]); }catch(e){ res={error:e}; } reviewBusy=false; if(res&&res.error){ if(btn){ btn.disabled=false; btn.textContent='Submit rating'; } if(msg) msg.textContent='Could not send — please try again.'; return; } try{ localStorage.setItem(reviewRatedKey(),String(reviewSelectedRating)); }catch(_){} ['reviewStars','reviewNote','reviewName','reviewSubmit'].forEach(function(id){ const el=document.getElementById(id); if(el) el.style.display='none'; }); const th=document.getElementById('reviewThanks'); if(th) th.style.display=''; if(msg) msg.textContent=''; loadReviews(); }
 const _urlParams = new URLSearchParams(window.location.search);
 const ARTIST_ID = _urlParams.get('artist');
 if (!ARTIST_ID) {
@@ -283,6 +307,8 @@ async function loadFromSupabase(){
             });
             sortRequestQueue();
         }
+
+        loadReviews();
 
         const ps=await db.from('played_songs').select('*').eq('artist_id',ARTIST_ID);
         if(ps.data){

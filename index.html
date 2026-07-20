@@ -339,6 +339,11 @@
                     <div style="text-align: center;"><button class="auth-btn" onclick="addNewSong()">Add Song</button></div>
                 </div>
             </div>
+            <div class="payment-section" id="perfReviewCard" style="display:none;">
+                <div class="section-title" style="margin-bottom: 12px;">Audience Ratings</div>
+                <div id="perfReviewSummary" style="text-align:center; margin-bottom:12px;"></div>
+                <div id="perfReviewNotes"></div>
+            </div>
         </div>
         <div id="livequeueTab" class="tab-content active">
             <div class="payment-section"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;"><div class="section-title" style="margin: 0;">Live Queue</div><button class="control-btn" onclick="resetAllCooldowns()">Clear Recently Played</button></div><div style="margin-bottom: 16px;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;"><div style="font-size: 15px; font-weight: bold;">Quick Add</div><div style="display: flex; gap: 8px;"><button class="shuffle-btn" onclick="shuffleQuickAdd()">↻</button><button class="control-btn" onclick="showAllSongsModal()">View All Songs</button></div></div><div id="quickAddGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;"></div></div><div id="liveQueueList"></div></div>
@@ -381,7 +386,7 @@
                 <div style="margin-bottom: 28px;"><div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.6;">Connection Status</div><p style="margin: 0;"><span style="color: #2ed573;">Green</span> means live. <span style="color: #ffd700;">Yellow</span> means reconnecting. <span style="color: #ff4757;">Red</span> means disconnected — refresh the page.</p></div>
             </div>
             <div style="margin-top: 30px; text-align: center;"><button class="auth-btn" onclick="closeHelpModal()" style="background: rgba(255,255,255,0.15); padding: 12px 40px;">Done</button></div>
-            <div style="margin-top: 24px; text-align: center; font-size: 11px; opacity: 0.4;">v6.9.12 · getliveque.com</div>
+            <div style="margin-top: 24px; text-align: center; font-size: 11px; opacity: 0.4;">v6.9.13 · getliveque.com</div>
         </div>
     </div>
     <div id="socialModal" class="modal"><div class="modal-content"><span class="close" onclick="closeSocialModal()">&times;</span><h2>Social Media Settings</h2><div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;"><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Instagram:</label><input type="text" id="instagramInput" class="auth-input" placeholder="username (without @)"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">X (Twitter):</label><input type="text" id="xInput" class="auth-input" placeholder="username (without @)"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">TikTok:</label><input type="text" id="tiktokInput" class="auth-input" placeholder="@username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Facebook:</label><input type="text" id="facebookInput" class="auth-input" placeholder="facebook.com/username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">YouTube:</label><input type="text" id="youtubeInput" class="auth-input" placeholder="@channelname"></div><button class="auth-btn" onclick="saveSocialMedia()">Update Social Profiles</button></div></div></div>
@@ -392,7 +397,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script>
-console.log('=== LIVEQUE ADMIN v6.9.12 ===');
+console.log('=== LIVEQUE ADMIN v6.9.13 ===');
 
 const SUPABASE_URL = 'https://jttswydixqeyyqvcohnq.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dHN3eWRpeHFleXlxdmNvaG5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNjE3ODYsImV4cCI6MjA3NDkzNzc4Nn0.WlvOfl11qVUVatSCIPy8t6u9-j4u1z5CpnBxXe50BdQ';
@@ -400,6 +405,8 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // Escape user-originated strings before they enter innerHTML (F8). requester_name
 // is audience-typed; song_title/song_artist can be set via crafted anon inserts.
 function escapeHTML(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+// Performer-side audience ratings (graceful: hidden if the reviews table is absent)
+async function loadPerformerReviews(){ if(!ARTIST_ID) return; let res; try{ res=await db.from('reviews').select('stars,note,reviewer_name,created_at').eq('artist_id',ARTIST_ID).order('created_at',{ascending:false}); }catch(_){ return; } if(!res||res.error||!res.data) return; const card=document.getElementById('perfReviewCard'); if(!card) return; const rows=res.data; const sum=document.getElementById('perfReviewSummary'); const notesEl=document.getElementById('perfReviewNotes'); if(rows.length===0){ if(sum) sum.innerHTML='<div style="opacity:0.6; font-size:14px;">No ratings yet. They appear here after fans rate your show.</div>'; if(notesEl) notesEl.innerHTML=''; card.style.display=''; return; } const avg=rows.reduce(function(a,r){return a+(r.stars||0);},0)/rows.length; const full=Math.round(avg); let starRow=''; for(let i=1;i<=5;i++){ starRow+=(i<=full?'★':'☆'); } if(sum){ sum.innerHTML='<div style="font-size:30px; color:#ffd700; letter-spacing:3px; line-height:1;">'+starRow+'</div><div style="font-size:22px; font-weight:800; margin-top:6px;">'+avg.toFixed(1)+'</div><div style="font-size:12px; opacity:0.65;">from '+rows.length+' rating'+(rows.length===1?'':'s')+'</div>'; } if(notesEl){ const withNotes=rows.filter(function(r){return r.note&&r.note.trim();}).slice(0,8); if(withNotes.length===0){ notesEl.innerHTML=''; }else{ notesEl.innerHTML='<div style="font-size:11px; text-transform:uppercase; letter-spacing:0.5px; opacity:0.5; margin:6px 0 8px; text-align:center;">Recent notes</div>'+withNotes.map(function(r){ let rs=''; for(let i=1;i<=5;i++){ rs+=(i<=(r.stars||0)?'★':'☆'); } const who=r.reviewer_name?escapeHTML(r.reviewer_name):'Anonymous'; return '<div style="background:rgba(255,255,255,0.05); border-radius:10px; padding:10px 12px; margin-bottom:8px;"><div style="color:#ffd700; font-size:13px; letter-spacing:2px;">'+rs+'</div><div style="font-size:14px; margin:4px 0 2px;">'+escapeHTML(r.note)+'</div><div style="font-size:11px; opacity:0.5;">— '+who+'</div></div>'; }).join(''); } } card.style.display=''; }
 
 // ARTIST_ID is now dynamic — set after login
 let ARTIST_ID = null;
@@ -697,7 +704,7 @@ async function loadFromSupabase() {
     const playedResult = await db.from('played_songs').select('*').eq('artist_id', ARTIST_ID);
     if (playedResult.data && !playedResult.error) { playedSongs = {}; playedResult.data.forEach(function(p) { const songKey = p.song_title + '-' + p.song_artist; playedSongs[songKey] = new Date(p.played_at).getTime(); }); }
     const settingsResult = await db.from('artist_settings').select('*').eq('artist_id', ARTIST_ID).single();
-    if (settingsResult.data && !settingsResult.error) { artistSettings = settingsResult.data; paymentMethods = settingsResult.data.payment_methods || {}; socialMediaHandles = settingsResult.data.social_handles || {}; tipAmounts = settingsResult.data.tip_amounts || [0, 2, 5, 10]; currentGigSessionId = settingsResult.data.current_gig_session_id || null; updateSessionBadge(); }
+    if (settingsResult.data && !settingsResult.error) { artistSettings = settingsResult.data; paymentMethods = settingsResult.data.payment_methods || {}; socialMediaHandles = settingsResult.data.social_handles || {}; tipAmounts = settingsResult.data.tip_amounts || [0, 2, 5, 10]; currentGigSessionId = settingsResult.data.current_gig_session_id || null; updateSessionBadge(); } loadPerformerReviews();
     const songsResult = await db.from('songs').select('*').eq('artist_id', ARTIST_ID).order('title', { ascending: true });
     if (songsResult.data && !songsResult.error && songsResult.data.length > 0) { songLibrary = songsResult.data.map(function(s) { return { id: s.id, title: s.title, artist: s.artist_name, spanish: s.spanish || false }; }); }
 }
