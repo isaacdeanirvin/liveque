@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LiveQue — Performer Guide</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --bg:#0f0f12; --card:#17171c; --line:rgba(255,255,255,0.08); --teal:#4ecdc4; --gold:#ffd700; --txt:#e9e9ee; --dim:rgba(255,255,255,0.6); }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--txt); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  a { color: var(--teal); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .top { padding: 40px 24px 28px; text-align: center; background: linear-gradient(135deg, #12433a, #0f0f12); border-bottom: 1px solid var(--line); }
+  .wordmark { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; }
+  .wordmark sup { font-size: 13px; color: var(--teal); }
+  .top p { color: var(--dim); margin-top: 6px; font-size: 15px; }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 32px 24px 80px; display: grid; grid-template-columns: 240px 1fr; gap: 40px; }
+  nav { position: sticky; top: 24px; align-self: start; font-size: 14px; }
+  nav .navtitle { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.4); margin-bottom: 12px; }
+  nav a { display: block; color: var(--dim); padding: 5px 0; border-left: 2px solid transparent; padding-left: 12px; margin-left: -2px; }
+  nav a:hover { color: var(--txt); border-left-color: var(--teal); text-decoration: none; }
+  main { min-width: 0; }
+  section { margin-bottom: 44px; scroll-margin-top: 20px; }
+  h2 { font-size: 24px; font-weight: 700; margin-bottom: 14px; }
+  h2 .num { color: var(--teal); font-size: 16px; vertical-align: middle; margin-right: 8px; font-weight: 600; }
+  h3 { font-size: 16px; font-weight: 650; margin: 20px 0 8px; color: #fff; }
+  p, li { color: rgba(255,255,255,0.82); margin-bottom: 10px; }
+  ul, ol { margin: 8px 0 12px 22px; }
+  li { margin-bottom: 8px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 22px 24px; margin-bottom: 16px; }
+  .steps { counter-reset: s; list-style: none; margin-left: 0; }
+  .steps li { counter-increment: s; position: relative; padding-left: 44px; margin-bottom: 16px; }
+  .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(45deg, var(--teal), #44a08d); color: #06251f; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .steps li b { color: #fff; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 20px; vertical-align: middle; }
+  .tag.setup { background: rgba(78,205,196,0.15); color: var(--teal); }
+  .tag.live { background: rgba(46,213,115,0.15); color: #2ed573; }
+  .tag.card { background: rgba(255,193,7,0.15); color: var(--gold); }
+  .callout { border-left: 3px solid var(--gold); background: rgba(255,215,0,0.06); padding: 14px 18px; border-radius: 8px; margin: 12px 0; }
+  .callout b { color: #fff; }
+  .money { color: var(--gold); font-weight: 700; }
+  details { border: 1px solid var(--line); border-radius: 12px; padding: 4px 18px; margin-bottom: 10px; background: rgba(255,255,255,0.02); }
+  summary { cursor: pointer; font-weight: 600; padding: 12px 0; color: #fff; }
+  details p { margin: 4px 0 14px; }
+  .foot { text-align: center; color: var(--dim); font-size: 14px; border-top: 1px solid var(--line); padding: 28px 24px; }
+  .btnlink { display: inline-block; background: linear-gradient(45deg, var(--teal), #44a08d); color: #06251f; font-weight: 700; padding: 11px 22px; border-radius: 12px; margin-top: 8px; }
+  .btnlink:hover { text-decoration: none; opacity: 0.92; }
+  @media (max-width: 780px) {
+    .wrap { grid-template-columns: 1fr; gap: 8px; }
+    nav { position: static; border-bottom: 1px solid var(--line); padding-bottom: 16px; margin-bottom: 12px; }
+    nav a { display: inline-block; margin-right: 6px; border: 1px solid var(--line); border-radius: 20px; padding: 5px 12px; }
+    nav a:hover { border-left-color: var(--line); }
+  }
+</style>
+</head>
+<body>
+  <div class="top">
+    <div class="wordmark">LiveQue<sup>TM</sup></div>
+    <p>Performer Guide</p>
+  </div>
+  <div class="wrap">
+    <nav>
+      <div class="navtitle">Contents</div>
+      <a href="#start">Quick start</a>
+      <a href="#songs">Add your songs</a>
+      <a href="#paid">Get paid</a>
+      <a href="#tips">Tip amounts</a>
+      <a href="#qr">Your QR code</a>
+      <a href="#gig">Run a live gig</a>
+      <a href="#fans">What fans see</a>
+      <a href="#recap">Your gig recap</a>
+      <a href="#ratings">Ratings &amp; feedback</a>
+      <a href="#how">How tips &amp; payouts work</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <main>
+      <section id="start">
+        <h2><span class="num">01</span>Quick start</h2>
+        <p>LiveQue lets your audience request songs and tip you to bump their pick up the queue — all from their phone, by scanning a QR code. Here's the whole thing in five steps.</p>
+        <div class="card">
+          <ol class="steps">
+            <li><b>Create your account</b> at <a href="https://getliveque.com">getliveque.com</a> — performer name, email, password. You land on your dashboard.</li>
+            <li><b>Add your songs</b> on the <span class="tag setup">Setup</span> tab — import a Spotify playlist, paste a list, or add a few by hand.</li>
+            <li><b>Connect Stripe</b> (Get Paid with LiveQue) so fans can tip you in-app, and/or add your Venmo/PayPal as backups.</li>
+            <li><b>Get your QR code</b> from the <span class="tag card">Card</span> tab and put it on your tables or stand.</li>
+            <li><b>Start your gig</b> on the <span class="tag live">Live</span> tab. Requests roll in — you're live.</li>
+          </ol>
+        </div>
+      </section>
+
+      <section id="songs">
+        <h2><span class="num">02</span>Add your songs</h2>
+        <p>On the <span class="tag setup">Setup</span> tab, under <b>Song Library</b>, there are four ways to build your list — mix and match:</p>
+        <h3>Import from Spotify</h3>
+        <p>Paste any Spotify <b>playlist or album link</b>, hit Import, pick the songs you want, and add them. Fastest way to load a whole set.</p>
+        <h3>Add Songs by Artist</h3>
+        <p>Search any artist and pull in their tracks — handy for filling out a cover repertoire.</p>
+        <h3>Paste a list</h3>
+        <p>Have a set list in Notes or a spreadsheet? Paste it in — <b>one song per line</b>, as <code>Title - Artist</code> or <code>Title, Artist</code> (or just the title). It previews what's new versus already in your library, then adds them all at once. You can also drop a <b>.csv</b> file.</p>
+        <h3>Add manually</h3>
+        <p>Type a single title and artist and hit Add Song. Good for one-offs.</p>
+        <div class="callout">Duplicates are skipped automatically, so paste freely — you won't end up with the same song twice.</div>
+      </section>
+
+      <section id="paid">
+        <h2><span class="num">03</span>Get paid</h2>
+        <p>There are two ways for fans to tip you. You can use either or both.</p>
+        <h3>In-app tips with Stripe <span class="money">(recommended)</span></h3>
+        <p>In <b>Get Paid with LiveQue</b> on the <span class="tag setup">Setup</span> tab, tap <b>Connect Stripe to get paid</b> and follow the short setup (about two minutes). Once connected, fans tip you <b>right inside the app</b> with Apple Pay, Google Pay, or a card — and it lands in your bank automatically.</p>
+        <div class="callout"><b>You keep 100%.</b> LiveQue takes no cut. Until you connect Stripe, the in-app tip buttons stay off so no one ever hits a broken payment.</div>
+        <h3>Backup tip links</h3>
+        <p>In <b>Payment Settings</b>, add your <b>Venmo, PayPal, Cash App, or Zelle</b>. These show up for fans as tip options — so even without Stripe, people can still tip you directly. With Stripe on, they appear as an "or tip directly" option.</p>
+      </section>
+
+      <section id="tips">
+        <h2><span class="num">04</span>Set your tip amounts</h2>
+        <p>Under <b>Tip Options</b> on <span class="tag setup">Setup</span>, choose the amounts fans can tap (for example $2, $5, $10). Keep them low enough to be easy and high enough to be worth it — a few quick taps is the whole idea.</p>
+      </section>
+
+      <section id="qr">
+        <h2><span class="num">05</span>Your QR code</h2>
+        <p>The <span class="tag card">Card</span> tab holds your personal <b>QR code</b>. Screenshot it, print it, or put it on a table tent and stand. Anyone who scans it goes straight to your live request page — no app to download.</p>
+      </section>
+
+      <section id="gig">
+        <h2><span class="num">06</span>Run a live gig</h2>
+        <ul>
+          <li><b>Start New Gig</b> (Setup or Live) clears the queue and starts a fresh session. Do this at the top of each show.</li>
+          <li>The <span class="tag live">Live</span> tab is your command center. New requests appear in the <b>Live Queue</b>. <span class="money">Paid tips sort to the top</span> and are flagged with the amount.</li>
+          <li>When a tip lands you'll see a <b>gold confetti burst</b> on screen — no sound, so it won't interrupt your set.</li>
+          <li>Tap <b>Play</b> when you start a song and <b>Done</b> when you finish it. <b>Quick Add</b> lets you drop your own songs into the queue.</li>
+        </ul>
+      </section>
+
+      <section id="fans">
+        <h2><span class="num">07</span>What your fans see</h2>
+        <p>They scan your QR code and land on a simple page with your name and song list. From there they can:</p>
+        <ul>
+          <li><b>Request a song for free</b>, or</li>
+          <li><b>Request + tip</b> to bump it up the queue — paying with Apple Pay, Google Pay, a card, or your Venmo/PayPal.</li>
+        </ul>
+        <p>After a tip they get a little confetti moment and a quick <b>"rate the show"</b> prompt. Easy enough that anyone can do it in a few taps.</p>
+      </section>
+
+      <section id="recap">
+        <h2><span class="num">08</span>Your gig recap</h2>
+        <p>After the show, LiveQue emails you a <b>recap</b>: tips collected, songs played, requests, set length, the crowd favorite, and your ratings for the night.</p>
+        <p>It sends itself when a gig has been quiet for a while, and again whenever you tap <b>Start New Gig</b> (you get the previous gig's recap first). There's also an <b>Email recap</b> button on the <span class="tag live">Live</span> tab if you want it on demand.</p>
+      </section>
+
+      <section id="ratings">
+        <h2><span class="num">09</span>Ratings &amp; feedback</h2>
+        <p>Fans can rate your show (one to five stars, with an optional note) right after they tip. Your running average and recent notes show up under <b>Audience Ratings</b> on the <span class="tag setup">Setup</span> tab.</p>
+        <p>Got a thought for us? Use <b>Send feedback</b> on your dashboard — it goes straight to Isaac &amp; Glen. We read every one.</p>
+      </section>
+
+      <section id="how">
+        <h2><span class="num">10</span>How tips &amp; payouts work</h2>
+        <p>In-app tips run on <b>Stripe</b>. When a fan pays, the charge goes through Stripe and the money is routed <b>straight to your connected account</b> — LiveQue never holds it and takes no cut. Payout timing (usually a couple of business days) follows Stripe's normal schedule, which you control in your Stripe dashboard.</p>
+        <p><b>Queue priority:</b> a paid request jumps ahead of free ones and sorts by tip amount, so the biggest tips rise to the top. Free requests still get their place in line.</p>
+        <p><b>Backup links</b> (Venmo/PayPal/etc.) send money to you directly through those apps — they're outside LiveQue, so those tips won't auto-bump a song, but they're a great fallback.</p>
+      </section>
+
+      <section id="faq">
+        <h2><span class="num">11</span>FAQ</h2>
+        <details><summary>Do fans need to download anything?</summary><p>No. They scan your QR code and everything happens in their phone's browser.</p></details>
+        <details><summary>What does LiveQue cost?</summary><p>It's free for performers, and you keep 100% of your tips. Standard Stripe processing fees apply to card payments, same as anywhere.</p></details>
+        <details><summary>Can people tip if I haven't set up Stripe?</summary><p>Yes — add your Venmo, PayPal, Cash App, or Zelle under Payment Settings and fans can tip you directly. Connecting Stripe just adds the smoother in-app option.</p></details>
+        <details><summary>The tip timer / "Live" clock looks off?</summary><p>It counts from when you tapped Start New Gig and now survives page refreshes. If it looks wrong, start a fresh gig.</p></details>
+        <details><summary>A fan tipped but their song didn't appear?</summary><p>It should appear within a few seconds once the payment clears. If it doesn't, make sure your gig session is active (Start New Gig) — and reach out via Send feedback.</p></details>
+        <details><summary>How do I get my recap email?</summary><p>It arrives after your gig goes quiet, or immediately when you start your next gig. Check spam the first time, and make sure your account email is correct.</p></details>
+      </section>
+    </main>
+  </div>
+  <div class="foot">
+    Built by two musicians, for musicians. — Isaac &amp; Glen Irvin<br>
+    <a class="btnlink" href="https://getliveque.com">Back to your dashboard</a>
+  </div>
+</body>
+</html>
