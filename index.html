@@ -660,7 +660,8 @@ function updateGigStatus() {
     if (!badge) return;
     const hasQueue = requestQueue.length > 0;
     if (hasQueue) {
-        if (!gigStartTime) gigStartTime = Date.now();
+        var _gs = null; if (currentGigSessionId) { var _pp = String(currentGigSessionId).split('-'); var _ts = parseInt(_pp[1], 10); if (_pp[0] === 'gig' && !isNaN(_ts)) _gs = _ts; }
+        if (_gs) { gigStartTime = _gs; } else if (!gigStartTime) { gigStartTime = Date.now(); }
         if (!gigStatusInterval) { gigStatusInterval = setInterval(updateGigStatus, 30000); }
         const elapsed = Date.now() - gigStartTime;
         const hours = Math.floor(elapsed / 3600000);
