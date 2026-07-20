@@ -1034,7 +1034,7 @@ async function addSpotifyLinkSongs() {
     btn.disabled = false; btn.textContent = 'Add Selected Songs';
 }
 
-const QR_BASE_URL = 'https://soft-nasturtium-c51aac.netlify.app/customer.html';
+const QR_BASE_URL = window.location.origin + '/customer.html';
 function getQRTargetURL() { return QR_BASE_URL + (ARTIST_ID ? '?artist=' + ARTIST_ID : ''); }
 let qrCodeInstance = null;
 
