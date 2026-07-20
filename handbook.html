@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LiveQue — Performer Handbook</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --bg:#0f0f12; --card:#17171c; --line:rgba(255,255,255,0.09); --teal:#4ecdc4; --gold:#ffd700; --txt:#e9e9ee; --dim:rgba(255,255,255,0.6); }
+  body { background: var(--bg); color: var(--txt); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  a { color: var(--teal); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .top { padding: 34px 24px 24px; text-align: center; background: linear-gradient(135deg, #12433a, #0f0f12); border-bottom: 1px solid var(--line); }
+  .wordmark { font-size: 32px; font-weight: 700; letter-spacing: -0.5px; }
+  .wordmark sup { font-size: 12px; color: var(--teal); }
+  .top p { color: var(--dim); margin-top: 5px; font-size: 15px; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 28px 24px 70px; }
+  .printbar { text-align: center; margin-bottom: 26px; }
+  .printbtn { background: linear-gradient(45deg, var(--teal), #44a08d); color: #06251f; font-weight: 700; font-size: 14px; border: none; padding: 10px 22px; border-radius: 11px; cursor: pointer; }
+  .printbtn:hover { opacity: 0.92; }
+  section { margin-bottom: 30px; page-break-inside: avoid; }
+  h2 { font-size: 19px; font-weight: 750; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  h2 .n { display:inline-flex; align-items:center; justify-content:center; width: 27px; height: 27px; border-radius: 50%; background: linear-gradient(45deg, var(--teal), #44a08d); color:#06251f; font-size: 14px; font-weight: 800; flex: none; }
+  p, li { color: rgba(255,255,255,0.85); font-size: 14.5px; }
+  ul, ol { margin: 6px 0 0 20px; }
+  li { margin-bottom: 7px; }
+  li b, p b { color: #fff; font-weight: 650; }
+  .callout { border-left: 3px solid var(--gold); background: rgba(255,215,0,0.07); padding: 12px 16px; border-radius: 8px; margin: 12px 0; font-size: 14px; }
+  .callout b { color: #fff; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  th { color: var(--teal); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  td b { color: #fff; }
+  .foot { text-align: center; color: var(--dim); font-size: 13.5px; border-top: 1px solid var(--line); padding-top: 22px; margin-top: 30px; }
+
+  /* ── Print: light, compact, ink-friendly ───────────────────────── */
+  @media print {
+    @page { margin: 14mm; }
+    body { background: #fff !important; color: #111 !important; font-size: 11pt; line-height: 1.45; }
+    .top { background: none !important; border-bottom: 2px solid #111; padding: 0 0 10px; text-align: left; }
+    .wordmark { color: #111; font-size: 24pt; }
+    .wordmark sup { color: #444; }
+    .top p { color: #444; }
+    .wrap { max-width: none; padding: 12px 0 0; }
+    .printbar, .noprint { display: none !important; }
+    h2 { color: #111; font-size: 13pt; margin-bottom: 6px; }
+    h2 .n { background: #111 !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    p, li, td { color: #222 !important; font-size: 10.5pt; }
+    li b, p b, td b, .callout b { color: #000 !important; }
+    a { color: #111 !important; text-decoration: underline; }
+    .callout { background: none !important; border-left: 3px solid #111; padding: 6px 12px; }
+    section { margin-bottom: 16px; }
+    th { color: #111 !important; }
+    th, td { border-bottom: 1px solid #bbb; padding: 5px 8px; }
+    .foot { border-top: 1px solid #111; color: #333; }
+  }
+</style>
+</head>
+<body>
+  <div class="top">
+    <div class="wordmark">LiveQue<sup>TM</sup></div>
+    <p>Performer Handbook — everything you need to run a gig</p>
+  </div>
+  <div class="wrap">
+    <div class="printbar noprint">
+      <button class="printbtn" onclick="window.print()">Print this handbook</button>
+    </div>
+
+    <p style="margin-bottom:24px;">LiveQue lets your audience request songs and tip you — right from their phones, by scanning a QR code. Set it up once (about 5 minutes), then it runs itself.</p>
+
+    <section>
+      <h2><span class="n">1</span>Set up (once, at home)</h2>
+      <p><b>Sign in</b> at <a href="https://getliveque.com">getliveque.com</a>.</p>
+      <p style="margin-top:10px;"><b>Add your songs</b> — on the <b>Setup</b> tab, under Song Library, pick whichever is easiest:</p>
+      <ul>
+        <li><b>Import from Spotify</b> — paste a playlist or album link, tick the songs, add.</li>
+        <li><b>Add Songs by Artist</b> — search any artist and pull in their tracks.</li>
+        <li><b>Paste a list</b> — dump your set list, one per line (<code>Title - Artist</code>), and add 30+ at once. A <code>.csv</code> works too.</li>
+        <li><b>Add manually</b> — one song at a time.</li>
+      </ul>
+      <div class="callout"><b>Get paid:</b> on Setup, under <b>Get Paid with LiveQue</b>, tap <b>"Connect Stripe to get paid"</b> and finish the short setup (~2 min). Until you do, fans can request for free and tip your Venmo/PayPal, but they <b>can't tip you by card in the app</b>. Tips go straight to your bank — LiveQue takes no cut.</div>
+      <p><b>Optional:</b> add Venmo / PayPal / Cash App / Zelle under <b>Payment Settings</b> as backups.</p>
+      <p style="margin-top:10px;"><b>Set your tip amounts</b> under <b>Tip Options</b> (e.g. $2, $5, $10).</p>
+      <p style="margin-top:10px;"><b>Get your QR code</b> from the <b>Card</b> tab. Screenshot it, print it, put it on your tables or stand.</p>
+    </section>
+
+    <section>
+      <h2><span class="n">2</span>Run your gig</h2>
+      <ul>
+        <li>Tap <b>Start New Gig</b> at the top of each show — it clears the queue for a fresh night.</li>
+        <li>The <b>Live</b> tab is your command center. Requests roll in, and <b>paid tips jump to the top</b> with the dollar amount shown.</li>
+        <li>When a tip lands you'll see a <b>gold confetti burst</b> — it's silent, so it won't interrupt your set.</li>
+        <li>Tap <b>Play</b> when you start a song and <b>Done</b> when you finish it. <b>Quick Add</b> drops your own songs into the queue.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2><span class="n">3</span>What your fans do</h2>
+      <p>Nothing to explain to them. They scan your QR code, your page opens, and they either:</p>
+      <ul>
+        <li><b>Request a song — free</b>, or</li>
+        <li><b>Request + tip</b> to bump it up the queue — Apple Pay, Google Pay, a card, or your Venmo/PayPal.</li>
+      </ul>
+      <p style="margin-top:8px;">After tipping they get a little confetti and a quick <b>"rate the show"</b> prompt. No app to download.</p>
+    </section>
+
+    <section>
+      <h2><span class="n">4</span>After the gig</h2>
+      <ul>
+        <li>Tap <b>End Gig</b> on the Live tab and LiveQue <b>emails you a recap</b>: tips collected, songs played, requests, set length, the crowd favorite, and your ratings. Forget to tap it? It sends itself once the gig goes quiet.</li>
+        <li>Your star ratings and fan notes appear under <b>Audience Ratings</b> on Setup.</li>
+        <li><b>Your Gigs</b> shows the numbers from every gig you've played.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2><span class="n">5</span>Cheat sheet</h2>
+      <table>
+        <tr><th>Where</th><th>What it's for</th></tr>
+        <tr><td><b>Setup</b></td><td>songs, tip amounts, payments, ratings, gig history</td></tr>
+        <tr><td><b>Live</b></td><td>your live queue during the show</td></tr>
+        <tr><td><b>Card</b></td><td>your QR code to print</td></tr>
+        <tr><td><b>Start New Gig</b></td><td>fresh queue for a new show</td></tr>
+        <tr><td><b>End Gig</b></td><td>wrap up and email your recap</td></tr>
+      </table>
+    </section>
+
+    <section>
+      <h2><span class="n">6</span>If something goes wrong</h2>
+      <ul>
+        <li><b>Forgot your password?</b> On the sign-in screen, tap <b>"Forgot your password?"</b>, enter your email, and we'll send a reset link. Open it, pick a new password, and you're back in. (Check your spam folder if it doesn't arrive.)</li>
+        <li><b>Fans can't tip by card?</b> Your Stripe isn't connected yet — see step 1.</li>
+        <li><b>A tipped song didn't appear?</b> Make sure you've tapped <b>Start New Gig</b> so there's an active session.</li>
+        <li><b>Anything else</b> — tap <b>Send feedback</b> on your dashboard. It goes straight to Isaac &amp; Glen.</li>
+      </ul>
+      <p style="margin-top:10px;">Full guide: <a href="https://getliveque.com/help.html">getliveque.com/help.html</a> &nbsp;·&nbsp; What's new: <a href="https://getliveque.com/changelog.html">getliveque.com/changelog.html</a></p>
+    </section>
+
+    <div class="foot">
+      Built by two musicians, for musicians. — Isaac &amp; Glen Irvin<br>
+      <span style="font-size:12.5px;">getliveque.com</span>
+    </div>
+  </div>
+</body>
+</html>
