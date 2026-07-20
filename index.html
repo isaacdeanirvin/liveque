@@ -396,7 +396,6 @@ async function loadArtistId(authUserId) {
     }
     ARTIST_ID = data.id;
     ARTIST_NAME = data.name || 'Performer';
-    console.log('✅ ARTIST_ID set:', ARTIST_ID);
     return true;
 }
 
@@ -636,7 +635,7 @@ async function loadFromSupabase() {
     const playedResult = await db.from('played_songs').select('*').eq('artist_id', ARTIST_ID);
     if (playedResult.data && !playedResult.error) { playedSongs = {}; playedResult.data.forEach(function(p) { const songKey = p.song_title + '-' + p.song_artist; playedSongs[songKey] = new Date(p.played_at).getTime(); }); }
     const settingsResult = await db.from('artist_settings').select('*').eq('artist_id', ARTIST_ID).single();
-    if (settingsResult.data && !settingsResult.error) { artistSettings = settingsResult.data; paymentMethods = settingsResult.data.payment_methods || {}; socialMediaHandles = settingsResult.data.social_handles || {}; tipAmounts = settingsResult.data.tip_amounts || [0, 2, 5, 10]; currentGigSessionId = settingsResult.data.current_gig_session_id || null; console.log('🎯 Loaded session:', currentGigSessionId); updateSessionBadge(); }
+    if (settingsResult.data && !settingsResult.error) { artistSettings = settingsResult.data; paymentMethods = settingsResult.data.payment_methods || {}; socialMediaHandles = settingsResult.data.social_handles || {}; tipAmounts = settingsResult.data.tip_amounts || [0, 2, 5, 10]; currentGigSessionId = settingsResult.data.current_gig_session_id || null; updateSessionBadge(); }
     const songsResult = await db.from('songs').select('*').eq('artist_id', ARTIST_ID).order('title', { ascending: true });
     if (songsResult.data && !songsResult.error && songsResult.data.length > 0) { songLibrary = songsResult.data.map(function(s) { return { id: s.id, title: s.title, artist: s.artist_name, spanish: s.spanish || false }; }); }
 }
