@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LiveQue — Changelog</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --bg:#0f0f12; --card:#17171c; --line:rgba(255,255,255,0.08); --teal:#4ecdc4; --gold:#ffd700; --txt:#e9e9ee; --dim:rgba(255,255,255,0.6); }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--txt); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  a { color: var(--teal); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .top { padding: 40px 24px 28px; text-align: center; background: linear-gradient(135deg, #12433a, #0f0f12); border-bottom: 1px solid var(--line); }
+  .wordmark { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; }
+  .wordmark sup { font-size: 13px; color: var(--teal); }
+  .top p { color: var(--dim); margin-top: 6px; font-size: 15px; }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 32px 24px 80px; }
+  .intro { color: rgba(255,255,255,0.72); font-size: 15px; margin-bottom: 28px; }
+  .rel { border-left: 2px solid var(--line); padding: 0 0 8px 26px; position: relative; margin-bottom: 10px; }
+  .rel::before { content: ''; position: absolute; left: -7px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 4px rgba(78,205,196,0.15); }
+  .rel.minor::before { background: rgba(255,255,255,0.35); box-shadow: none; width: 10px; height: 10px; left: -6px; }
+  .ver { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+  .ver .num { font-size: 20px; font-weight: 800; }
+  .ver .theme { font-size: 15px; color: var(--gold); font-weight: 600; }
+  .ver .big { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--teal); border: 1px solid rgba(78,205,196,0.4); border-radius: 20px; padding: 1px 9px; }
+  ul { list-style: none; margin: 10px 0 22px; }
+  li { position: relative; padding-left: 74px; margin-bottom: 9px; color: rgba(255,255,255,0.85); font-size: 14.5px; }
+  .tag { position: absolute; left: 0; top: 2px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; padding: 2px 7px; border-radius: 5px; width: 62px; text-align: center; }
+  .t-new { background: rgba(78,205,196,0.16); color: var(--teal); }
+  .t-imp { background: rgba(99,91,255,0.18); color: #a9a2ff; }
+  .t-fix { background: rgba(255,193,7,0.16); color: var(--gold); }
+  .t-sec { background: rgba(255,75,107,0.16); color: #ff8095; }
+  .t-rm  { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.55); }
+  li b { color: #fff; font-weight: 600; }
+  .foot { text-align: center; color: var(--dim); font-size: 14px; border-top: 1px solid var(--line); margin-top: 24px; padding: 26px 0 0; }
+  .foot a.btn { display:inline-block; background: linear-gradient(45deg, var(--teal), #44a08d); color:#06251f; font-weight:700; padding:10px 20px; border-radius:11px; margin-top:8px; }
+  .foot a.btn:hover { text-decoration:none; opacity:0.92; }
+  @media (max-width: 560px){ li { padding-left: 0; padding-top: 22px; } .tag { top: 0; } }
+</style>
+</head>
+<body>
+  <div class="top">
+    <div class="wordmark">LiveQue<sup>TM</sup></div>
+    <p>Changelog — what we've built, version by version</p>
+  </div>
+  <div class="wrap">
+    <p class="intro">Every update to LiveQue, newest first. Built by Isaac &amp; Glen Irvin. <span style="color:var(--teal);">New</span> = features, <span style="color:#a9a2ff;">Improved</span> = made better, <span style="color:var(--gold);">Fixed</span> = bugs squashed.</p>
+
+    <div class="rel">
+      <div class="ver"><span class="num">v6.9.23</span> <span class="theme">Email goes live + this page</span></div>
+      <ul>
+        <li><span class="tag t-new">New</span>This <b>Changelog</b> page — every version and what changed.</li>
+        <li><span class="tag t-new">New</span><b>Transactional email</b> wired end to end: a welcome/intro email on sign-up and a per-gig recap email, sending through Resend on your own <b>getliveque.com</b> domain (DKIM, SPF, DMARC configured).</li>
+      </ul>
+    </div>
+
+    <div class="rel">
+      <div class="ver"><span class="num">v6.9.22</span> <span class="theme">Your Gigs history</span></div>
+      <ul>
+        <li><span class="tag t-new">New</span>A <b>"Your Gigs"</b> card on Setup lists every past gig — gig number, date, set length, tips total &amp; count, songs played, requests, rating, and the crowd favorite.</li>
+      </ul>
+    </div>
+
+    <div class="rel">
+      <div class="ver"><span class="num">v6.9.21</span> <span class="theme">End the night cleanly</span></div>
+      <ul>
+        <li><span class="tag t-new">New</span>An explicit <b>"End Gig"</b> button that emails your recap and saves the gig.</li>
+        <li><span class="tag t-new">New</span><b>Durable gig capture</b> — every gig's final numbers are saved permanently, even after the queue clears.</li>
+        <li><span class="tag t-imp">Improved</span>Starting a new gig no longer emails a recap; it now silently saves the gig that just ended, so no gig is ever lost.</li>
+      </ul>
+    </div>
+
+    <div class="rel">
+      <div class="ver"><span class="num">v6.9.20</span> <span class="theme">Performer Guide</span></div>
+      <ul>
+        <li><span class="tag t-new">New</span>A full how-to <a href="help.html">Performer Guide</a> — quick start, adding songs, getting paid, running a gig, recaps, and an FAQ — linked from your dashboard.</li>
+      </ul>
+    </div>
+
+    <div class="rel">
+      <div class="ver"><span class="num">v6.9.19</span> <span class="theme">Recaps that find you</span></div>
+      <ul>
+        <li><span class="tag t-new">New</span>A <b>server-side recap sweeper</b>: your gig recap emails itself after the gig goes quiet, even if your dashboard is closed.</li>
+      </ul>
+    </div>
+
+    <div class="rel minor">
+      <div class="ver"><span class="num">v6.9.18</span> <span class="theme">Recap timing</span></div>
+      <ul>
+        <li><span class="tag t-imp">Improved</span>The auto-recap now waits for <b>6 hours</b> of no new requests, so it can never fire in the middle of your set.</li>
+      </ul>
+    </div>
+
+    <div class="rel minor">
+      <div class="ver"><span class="num">v6.9.17</span> <span class="theme">Tell us what you think</span></div>
+      <ul>
+        <li><span class="tag t-new">New</span>In-app <b>"Send feedback"</b> — your notes go straight to Isaac &amp; Glen.</li>
+      </ul>
+    </div>
+
+    <div class="rel">
+      <div class="ver"><span class="num">v6.9.16</span> <span class="theme">Gig recap email</span></div>
+      <ul>
+        <li><span class="tag t-new">New</span>After your gig, an emailed <b>recap</b>: tips collected, songs played, requests, set length, top song, and ratings.</li>
+      </ul>
+    </div>
+
+    <div class="rel">
+      <div class="ver"><span class="num">v6.9.15</span> <span class="theme">Tip anywhere, rate anytime</span></div>
+      <ul>
+        <li><span class="tag t-new">New</span><b>Venmo / PayPal / Cash App / Zelle</b> now appear inside the song request — fans can tip you even if you haven't connected Stripe.</li>
+        <li><span class="tag t-new">New</span>A <b>"Rate the show"</b> prompt appears right after a fan tips.</li>
+        <li><span class="tag t-new">New</span><b>Bulk song import</b> — paste a list (or drop a .csv) and add 30+ songs at once.</li>
+      </ul>
+    </div>
+
+    <div class="rel">
+      <div class="ver"><span class="num">v6.9.14</span> <span class="theme">Silent celebration</span></div>
+      <ul>
+        <li><span class="tag t-new">New</span>Paid tips set off a <b>musical confetti burst</b> (with music notes) on both your screen and the fan's.</li>
+        <li><span class="tag t-rm">Removed</span>The tip <b>chime</b> — live musicians don't want dings mid-song, so the celebration is now purely visual.</li>
+        <li><span class="tag t-fix">Fixed</span>The <b>"Live" gig timer</b> no longer resets to "just started" every time the page is refreshed.</li>
+      </ul>
+    </div>
+
+    <div class="rel">
+      <div class="ver"><span class="num">v6.9.13</span> <span class="theme">Audience ratings</span></div>
+      <ul>
+        <li><span class="tag t-new">New</span>Fans can <b>rate your show</b> (1–5 stars + an optional note); your average and recent notes show up on Setup.</li>
+      </ul>
+    </div>
+
+    <div class="rel minor">
+      <div class="ver"><span class="num">v6.9.12</span> <span class="theme">Never miss a tip</span></div>
+      <ul>
+        <li><span class="tag t-new">New</span>Paid tips pop a notification on your dashboard so you catch every one (made silent + visual in v6.9.14).</li>
+      </ul>
+    </div>
+
+    <div class="rel">
+      <div class="ver"><span class="num">v6.9.11</span> <span class="theme">Launch-ready overhaul</span> <span class="big">Major</span></div>
+      <ul>
+        <li><span class="tag t-new">New</span><b>Wallets-first checkout</b> — Apple Pay, Google Pay, and card, made grandma-easy.</li>
+        <li><span class="tag t-new">New</span>A <b>premium redesign</b> of the sign-in / create-account screen.</li>
+        <li><span class="tag t-new">New</span>A first-run <b>onboarding wizard</b> that spells out "connect Stripe to get paid."</li>
+        <li><span class="tag t-new">New</span>Your live site went custom-domain: <b>getliveque.com</b>.</li>
+        <li><span class="tag t-new">New</span>Tip buttons only appear once your <b>Stripe is ready to charge</b> — no broken payments.</li>
+        <li><span class="tag t-new">New</span>A post-payment <b>"pending" state</b> so a tipped song shows up immediately.</li>
+        <li><span class="tag t-imp">Improved</span>Removed the Stripe <b>Link</b> wallet from checkout — no login wall, just tap or type a card.</li>
+        <li><span class="tag t-imp">Improved</span>The QR code always points at your live page on the right domain.</li>
+        <li><span class="tag t-sec">Security</span>All fan- and performer-entered text is <b>escaped at render</b> (cross-site-scripting proofed).</li>
+        <li><span class="tag t-fix">Fixed</span>Closed a <b>fake-tip hole</b> — fans can only add free, queued requests; real tips come only through Stripe's verified webhook.</li>
+        <li><span class="tag t-fix">Fixed</span>Paid and free requests were <b>invisible</b> on accounts with no active gig session — now they always show.</li>
+      </ul>
+    </div>
+
+    <div class="rel minor">
+      <div class="ver"><span class="num">v6.9.10</span> <span class="theme">Webhook-only paid requests</span></div>
+      <ul>
+        <li><span class="tag t-imp">Improved</span>Paid requests are created <b>only</b> by Stripe's verified webhook, for tighter integrity.</li>
+      </ul>
+    </div>
+
+    <div class="rel minor">
+      <div class="ver"><span class="num">v6.9.9</span> <span class="theme">In-app Stripe tips</span></div>
+      <ul>
+        <li><span class="tag t-new">New</span>Fans can <b>tip with Stripe</b> right on your page.</li>
+        <li><span class="tag t-new">New</span>Payout status is reflected back in the app.</li>
+      </ul>
+    </div>
+
+    <div class="rel minor">
+      <div class="ver"><span class="num">v6.9.8</span> <span class="theme">Stripe Connect onboarding</span></div>
+      <ul>
+        <li><span class="tag t-new">New</span>A <b>"Connect Stripe"</b> onboarding button to set up payouts.</li>
+      </ul>
+    </div>
+
+    <div class="rel minor">
+      <div class="ver"><span class="num">v6.9.7</span> <span class="theme">Spotify import</span></div>
+      <ul>
+        <li><span class="tag t-new">New</span>Import songs by pasting a <b>Spotify playlist or album link</b>.</li>
+      </ul>
+    </div>
+
+    <div class="foot">
+      Built by two musicians, for musicians. — Isaac &amp; Glen Irvin<br>
+      <a class="btn" href="https://getliveque.com">Back to your dashboard</a>
+    </div>
+  </div>
+</body>
+</html>
