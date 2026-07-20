@@ -509,12 +509,16 @@ async function signUp() {
 
     // Auto-create artist_settings row so the new performer doesn't 406 on first dashboard load.
     // Non-fatal: if this fails, we log it and continue — the dashboard can lazily create it on first save.
+    // Mint an active gig session at signup so no account is ever left with a
+    // null session. A null session makes paid requests invisible on the audience
+    // page, whose queue query cannot match SQL NULLs (see F6).
+    const initialGigSession = 'gig-' + Date.now() + '-' + Math.random().toString(36).substring(2, 9);
     const { error: settingsError } = await db.from('artist_settings').insert([{
         artist_id: newArtist.id,
         payment_methods: {},
         social_handles: {},
         tip_amounts: [0, 2, 5, 10],
-        current_gig_session_id: null
+        current_gig_session_id: initialGigSession
     }]);
 
     if (settingsError) {

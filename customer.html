@@ -255,7 +255,11 @@ async function loadFromSupabase(){
             console.log('📱 Social handles:',socialMediaHandles);
         }
         
-        const rq=await db.from('requests').select('*').eq('artist_id',ARTIST_ID).eq('gig_session_id',currentGigSessionId).order('tip_amount',{ascending:false});
+        // Use .is() for a null session — PostgREST .eq() cannot match SQL NULLs,
+        // which would hide paid requests on accounts with no active gig (F6).
+        let rqQuery=db.from('requests').select('*').eq('artist_id',ARTIST_ID);
+        rqQuery=currentGigSessionId?rqQuery.eq('gig_session_id',currentGigSessionId):rqQuery.is('gig_session_id',null);
+        const rq=await rqQuery.order('tip_amount',{ascending:false});
         if(rq.data){
             requestQueue=rq.data.map(function(r){
                 return{
