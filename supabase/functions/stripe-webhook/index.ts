@@ -3,7 +3,15 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import Stripe from "https://esm.sh/stripe@16.12.0?target=deno";
 
 const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY")!;
-const STRIPE_WEBHOOK_SECRET = Deno.env.get("STRIPE_WEBHOOK_SECRET")!;
+// Two webhook endpoints point at this one function: a normal one (payments,
+// disputes) and a Connected-accounts one (account.updated). Stripe gives each
+// endpoint its OWN signing secret, so a single secret can only ever verify one of
+// them - the other's events fail with a 400. Accept both. CONNECT is optional so
+// nothing breaks before the second endpoint exists.
+const WEBHOOK_SECRETS = [
+  Deno.env.get("STRIPE_WEBHOOK_SECRET"),
+  Deno.env.get("STRIPE_WEBHOOK_SECRET_CONNECT"),
+].filter(Boolean) as string[];
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
@@ -17,13 +25,22 @@ serve(async (req) => {
   const sig = req.headers.get("stripe-signature");
   const bodyText = await req.text();
 
+  // Try each configured signing secret. Stripe signs with exactly one, so the
+  // first that verifies is the right endpoint; only fail if none match.
   let event;
-  try {
-    event = await stripe.webhooks.constructEventAsync(
-      bodyText, sig!, STRIPE_WEBHOOK_SECRET, undefined, cryptoProvider
-    );
-  } catch (err) {
-    return new Response("Bad signature: " + err.message, { status: 400 });
+  let lastErr;
+  for (const secret of WEBHOOK_SECRETS) {
+    try {
+      event = await stripe.webhooks.constructEventAsync(
+        bodyText, sig!, secret, undefined, cryptoProvider
+      );
+      break;
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+  if (!event) {
+    return new Response("Bad signature: " + (lastErr?.message ?? "no matching secret"), { status: 400 });
   }
 
   // A LIVE endpoint receives test events as well as live ones. Stripe's own

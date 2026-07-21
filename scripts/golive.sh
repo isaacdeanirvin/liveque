@@ -120,14 +120,22 @@ bold "Step 1 of 2 - webhook signing secret"
 echo "  This goes first on purpose. A live signing secret with no live traffic is"
 echo "  harmless; live keys with a stale secret drops every event silently."
 echo
-WHSEC=""; read_secret "Live webhook signing secret" "whsec_" 32 WHSEC
+echo "  There are TWO webhook endpoints, each with its OWN signing secret:"
+echo "    1. the normal one          (Your account: payments, disputes)"
+echo "    2. the connected-accounts one (account.updated)"
+echo "  Both point at the same function, so it must know both secrets or the"
+echo "  second endpoint's events all fail signature checks. Copy each whsec_ from"
+echo "  its own page: dashboard.stripe.com/workbench/webhooks -> the endpoint -> Signing secret."
+echo
+WHSEC=""; read_secret "Webhook 1 (Your account) signing secret" "whsec_" 32 WHSEC
+WHSEC_CONNECT=""; read_secret "Webhook 2 (Connected accounts) signing secret" "whsec_" 32 WHSEC_CONNECT
 
 TMP="$(mktemp -t liveque-golive)"; chmod 600 "$TMP"
-printf 'STRIPE_WEBHOOK_SECRET=%s\n' "$WHSEC" > "$TMP"
+printf 'STRIPE_WEBHOOK_SECRET=%s\nSTRIPE_WEBHOOK_SECRET_CONNECT=%s\n' "$WHSEC" "$WHSEC_CONNECT" > "$TMP"
 if supabase secrets set --env-file "$TMP" --project-ref "$PROJECT_REF" >/dev/null 2>&1; then
-  grn "  webhook secret set"
+  grn "  both webhook secrets set"
 else
-  red "  FAILED to set webhook secret"; exit 1
+  red "  FAILED to set webhook secrets"; exit 1
 fi
 : > "$TMP"
 
@@ -149,7 +157,7 @@ else
   red "  FAILED to set API keys"; exit 1
 fi
 : > "$TMP"; rm -f "$TMP"; TMP=""
-unset SK PK WHSEC
+unset SK PK WHSEC WHSEC_CONNECT
 
 echo
 bold "Verifying"
