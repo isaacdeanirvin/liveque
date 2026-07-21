@@ -26,6 +26,23 @@ serve(async (req) => {
     return new Response("Bad signature: " + err.message, { status: 400 });
   }
 
+  // A LIVE endpoint receives test events as well as live ones. Stripe's own
+  // Connect docs say so: "your production webhook URLs receive both live and
+  // test webhooks". Without this guard, anyone able to trigger a test payment
+  // causes real fulfilment in production: a song queued, a tip counted, a recap
+  // sent. Fulfil only what matches the key this function is running on.
+  const RUNNING_LIVE = STRIPE_SECRET_KEY.startsWith("sk_live_");
+  if (event.livemode !== RUNNING_LIVE) {
+    console.log(
+      `Ignoring ${event.type}: event.livemode=${event.livemode} but this ` +
+      `deployment is ${RUNNING_LIVE ? "live" : "test"}`,
+    );
+    // 2xx so Stripe stops retrying. This is a deliberate no-op, not a failure.
+    return new Response(JSON.stringify({ received: true, ignored: "mode mismatch" }), {
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   if (event.type === "payment_intent.succeeded") {
     const pi = event.data.object;
     const m = pi.metadata || {};
@@ -134,6 +151,51 @@ serve(async (req) => {
       }
     } catch (e) {
       console.error("Dispute handler error:", e);
+      return new Response("Handler error", { status: 500 });
+    }
+  }
+
+  // Performer readiness, pushed rather than polled.
+  //
+  // Until now the only thing that wrote stripe_charges_enabled was the performer
+  // opening their own dashboard, which calls stripe-status. That means someone
+  // can finish Stripe onboarding, close the tab, and their fan page still shows
+  // no tip buttons at their next gig. Stripe knows the moment KYC clears; this
+  // lets it tell us.
+  //
+  // Requires a webhook endpoint scoped to CONNECTED ACCOUNTS subscribed to
+  // account.updated. A normal account endpoint will not deliver this.
+  if (event.type === "account.updated") {
+    const acct = event.data.object;
+    try {
+      const onboarded = !!(acct.charges_enabled && acct.payouts_enabled && acct.details_submitted);
+      const admin = createClient(SUPABASE_URL, SERVICE_ROLE);
+
+      const { data: artist } = await admin
+        .from("artists")
+        .select("id, stripe_onboarded")
+        .eq("stripe_account_id", acct.id)
+        .maybeSingle();
+
+      if (!artist) {
+        console.log("account.updated for an unknown account " + acct.id);
+      } else {
+        if (artist.stripe_onboarded !== onboarded) {
+          await admin.from("artists").update({ stripe_onboarded: onboarded }).eq("id", artist.id);
+        }
+        // Mirror onto artist_settings, which is the only one of the two the
+        // anonymous fan page is allowed to read.
+        await admin.from("artist_settings")
+          .update({ stripe_charges_enabled: onboarded })
+          .eq("artist_id", artist.id);
+        console.log(
+          `account.updated ${acct.id} -> onboarded=${onboarded} ` +
+          `(charges=${!!acct.charges_enabled} payouts=${!!acct.payouts_enabled} ` +
+          `details=${!!acct.details_submitted})`,
+        );
+      }
+    } catch (e) {
+      console.error("account.updated handler error:", e);
       return new Response("Handler error", { status: 500 });
     }
   }

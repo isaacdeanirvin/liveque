@@ -38,21 +38,20 @@ if [ "$(git rev-parse HEAD)" = "$(git ls-remote origin main 2>/dev/null | cut -f
   ok "local HEAD matches origin/main"
 else no "local and origin/main differ - push"; fi
 
-head_ "APPLE PAY / GOOGLE PAY DOMAIN"
-apath="/.well-known/apple-developer-merchantid-domain-association"
-acode=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 "$SITE$apath")
-aredir=$(curl -s -o /dev/null -w '%{redirect_url}' --max-time 15 "$SITE$apath")
-if [ "$acode" = "200" ]; then
-  ok "association file served (200)"
-  [ -z "$aredir" ] && ok "served without redirect" || no "redirects to $aredir - Stripe requires no redirect"
-  bytes=$(curl -s --max-time 15 "$SITE$apath" | wc -c | tr -d ' ')
-  [ "$bytes" -gt 100 ] && ok "file is ${bytes} bytes" || no "file is only ${bytes} bytes - probably wrong content"
-else
-  no "association file returns $acode - wallet buttons will not render"
-fi
-[ -f "$REPO/.well-known/apple-developer-merchantid-domain-association" ] \
-  && ok "association file present in repo" \
-  || no "no association file in repo (download it from Stripe, see docs/GOLIVE.md)"
+head_ "APPLE PAY / GOOGLE PAY"
+# NOTE: there is deliberately no /.well-known/apple-developer-merchantid-domain-association
+# check here. Stripe handles Apple merchant validation itself and its current docs
+# say not to follow Apple's own process. The string "well-known" does not appear
+# anywhere in Stripe's current Apple Pay or payment-method-domain guides. A 404 on
+# that path is EXPECTED and is not why wallet buttons fail.
+#
+# What actually gates the wallets is domain registration in the Stripe Dashboard,
+# per mode, which cannot be read from here without a secret key.
+tls=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 "$SITE/")
+[ "$tls" = "200" ] && ok "HTTPS serving (Google Pay requires a TLS domain-validated cert)" \
+                   || no "site not serving over HTTPS"
+hmm "domain registration is Dashboard-only: verify getliveque.com AND www.getliveque.com"
+hmm "  appear at dashboard.stripe.com/settings/payment_method_domains in LIVE mode"
 
 head_ "EDGE FUNCTIONS"
 if command -v supabase >/dev/null 2>&1; then
