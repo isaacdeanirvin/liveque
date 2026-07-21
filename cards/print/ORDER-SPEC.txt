@@ -40,14 +40,37 @@ Sides             Double sided, different artwork each side
 STOCK AND FINISH
 ===========================================================================
 
-Recommended:  18pt Colorplan Ebony, through-dyed, colour-matched edges
-              White ink printing
-              ~$87 CAD per 250, ~$174 CAD for 250 each of both brothers
-              Jukebox promo code JUL20BC takes 20% off
+Vendor:       JUKEBOX PRINT (Vancouver BC) - jukeboxprint.com
+Stock:        18pt Colorplan Ebony, through-dyed, colour-matched edges
+Print:        "Full Color + White Ink Both Sides"
+
+REAL PRICING (live-configured 2026-07-20, CAD, delivered):
+              250 = $105    500 = $155     <- WITH white ink
+              250 = $87     500 = $125     <- without white ink
+
+  White ink is +$18 at 250, +$30 at 500. An earlier version of this
+  file quoted the WITHOUT-white-ink price. That was wrong.
+
+  Jukebox charges PER DESIGN. Two brothers at 250 each = ~$210 CAD
+  before any discount.
+
+PROMO: use JUL25 (25% off entire cart), NOT JUL20BC (20%, cards only).
+  JUL25 is one use per customer, so put BOTH designs in ONE cart.
+  Roughly $158 CAD for 250 each, shipped.
+
+  Free shipping over $75 to North America. Ships from Vancouver.
+  One business day production. MOQ 50.
 
 Why through-dyed: the card is near-black on both faces. Printing black on
 white stock shows a white edge on every cut and every scuff. Through-dyed
-stock is black all the way through.
+stock is black all the way through. This is the single biggest thing
+separating a dark card that feels expensive from one that feels cheap.
+
+NOTE ON COLOUR: Colorplan Ebony's swatch is #1C1C1C, slightly lighter than
+our #080808. It is the closest through-dyed stock available. Also, Ebony
+may be hidden from Jukebox's self-serve configurator - if you cannot select
+it, call 888-667-0067 and ask them to quote 18pt Colorplan Ebony with white
+ink both sides.
 
 Foil was considered and rejected: foil cannot carry a scannable QR code
 (ISO/IEC 18004 Annex K - specular reflection off polished metal interferes
@@ -62,11 +85,23 @@ This is a REAL, WORKING QR CODE. Not a placeholder.
   Encodes:           https://getliveque.com
   Error correction:  H (30% recoverable - survives scuffs and dark bars)
   Version:           3  (29 x 29 modules)
-  Printed size:      0.86 in  (spec floor is 0.8 in)
+  Printed size:      0.87 in  (spec floor is 0.8 in)
   Quiet zone:        full 4 modules on all sides
   Verified:          decoded out of the finished card art, and still decoded
                      when downscaled to 400px wide, far below what any phone
                      camera captures
+
+TELL JUKEBOX: "Please double-hit the white ink."
+  Digital white on dark stock commonly lands at only 60-75% opacity and
+  reads grey. On a 0.87in QR that can drop contrast below the scanning
+  threshold. A double hit fixes it. This is the single most important
+  thing to say when you order.
+
+POLARITY IS ALREADY CORRECT. The white panel prints in white ink and the
+dark modules are simply an absence of ink, letting the Ebony show through.
+That gives standard dark-on-light, which every scanner handles. An
+inverted QR (light modules on a dark field) is the common failure and
+this design avoids it.
 
 STILL DO THIS: when the printed proof arrives, scan it with an actual phone
 before approving the full run. Screen tests are not print tests.

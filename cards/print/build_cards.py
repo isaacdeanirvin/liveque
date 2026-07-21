@@ -71,11 +71,16 @@ def wrap(draw, text, f, max_w):
     return lines
 
 def qr_image(px_code):
-    """Real QR, error correction H, no built-in border. Returns (img, module_px)."""
+    """Real QR, error correction H, no built-in border. Returns (img, module_px).
+
+    Module size is rounded UP. Flooring quietly shrank the code below the size
+    asked for: 0.86in of budget over 29 modules floored to 17px per module and
+    printed at 0.822in. Rounding up holds the requested size.
+    """
     qr = segno.make(URL, error="h", micro=False)
     matrix = [list(row) for row in qr.matrix]
     n = len(matrix)
-    mod = max(1, px_code // n)
+    mod = max(1, -(-px_code // n))
     size = mod * n
     img = Image.new("RGB", (size, size), (255, 255, 255))
     d = ImageDraw.Draw(img)
