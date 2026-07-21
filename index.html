@@ -132,8 +132,10 @@
         .lp-demo { max-width: 330px; margin: 0 auto 30px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 12px; text-align: left; }
         .lp-demotop { display: flex; justify-content: space-between; align-items: center; padding: 2px 4px 10px; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,.5); font-weight: 600; }
         .lp-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #4ecdc4; margin-right: 6px; vertical-align: middle; }
-        .lp-q { position: relative; height: 196px; }
-        .lp-qi { position: absolute; left: 0; right: 0; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,.05); border-left: 3px solid #ff6b6b; border-radius: 10px; padding: 10px 12px; transition: transform .8s cubic-bezier(.16,1,.3,1), border-color .35s, background .35s; }
+        /* Rows sit in normal flow. No measured height, no absolute positioning, so a
+           failure in the animation still leaves three readable rows on the page. */
+        .lp-q { display: flex; flex-direction: column; gap: 8px; }
+        .lp-qi { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,.05); border-left: 3px solid #ff6b6b; border-radius: 10px; padding: 10px 12px; transition: transform .8s cubic-bezier(.16,1,.3,1), border-color .35s, background .35s; }
         .lp-qi .t { flex: 1; min-width: 0; }
         .lp-qi .n { font-size: 13.5px; font-weight: 650; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .lp-qi .a { font-size: 11px; color: rgba(255,255,255,.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -241,7 +243,13 @@
 
             <div class="lp-demo" aria-label="A request queue reordering when a tip arrives">
               <div class="lp-demotop"><span><span class="lp-dot"></span>Your queue</span><span id="lpDq">3 waiting</span></div>
-              <div class="lp-q" id="lpQ"></div>
+              <!-- Rows live in the markup, not in JS. If the script never runs, the
+                   reader still sees a queue instead of an empty box. -->
+              <div class="lp-q" id="lpQ">
+                <div class="lp-qi"><div class="t"><div class="n">Free Fallin'</div><div class="a">Tom Petty</div></div><span class="tag">$5</span></div>
+                <div class="lp-qi"><div class="t"><div class="n">Wagon Wheel</div><div class="a">Old Crow Medicine Show</div></div><span class="tag">$5</span></div>
+                <div class="lp-qi"><div class="t"><div class="n">Landslide</div><div class="a">Fleetwood Mac</div></div><span class="tag">$5</span></div>
+              </div>
             </div>
 
             <button class="lp-btn" onclick="goToLogin('up')">Create your free account</button>
@@ -582,7 +590,7 @@
                 <div style="margin-bottom: 28px;"><div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.6;">Connection Status</div><p style="margin: 0;"><span style="color: #2ed573;">Green</span> means live. <span style="color: #ffd700;">Yellow</span> means reconnecting. <span style="color: #ff4757;">Red</span> means disconnected — refresh the page.</p></div>
             </div>
             <div style="margin-top: 30px; text-align: center;"><button class="auth-btn" onclick="closeHelpModal()" style="background: rgba(255,255,255,0.15); padding: 12px 40px;">Done</button></div>
-            <div style="margin-top: 24px; text-align: center; font-size: 11px; opacity: 0.4;">v6.9.28 · getliveque.com</div>
+            <div style="margin-top: 24px; text-align: center; font-size: 11px; opacity: 0.4;">v6.9.29 · getliveque.com</div>
         </div>
     </div>
     <div id="socialModal" class="modal"><div class="modal-content"><span class="close" onclick="closeSocialModal()">&times;</span><h2>Social Media Settings</h2><div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;"><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Instagram:</label><input type="text" id="instagramInput" class="auth-input" placeholder="username (without @)"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">X (Twitter):</label><input type="text" id="xInput" class="auth-input" placeholder="username (without @)"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">TikTok:</label><input type="text" id="tiktokInput" class="auth-input" placeholder="@username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Facebook:</label><input type="text" id="facebookInput" class="auth-input" placeholder="facebook.com/username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">YouTube:</label><input type="text" id="youtubeInput" class="auth-input" placeholder="@channelname"></div><button class="auth-btn" onclick="saveSocialMedia()">Update Social Profiles</button></div></div></div>
@@ -593,7 +601,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script>
-console.log('=== LIVEQUE ADMIN v6.9.28 ===');
+console.log('=== LIVEQUE ADMIN v6.9.29 ===');
 
 const SUPABASE_URL = 'https://jttswydixqeyyqvcohnq.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dHN3eWRpeHFleXlxdmNvaG5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNjE3ODYsImV4cCI6MjA3NDkzNzc4Nn0.WlvOfl11qVUVatSCIPy8t6u9-j4u1z5CpnBxXe50BdQ';
@@ -675,35 +683,39 @@ function goToLogin(which) {
 }
 
 // The hero demo: three requests, a tip lands on the last one, it climbs to the
-// top. Row height is measured rather than assumed so it holds at any font size.
+// top. The rows come from the markup, so this script only ever animates what is
+// already on the page.
 (function () {
     var q = document.getElementById('lpQ'), dq = document.getElementById('lpDq');
-    if (!q) return;
+    if (!q || !dq) return;
+    var els = Array.prototype.slice.call(q.children);
+    if (els.length < 3) return;
     var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var songs = [
-        { n: "Free Fallin'", a: 'Tom Petty' },
-        { n: 'Wagon Wheel', a: 'Old Crow Medicine Show' },
-        { n: 'Landslide', a: 'Fleetwood Mac' }
-    ];
-    var els = songs.map(function (s) {
-        var d = document.createElement('div');
-        d.className = 'lp-qi';
-        d.innerHTML = '<div class="t"><div class="n">' + s.n + '</div><div class="a">' + s.a + '</div></div><span class="tag">$5</span>';
-        q.appendChild(d);
-        return d;
-    });
-    var ROW = Math.round(els[0].getBoundingClientRect().height) + 8;
-    q.style.height = (ROW * els.length - 8) + 'px';
-    function place(order) { order.forEach(function (i, slot) { els[i].style.transform = 'translateY(' + (slot * ROW) + 'px)'; }); }
-    place([0, 1, 2]);
-    if (still) { els[2].classList.add('paid'); place([2, 0, 1]); dq.textContent = 'Up next'; return; }
+    if (still) { els[2].classList.add('paid'); q.insertBefore(els[2], els[0]); dq.textContent = 'Up next'; return; }
+
+    // FLIP: reorder the DOM, then animate from where each row used to be. Measuring
+    // happens at the moment of the move, so it cannot go stale.
+    function reorder(move) {
+        var before = els.map(function (e) { return e.getBoundingClientRect().top; });
+        move();
+        els.forEach(function (e, i) {
+            var shift = before[i] - e.getBoundingClientRect().top;
+            e.style.transition = 'none';
+            e.style.transform = shift ? 'translateY(' + shift + 'px)' : '';
+        });
+        void q.offsetHeight;
+        els.forEach(function (e) { e.style.transition = ''; e.style.transform = ''; });
+    }
+
     var t = [];
     (function run() {
         t.forEach(clearTimeout); t = [];
-        els.forEach(function (e) { e.classList.remove('paid'); });
-        place([0, 1, 2]); dq.textContent = '3 waiting';
+        els.forEach(function (e) { e.classList.remove('paid'); e.style.transition = 'none'; e.style.transform = ''; q.appendChild(e); });
+        void q.offsetHeight;
+        els.forEach(function (e) { e.style.transition = ''; });
+        dq.textContent = '3 waiting';
         t.push(setTimeout(function () { els[2].classList.add('paid'); dq.textContent = '$5 tip'; }, 1600));
-        t.push(setTimeout(function () { place([2, 0, 1]); }, 2200));
+        t.push(setTimeout(function () { reorder(function () { q.insertBefore(els[2], els[0]); }); }, 2200));
         t.push(setTimeout(function () { dq.textContent = 'Up next'; }, 3100));
         t.push(setTimeout(run, 7200));
     })();
