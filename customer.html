@@ -226,12 +226,25 @@ let pendingRequest=null;
 let songLibrary=[];
 let popularSongsShuffled=[];
 let currentGigSessionId=null;
+// KILL SWITCH: in-app card tipping is OFF for this release.
+//
+// Stripe is still in test mode, so a card tapped here would move no real money while
+// looking exactly like it had. Every request is free and tips go through the
+// performer's own handles instead. Flip this back to true only after the go-live
+// runbook is finished and a real card has been tested off-peak (docs/GOLIVE.md).
+//
+// Deliberately a constant rather than deleted code: the whole Stripe path is intact
+// underneath, so turning tips back on is a one-word change, not a rebuild.
+const STRIPE_TIPS_ENABLED = false;
+
 let stripeChargesEnabled=false;
 let pendingTip=null;
 
 const paymentIcons = {
     paypal: '💳',
-    cashapp: '💵'
+    cashapp: '💵',
+    venmo: '🅥',
+    applepay: '🍎'
 };
 
 // Social icons
@@ -322,7 +335,7 @@ async function loadFromSupabase(){
             paymentMethods=st.data.payment_methods||{};
             socialMediaHandles=st.data.social_handles||{};
             tipAmounts=st.data.tip_amounts||[0,2,5,10];
-            stripeChargesEnabled=st.data.stripe_charges_enabled===true;
+            stripeChargesEnabled = STRIPE_TIPS_ENABLED && st.data.stripe_charges_enabled===true;
         }
         
         // Use .is() for a null session. PostgREST .eq() cannot match SQL NULLs,
@@ -696,10 +709,33 @@ function renderPaymentMethods(){
     
     let hasPaymentMethods=false;
     
-    // Venmo and Zelle removed for good: Venmo bars personal accounts from commercial
-    // transactions, and Zelle has no developer path and no purchase protection.
-    // PayPal and Cash App stay, but neither can be confirmed, so they are labelled as
-    // not moving the song. Only a Stripe tip does that.
+    // In-app card tipping is off in this release (STRIPE_TIPS_ENABLED, top of file), so
+    // every request is free and these handles are the only way to tip. None of them can
+    // be confirmed by us, so none of them move a song up the queue, and the copy says so.
+    //
+    // Venmo is back by request. It is only safe on a BUSINESS profile: Venmo's user
+    // agreement bars personal accounts from commercial transactions and gig tips qualify,
+    // with frozen funds as the documented consequence. The performer-side field says this
+    // in the dashboard, which is the only place it can actually be acted on.
+    //
+    // Zelle stays out. No purchase protection and irreversible payments is the wrong
+    // combination to hand a stranger in a bar.
+    if(paymentMethods.venmo){
+        hasPaymentMethods=true;
+        const b=document.createElement('button');
+        b.className='payment-btn';
+        b.innerHTML=paymentIcons.venmo+' Venmo';
+        b.onclick=function(){openPayment('venmo',paymentMethods.venmo);};
+        c.appendChild(b);
+    }
+    if(paymentMethods.applepay){
+        hasPaymentMethods=true;
+        const b=document.createElement('button');
+        b.className='payment-btn';
+        b.innerHTML=paymentIcons.applepay+' Apple Cash';
+        b.onclick=function(){openPayment('applepay',paymentMethods.applepay);};
+        c.appendChild(b);
+    }
     if(paymentMethods.paypal){
         hasPaymentMethods=true;
         const b=document.createElement('button');
@@ -723,6 +759,8 @@ function renderPaymentMethods(){
 
 function renderModalBackupTips(tc){
     var methods=[];
+    if(paymentMethods.venmo) methods.push(['venmo','Venmo',paymentMethods.venmo]);
+    if(paymentMethods.applepay) methods.push(['applepay','Apple Cash',paymentMethods.applepay]);
     if(paymentMethods.paypal) methods.push(['paypal','PayPal',paymentMethods.paypal]);
     if(paymentMethods.cashapp) methods.push(['cashapp','Cash App',paymentMethods.cashapp]);
     if(methods.length===0) return;
@@ -811,10 +849,33 @@ function openPayment(m,h){
         u = h.includes('paypal.me/') ? 'https://'+h.replace(/^https?:\/\//,'') : 'https://paypal.me/'+h;
     }else if(m==='cashapp'){
         u='https://cash.app/'+h;
+    }else if(m==='venmo'){
+        // Tolerate a pasted profile URL or a bare @handle, and land on the current
+        // /u/ path, which is what both the app and the web profile resolve.
+        var vh = h.replace(/^https?:\/\/(www\.)?(account\.)?venmo\.com\/(u\/)?/,'').replace(/^@/,'');
+        u='https://venmo.com/u/'+encodeURIComponent(vh);
+    }else if(m==='applepay'){
+        // Apple Cash is sent inside Messages and has no URL scheme to hand off to, so
+        // the most useful thing is to put the number on their clipboard and say where
+        // to paste it. Falls back to showing it, because clipboard access needs a
+        // secure context and a user gesture and can still be refused.
+        copyOrShow(h, 'Send Apple Cash to this in Messages');
+        return;
     }
 
     if(u){
         window.open(u,'_blank');
+    }
+}
+
+function copyOrShow(text, why){
+    function shown(){ window.prompt(why + ':', text); }
+    if(navigator.clipboard && window.isSecureContext){
+        navigator.clipboard.writeText(text).then(function(){
+            alert(why + ':\n\n' + text + '\n\nCopied. Open Messages and paste it.');
+        }).catch(shown);
+    }else{
+        shown();
     }
 }
 
