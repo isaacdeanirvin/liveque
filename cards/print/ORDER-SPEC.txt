@@ -40,26 +40,46 @@ Sides             Double sided, different artwork each side
 STOCK AND FINISH
 ===========================================================================
 
-Vendor:       JUKEBOX PRINT (Vancouver BC) - jukeboxprint.com
-Stock:        18pt Colorplan Ebony, through-dyed, colour-matched edges
-Print:        "Full Color + White Ink Both Sides"
+BUYER IS IN LOS ANGELES, USA. All prices below are USD.
 
-REAL PRICING (live-configured 2026-07-20, CAD, delivered):
-              250 = $105    500 = $155     <- WITH white ink
-              250 = $87     500 = $125     <- without white ink
+OPTION 1 - JUKEBOX PRINT (cheapest verified)   jukeboxprint.com
+  Stock:  18pt Colorplan Ebony, through-dyed, colour-matched edges
+  Print:  "Full Color + White Ink Both Sides"
+  Price:  250 = $91 USD      500 = $135 USD    (per design, with white ink)
+          Two people at 250 each = ~$182 USD
 
-  White ink is +$18 at 250, +$30 at 500. An earlier version of this
-  file quoted the WITHOUT-white-ink price. That was wrong.
-
-  Jukebox charges PER DESIGN. Two brothers at 250 each = ~$210 CAD
-  before any discount.
-
-PROMO: use JUL25 (25% off entire cart), NOT JUL20BC (20%, cards only).
-  JUL25 is one use per customer, so put BOTH designs in ONE cart.
-  Roughly $158 CAD for 250 each, shipped.
-
-  Free shipping over $75 to North America. Ships from Vancouver.
+  Ships from Vancouver BC. Free shipping over $75 to North America.
   One business day production. MOQ 50.
+  NO DUTY: US de minimis is $800, so an order this size enters duty free.
+  A Canadian origin costs you nothing as a US buyer.
+
+  Promo codes JUL20BC and JUL25 were displayed on their site on
+  2026-07-20. Do not count on them. Paste one at checkout and see.
+  It costs nothing to try and the price above assumes neither applies.
+
+OPTION 2 - 4OVER4.COM (US-based, worth one quote)   4over4.com
+  Stock:  Midnite Black Uncoated, 32pt / 48pt / 64pt / 80pt
+  Print:  confirmed white ink. Their configurator lists literally
+          "1/1 : White Ink Both Sides" and "5/5 : CMYK + White Both Sides"
+  Price:  COULD NOT VERIFY at 250/500. Their configurator would not
+          produce a quantity table. Starting figure shown was 40.62.
+  Ships:  "4OVER4 ships to all 50 states" - no cross-border at all.
+  Note:   Their black stock being dyed through is LIKELY but NOT stated
+          anywhere on the page. Ask for a sample before committing.
+
+  Being in LA, this is the one to phone for a quote. If they beat $182
+  for both sets and confirm the stock is black through the core, take it.
+
+OPTION 3 - LUXURY PRINTING (New York)   luxuryprinting.com
+  28pt Duplex Black Uncoated: $140 USD / 250, $220 USD / 500
+  Genuinely black core: "the edges and inside of the card are also black
+  (if you tear it apart)". But WHITE INK IS QUOTE ONLY on this stock,
+  so the price above does not include it. 5-7 business days.
+
+DO NOT USE: MOO, Vistaprint, GotPrint, Staples, Office Depot, Canva,
+UPrinting, NextDayFlyers, PsPrint, SilkCards, Mixam. Every one of them
+fails on white ink, dark stock, or both. This was verified vendor by
+vendor, not assumed.
 
 Why through-dyed: the card is near-black on both faces. Printing black on
 white stock shows a white edge on every cut and every scuff. Through-dyed

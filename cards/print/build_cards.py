@@ -45,11 +45,15 @@ PEOPLE = [
 def font(name, px):
     return ImageFont.truetype(os.path.join(FONTS, name), px)
 
-def tracked(draw, xy, text, f, fill, track=0):
-    """PIL has no letter-spacing. Draw glyph by glyph."""
+def tracked(draw, xy, text, f, fill, track=0, anchor="la"):
+    """PIL has no letter-spacing, so draw glyph by glyph.
+
+    anchor="ls" draws on the BASELINE rather than the top of the box, which is
+    what lets two different type sizes line up across a column gap.
+    """
     x, y = xy
     for ch in text:
-        draw.text((x, y), ch, font=f, fill=fill)
+        draw.text((x, y), ch, font=f, fill=fill, anchor=anchor)
         x += draw.textlength(ch, font=f) + track
     return x
 
@@ -113,15 +117,21 @@ def front(p):
     ry = y + inch(0.055)
     d.rectangle([SAFE, ry, SAFE + inch(0.42), ry + inch(0.018)], fill=TEAL)
 
-    # identity block pinned to the bottom safe edge
-    by = BLEED_H - SAFE - inch(0.40)
-    d.text((SAFE, by), f"{p['first']} {p['last']}", font=f_name, fill=INK)
-    tracked(d, (SAFE, by + inch(0.185)), "MUSICIAN", f_role, DIM, track=inch(0.019))
-
+    # Identity block. Two shared BASELINES, so the name sits on exactly the same
+    # line as the email and the role on the same line as the handle. Drawing at
+    # PIL's default top-of-box anchor is what threw these out of alignment: an
+    # 11.5pt name and an 8.5pt email have different ascents, so an equal y value
+    # puts them on visibly different lines.
+    # base2 sits far enough up that descenders stay inside the safe area
+    base1 = BLEED_H - SAFE - inch(0.255)
+    base2 = BLEED_H - SAFE - inch(0.042)
     right = BLEED_W - SAFE
-    for i, line in enumerate([p["email"], p["ig"]]):
-        w = d.textlength(line, font=f_meta)
-        d.text((right - w, by + inch(0.055) + i * inch(0.145)), line, font=f_meta, fill=(185, 185, 185))
+
+    d.text((SAFE, base1), f"{p['first']} {p['last']}", font=f_name, fill=INK, anchor="ls")
+    d.text((right, base1), p["email"], font=f_meta, fill=(185, 185, 185), anchor="rs")
+
+    tracked(d, (SAFE, base2), "MUSICIAN", f_role, DIM, track=inch(0.019), anchor="ls")
+    d.text((right, base2), p["ig"], font=f_meta, fill=(185, 185, 185), anchor="rs")
     return img
 
 def back():
