@@ -731,13 +731,22 @@ function renderModalBackupTips(tc){
 // Apple Pay and Link. Never vary it by card type: Mastercard's second definition
 // catches "any fee charged in connection with a Transaction that is not charged
 // if another payment method is used."
-var COVER_FEES_ENABLED = true;   // kill switch: set false to pull the feature
+// OFF. The research said don't ship it: upside is capped at +4% to +6% of
+// performer take, it breaks even at only a 3.8% to 5.5% conversion drop, and
+// published conversion effects range from 0% to -38.5%. The uncertainty is
+// several times wider than the prize. Code is built and tested, so flipping
+// this to true is the only step needed if we ever want to A/B it.
+var COVER_FEES_ENABLED = false;
 
 function coverFeeCents(tipCents){
     // charge - (0.029*charge + 30) = tip  ->  charge = (tip + 30) / 0.971
     return Math.ceil((tipCents + 30) / 0.971) - tipCents;
 }
 function coverFeesOn(){
+    // Gate on the kill switch, not just the checkbox. Hiding the row is not the
+    // same as disabling the feature: without this, a stale or flipped checkbox
+    // would send cover_fees:true and charge the fan extra with no UI shown.
+    if(!COVER_FEES_ENABLED) return false;
     var el = document.getElementById('coverFees');
     return !!(el && el.checked);
 }
@@ -766,6 +775,7 @@ function renderCoverFees(tipDollars){
     if(btn && !btn.disabled) btn.textContent = 'Pay $'+(coverFeesOn()?total:tipDollars);
 }
 function toggleCoverFees(){
+    if(!COVER_FEES_ENABLED) return;
     var el=document.getElementById('coverFees');
     if(el) el.checked=!el.checked;
     renderCoverFees();
