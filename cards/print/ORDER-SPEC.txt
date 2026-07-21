@@ -1,0 +1,120 @@
+LIVEQUE BUSINESS CARDS - PRINT ORDER SPEC
+Generated 20 July 2026
+
+===========================================================================
+WHAT TO UPLOAD
+===========================================================================
+
+Deliverable 1 - GLEN IRVIN
+  front:  1-glen-front.pdf   (or .png)
+  back:   1-glen-back.pdf    (or .png)
+
+Deliverable 2 - ISAAC IRVIN
+  front:  2-isaac-front.pdf  (or .png)
+  back:   2-isaac-back.pdf   (or .png)
+
+If the printer wants one file:  LiveQue-CARDS-ALL.pdf
+  page 1  Glen front
+  page 2  Glen back
+  page 3  Isaac front
+  page 4  Isaac back
+
+The PROOF-*.png files are for YOU, not the printer. They have the trim and
+safe-area guides drawn on. Do not upload those.
+
+===========================================================================
+SPECIFICATIONS
+===========================================================================
+
+Resolution        600 DPI
+Document size     3.75 x 2.25 in   (2250 x 1350 px)  <- includes bleed
+Trim size         3.5 x 2.0 in     (2100 x 1200 px)  <- US standard
+Safe area         3.25 x 1.75 in   (1950 x 1050 px)
+Bleed             0.125 in per edge
+Colour            RGB, background #080808
+
+Orientation       Landscape
+Sides             Double sided, different artwork each side
+
+===========================================================================
+STOCK AND FINISH
+===========================================================================
+
+Recommended:  18pt Colorplan Ebony, through-dyed, colour-matched edges
+              White ink printing
+              ~$87 CAD per 250, ~$174 CAD for 250 each of both brothers
+              Jukebox promo code JUL20BC takes 20% off
+
+Why through-dyed: the card is near-black on both faces. Printing black on
+white stock shows a white edge on every cut and every scuff. Through-dyed
+stock is black all the way through.
+
+Foil was considered and rejected: foil cannot carry a scannable QR code
+(ISO/IEC 18004 Annex K - specular reflection off polished metal interferes
+with reading), and it cost about $836 CAD more across both brothers.
+
+===========================================================================
+THE QR CODE - READ THIS
+===========================================================================
+
+This is a REAL, WORKING QR CODE. Not a placeholder.
+
+  Encodes:           https://getliveque.com
+  Error correction:  H (30% recoverable - survives scuffs and dark bars)
+  Version:           3  (29 x 29 modules)
+  Printed size:      0.86 in  (spec floor is 0.8 in)
+  Quiet zone:        full 4 modules on all sides
+  Verified:          decoded out of the finished card art, and still decoded
+                     when downscaled to 400px wide, far below what any phone
+                     camera captures
+
+STILL DO THIS: when the printed proof arrives, scan it with an actual phone
+before approving the full run. Screen tests are not print tests.
+
+===========================================================================
+TYPEFACE
+===========================================================================
+
+Inter, by Rasmus Andersson.
+Licensed under the SIL Open Font License 1.1, which expressly permits
+embedding in and distribution with print files.
+
+The previous design used Segoe UI. That is Microsoft-licensed and NOT
+legally embeddable in a print file. This is why the type changed.
+
+License text is included at fonts/Inter-LICENSE.txt.
+
+===========================================================================
+IF THE PRINTER ASKS FOR VECTOR
+===========================================================================
+
+These are 600 DPI raster files. For business cards that is above the usual
+300 DPI requirement and most printers, Jukebox included, accept it.
+
+If your printer specifically demands vector (AI/EPS/vector PDF):
+  - qr-getliveque.svg is a true vector QR, use that
+  - the type would need outlining in Illustrator or Affinity
+  - tell me and I will rebuild it as vector
+
+===========================================================================
+CHECKS ALREADY RUN
+===========================================================================
+
+  [x] All ink inside the safe area on all four faces (measured, not eyeballed)
+  [x] QR decodes from the finished card art
+  [x] QR still decodes at 400px wide
+  [x] QR above the 0.8in size floor with full quiet zone
+  [x] 600 DPI, correct bleed geometry
+  [x] Typeface legally embeddable
+  [x] Contact details correct:
+        Glen  glenirvin@gmail.com  @irvspanish
+        Isaac isaacirvin@gmail.com @isaacirvin
+
+===========================================================================
+REBUILD
+===========================================================================
+
+  cd ~/liveque/cards/print
+  python3 build_cards.py
+
+Edit build_cards.py to change copy, sizes or colours.
