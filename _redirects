@@ -13,3 +13,24 @@
 
 https://soft-nasturtium-c51aac.netlify.app/*  https://getliveque.com/:splat  301!
 http://soft-nasturtium-c51aac.netlify.app/*   https://getliveque.com/:splat  301!
+
+# landing.html is the old standalone front page, superseded when the landing copy
+# moved into index.html. It was left live in case Glen had pasted the link
+# somewhere, and a redirect keeps that promise while removing the duplicate.
+#
+# It is not merely redundant, it is wrong: it still advertises "Apple Pay, Google
+# Pay, a card, or your Venmo". Venmo was deliberately removed as a tip option
+# because Venmo prohibits personal accounts from accepting business payments and
+# performers risked having funds frozen. That page is live on the domain Stripe is
+# about to review for activation.
+/landing.html  /  301!
+
+# archive/ holds dated snapshots of old builds. Netlify publishes everything in the
+# repo root, so those were being served live: three separate older versions of the
+# app reachable on the production domain, each still carrying the Venmo / PayPal /
+# CashApp / Zelle payment-settings UI that was removed on purpose.
+#
+# Scanned before writing this: they contain no secret keys, only the Supabase anon
+# JWT, which is public by design. So this is duplicate content and a bad look during
+# Stripe review, not a credential leak. Keep them in git, stop serving them.
+/archive/*  /  301!

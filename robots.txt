@@ -1,0 +1,12 @@
+# getliveque.com
+#
+# customer.html is a per-performer page driven by ?artist=<uuid>. Without that
+# parameter it renders "Invalid link", so a crawler indexing it produces a dead
+# result for a real search, and indexing one performer's URL would surface their
+# gig page under searches meant for someone else. Kept out of the index; the page
+# stays fully reachable to anyone who scans a QR code or follows a shared link.
+User-agent: *
+Disallow: /customer.html
+Disallow: /archive/
+
+Sitemap: https://getliveque.com/sitemap.xml

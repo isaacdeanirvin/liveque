@@ -51,6 +51,27 @@
     <p class="intro">Every update to LiveQue, newest first. Built by Isaac &amp; Glen Irvin. <span style="color:var(--teal);">New</span> = features, <span style="color:#a9a2ff;">Improved</span> = made better, <span style="color:var(--gold);">Fixed</span> = bugs squashed.</p>
 
     <div class="rel">
+      <div class="ver"><span class="num">v6.9.45</span> <span class="theme">Getting ready for real money</span></div>
+      <ul>
+        <li><span class="tag t-rm">Removed</span><b>Venmo, Zelle and Cash App are gone as tip options</b>, and they are not coming back. Venmo's own rules prohibit personal accounts from accepting business payments, so a performer following our old advice risked having their funds frozen. Zelle has no developer path and gives your fans no purchase protection. Card, Apple Pay and Google Pay only, all through Stripe, all landing in your own bank.</li>
+        <li><span class="tag t-fix">Fixed</span><b>Finishing Stripe setup now actually sticks.</b> The last step used to send you back to an old address for the site, where you arrived signed out. Setup completed at Stripe's end, but we never heard about it, so your tip buttons stayed off with nothing to tell you why. If you set up payouts and fans still could not tip you, this was why.</li>
+        <li><span class="tag t-fix">Fixed</span><b>You get marked ready the moment Stripe approves you</b>, instead of only when you next open the dashboard.</li>
+        <li><span class="tag t-imp">Improved</span><b>Sharing looks like something now.</b> Links you send get a proper title, description and image instead of a bare URL, and the site has a real icon in your browser tab.</li>
+        <li><span class="tag t-sec">Security</span>Old versions of the app were still reachable on the site. They are closed off. No passwords or payment keys were ever in them &mdash; we checked before writing this.</li>
+      </ul>
+    </div>
+
+    <div class="rel">
+      <div class="ver"><span class="num">v6.9.44</span> <span class="theme">Legal cover, and a fairer split</span></div>
+      <ul>
+        <li><span class="tag t-new">New</span><b>Terms of Service</b> and a <b>Privacy Policy</b>, at <a href="terms.html">/terms.html</a> and <a href="privacy.html">/privacy.html</a>, plus an agree checkbox at signup.</li>
+        <li><span class="tag t-fix">Fixed</span><b>The tip maths now matches what we publish.</b> Every page says a $5 tip leaves you $4.55. The code was handing over the full $5 and quietly billing us the card fee. It now does exactly what the pricing says, on every amount.</li>
+        <li><span class="tag t-imp">Improved</span><b>Share buttons</b> in three places: your gig link, a fan's share after tipping, and the front page.</li>
+        <li><span class="tag t-fix">Fixed</span>Phone layout on the about section, and <b>eight controls that were too small to tap</b> &mdash; including the rating stars, which get tapped one-handed in a dark room.</li>
+      </ul>
+    </div>
+
+    <div class="rel">
       <div class="ver"><span class="num">v6.9.25</span> <span class="theme">Printable handbook</span></div>
       <ul>
         <li><span class="tag t-new">New</span>A <b>one-page Performer Handbook</b> at <a href="handbook.html">/handbook.html</a>. The whole thing (set up, run a gig, what fans see, after the gig, cheat sheet, troubleshooting) on a single page, styled to print cleanly in black and white.</li>
@@ -127,7 +148,7 @@
     <div class="rel">
       <div class="ver"><span class="num">v6.9.15</span> <span class="theme">Tip anywhere, rate anytime</span></div>
       <ul>
-        <li><span class="tag t-new">New</span><b>Venmo / PayPal / Cash App / Zelle</b> now appear inside the song request. Fans can tip you even if you haven't connected Stripe.</li>
+        <li><span class="tag t-new">New</span><b>Venmo / PayPal / Cash App / Zelle</b> appeared inside the song request. <b>Since removed &mdash; see v6.9.45.</b> Venmo prohibits personal accounts from accepting business payments, and following this advice risked getting a performer's funds frozen.</li>
         <li><span class="tag t-new">New</span>A <b>"Rate the show"</b> prompt appears right after a fan tips.</li>
         <li><span class="tag t-new">New</span><b>Bulk song import</b>: paste a list (or drop a .csv) and add 30+ songs at once.</li>
       </ul>
