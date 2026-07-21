@@ -72,6 +72,78 @@ may be hidden from Jukebox's self-serve configurator - if you cannot select
 it, call 888-667-0067 and ask them to quote 18pt Colorplan Ebony with white
 ink both sides.
 
+===========================================================================
+DO NOT ADD SOFT TOUCH. DO NOT ADD LAMINATE.
+===========================================================================
+
+Two reasons, and the first one is not a matter of taste.
+
+1. Taghleef/Derprosa invented the soft-touch film category. Their standard
+   soft-touch datasheet never mentions fingerprints. Their separate
+   Pro-Shield product advertises "remarkable anti-fingerprints properties"
+   and is "recommended for all types of DARK COLOR BACKGROUNDS that make
+   smudges more visible." That is the manufacturer conceding the defect in
+   order to sell the fix. On a black card, soft touch is the worst
+   available choice.
+
+2. UNCOATED TAKES A PEN. Laminate does not. Musicians write on each other's
+   cards: set times, venue names, "call me about Tuesday." A laminated card
+   cannot be written on. This is a real advantage of uncoated Colorplan for
+   your specific use, and no vendor will ever mention it.
+
+Uncoated also hides scuffs better than matte laminate, and matte surfaces
+read as more sincere than gloss in the only finish comparison with real
+peer-reviewed evidence behind it (Chen 2021, J. Product & Brand Management
+30(5): matte scored 5.01 vs gloss 3.68 on brand sincerity).
+
+===========================================================================
+DO NOT PAY FOR THICKNESS BEYOND 18PT
+===========================================================================
+
+The "heavier stock feels more premium" idea rests on the weight-as-
+importance literature, and that literature has collapsed. Rabelo et al.
+2015 (PLOS ONE 10(8)) meta-analysed 25 published weight-importance effects:
+the naive estimate was d=0.57, but the homogeneity test came back
+p=0.999993, which is impossibly uniform, and the publication-bias-corrected
+estimate is NEGATIVE. Three of their own experiments were null.
+
+No study has ever tested paper caliper against perceived quality. 18pt is a
+cheap upgrade over 16pt and worth taking. Past that you are paying real
+money for a difference nobody has shown anyone notices.
+
+Also skip letterpress, foil, emboss and painted edges unless you simply
+want them. There is no peer-reviewed evidence that any of them raise
+perceived value. Every claim to the contrary traces to a printer selling
+that finish. Deboss and emboss are also invisible in a dark bar, which is
+where this card gets handed over.
+
+===========================================================================
+THE "88% OF CARDS ARE THROWN OUT IN A WEEK" STAT IS FAKE
+===========================================================================
+
+Traced to the end: Adobe blog (2016) credited it to SilkCards, a business
+card printing company, whose infographic has no sources section, no links,
+and no citation for any of its eight statistics. The chain terminates in a
+printer's marketing graphic.
+
+Same for "72% judge a company by its business card" (traces to Statistic
+Brain, the outfit behind the debunked 8-second attention span, which the
+BBC could not get to substantiate anything) and "68% perceive brands as
+more premium with heavier stock" (attributed to a "Paper Industry
+Association" that could not be confirmed to exist).
+
+There is NO verifiable data on business card retention. Anyone quoting you
+a number is repeating a printer's marketing.
+
+What IS evidenced, and it is free: physically handing someone an object and
+letting them hold it raises what they think it is worth by 37% to 61%
+(Wolf/Arkes/Muhanna 2008; Bushong/King/Camerer/Rangel 2010, American
+Economic Review 100(4)). And a card that feels UNPLEASANT actively destroys
+that gain rather than being neutral (Peck & Shu 2009, JCR 36(3), Study 4).
+
+The biggest wins here cost nothing. The expensive upgrades have no
+evidence behind them at all.
+
 Foil was considered and rejected: foil cannot carry a scannable QR code
 (ISO/IEC 18004 Annex K - specular reflection off polished metal interferes
 with reading), and it cost about $836 CAD more across both brothers.
@@ -92,10 +164,19 @@ This is a REAL, WORKING QR CODE. Not a placeholder.
                      camera captures
 
 TELL JUKEBOX: "Please double-hit the white ink."
-  Digital white on dark stock commonly lands at only 60-75% opacity and
-  reads grey. On a 0.87in QR that can drop contrast below the scanning
-  threshold. A double hit fixes it. This is the single most important
-  thing to say when you order.
+  This is the single most important thing to say when you order.
+
+  Digital white on dark stock commonly lands at only 60-75% opacity.
+  Decoder testing shows the killer is not low contrast, it is PATCHINESS:
+  an opaque but mottled white patch dropped to an 80% decode rate, and
+  moderate opacity with heavy mottle failed 100% of the time. A double hit
+  is what makes the white solid rather than blotchy.
+
+  Do NOT let anyone letterpress the white. A practitioner on Briar Press
+  reports needing SEVEN layers in perfect register to get opaque white
+  letterpress, and another says it simply does not work. Foil, screen
+  print, or a double-hit digital white are the routes that give real
+  opacity. Letterpress would also crush the fine QR detail.
 
 POLARITY IS ALREADY CORRECT. The white panel prints in white ink and the
 dark modules are simply an absence of ink, letting the Ebony show through.
