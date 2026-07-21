@@ -128,7 +128,7 @@
             <div class="social-links" id="socialLinksContainer"></div>
         </div>
         <div id="nowPlayingSection" style="display: none;"></div>
-        <div class="payment-section"><div class="section-title">🥃 Feeling Tipsy?</div><div class="payment-buttons" id="paymentButtonsContainer"></div></div>
+        <div class="payment-section"><div class="section-title">🥃 Feeling Tipsy?</div><div class="payment-buttons" id="paymentButtonsContainer"></div><div style="font-size:11px; opacity:0.55; text-align:center; margin-top:10px; line-height:1.5;">These send money straight to the performer. To move a song up the queue, tip with the request itself.</div></div>
         <div class="payment-section"><div class="section-title">Current Queue</div><div id="audienceQueue"></div></div>
         <div class="payment-section"><div class="section-title">Request a Song</div><input type="text" class="search-bar" placeholder="Search LiveQue..." oninput="searchSongs(this.value)"><div id="songsList"></div></div>
         <div class="payment-section" id="reviewSection" style="display:none;">
@@ -189,6 +189,7 @@ let stripeChargesEnabled=false;
 let pendingTip=null;
 
 const paymentIcons = {
+    paypal: '💳',
     cashapp: '💵'
 };
 
@@ -654,10 +655,18 @@ function renderPaymentMethods(){
     
     let hasPaymentMethods=false;
     
-    // Venmo, PayPal and Zelle buttons removed. None of them could confirm the money
-    // arrived, so a tip through them never moved the request up the queue. Venmo also
-    // bars personal accounts from taking commercial payments, which is what a pasted
-    // @handle was doing.
+    // Venmo and Zelle removed for good: Venmo bars personal accounts from commercial
+    // transactions, and Zelle has no developer path and no purchase protection.
+    // PayPal and Cash App stay, but neither can be confirmed, so they are labelled as
+    // not moving the song. Only a Stripe tip does that.
+    if(paymentMethods.paypal){
+        hasPaymentMethods=true;
+        const b=document.createElement('button');
+        b.className='payment-btn';
+        b.innerHTML=paymentIcons.paypal+' PayPal';
+        b.onclick=function(){openPayment('paypal',paymentMethods.paypal);};
+        c.appendChild(b);
+    }
     if(paymentMethods.cashapp){
         hasPaymentMethods=true;
         const b=document.createElement('button');
@@ -673,6 +682,7 @@ function renderPaymentMethods(){
 
 function renderModalBackupTips(tc){
     var methods=[];
+    if(paymentMethods.paypal) methods.push(['paypal','PayPal',paymentMethods.paypal]);
     if(paymentMethods.cashapp) methods.push(['cashapp','Cash App',paymentMethods.cashapp]);
     if(methods.length===0) return;
     var wrap=document.createElement('div');
@@ -695,7 +705,9 @@ function renderModalBackupTips(tc){
 function openPayment(m,h){
     let u='';
 
-    if(m==='cashapp'){
+    if(m==='paypal'){
+        u = h.includes('paypal.me/') ? 'https://'+h.replace(/^https?:\/\//,'') : 'https://paypal.me/'+h;
+    }else if(m==='cashapp'){
         u='https://cash.app/'+h;
     }
 

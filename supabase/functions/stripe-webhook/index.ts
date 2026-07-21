@@ -67,6 +67,62 @@ serve(async (req) => {
     }
   }
 
+  // We use destination charges (transfer_data[destination] in stripe-create-tip).
+  // Stripe debits DISPUTES FROM THE PLATFORM BALANCE, not from the performer, and
+  // on_behalf_of does not change that. Since LiveQue takes 0%, an unhandled $5
+  // dispute costs us $5 plus the dispute fee against zero revenue. Reversing the
+  // transfer pulls the money back out of the performer's account instead.
+  if (event.type === "charge.dispute.created") {
+    const dispute = event.data.object;
+    try {
+      const chargeId = typeof dispute.charge === "string" ? dispute.charge : dispute.charge?.id;
+      if (!chargeId) throw new Error("Dispute " + dispute.id + " had no charge id");
+
+      const charge = await stripe.charges.retrieve(chargeId);
+      const transferId = typeof charge.transfer === "string" ? charge.transfer : charge.transfer?.id;
+
+      if (transferId) {
+        try {
+          // Keyed on the dispute id so Stripe's retries cannot double-reverse.
+          await stripe.transfers.createReversal(
+            transferId,
+            { amount: dispute.amount },
+            { idempotencyKey: "liveque-dispute-" + dispute.id },
+          );
+          console.log("Reversed transfer " + transferId + " for dispute " + dispute.id);
+        } catch (revErr) {
+          // Usually means the performer was already paid out and their balance is
+          // short. Stripe only chases it if debit_negative_balances is on. Loud on
+          // purpose: this is the case where LiveQue actually eats the money.
+          console.error(
+            "REVERSAL FAILED, platform absorbs this one. dispute=" + dispute.id +
+            " transfer=" + transferId + " reason=" + (revErr?.message || revErr),
+          );
+        }
+      } else {
+        console.error("No transfer on charge " + chargeId + " for dispute " + dispute.id);
+      }
+
+      // Drop the request back to unpaid. It keeps its place in the queue but loses
+      // the priority it no longer paid for. Deliberately not inventing a new status
+      // value the dashboard has never had to render.
+      const piId = typeof charge.payment_intent === "string"
+        ? charge.payment_intent
+        : charge.payment_intent?.id;
+      if (piId) {
+        const admin = createClient(SUPABASE_URL, SERVICE_ROLE);
+        const { error } = await admin
+          .from("requests")
+          .update({ tip_amount: 0 })
+          .eq("stripe_payment_intent_id", piId);
+        if (error) console.error("Could not clear tip for disputed " + piId + ":", error);
+      }
+    } catch (e) {
+      console.error("Dispute handler error:", e);
+      return new Response("Handler error", { status: 500 });
+    }
+  }
+
   return new Response(JSON.stringify({ received: true }), {
     headers: { "Content-Type": "application/json" },
   });

@@ -131,6 +131,10 @@
         .lp-already { display: block; font-size: 14px; color: rgba(255,255,255,.62); margin-top: 18px; }
         .lp-already button { background: none; border: none; padding: 0; font: inherit; font-weight: 700; color: #4ecdc4; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
         .lp-already button:hover { color: #6fdbd3; }
+        .signup-agree { display: flex; align-items: flex-start; gap: 10px; margin: 4px 0 16px; cursor: pointer; text-align: left; }
+        .signup-agree input { flex: 0 0 auto; width: 18px; height: 18px; margin-top: 1px; accent-color: #4ecdc4; cursor: pointer; }
+        .signup-agree span { font-size: 13px; line-height: 1.5; color: rgba(255,255,255,.72); }
+        .signup-agree a { color: #4ecdc4; text-decoration: underline; text-underline-offset: 2px; }
         .lp-demo { max-width: 330px; margin: 0 auto 30px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 12px; text-align: left; }
         .lp-demotop { display: flex; justify-content: space-between; align-items: center; padding: 2px 4px 10px; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,.5); font-weight: 600; }
         .lp-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #4ecdc4; margin-right: 6px; vertical-align: middle; }
@@ -352,6 +356,15 @@
                     <label for="signupConfirm">Confirm password</label>
                     <input type="password" class="login-input" id="signupConfirm" placeholder="Re-enter your password" autocomplete="new-password">
                 </div>
+                <!-- Clickwrap. Berman v. Freedom Financial (9th Cir. 2022): a click is
+                     assent "only if the user is explicitly advised that the act of
+                     clicking will constitute assent". A footer link is not enough
+                     (Nguyen v. Barnes & Noble). Hence a real checkbox, above the
+                     button, with the links visible without scrolling. -->
+                <label class="signup-agree" for="agreeTerms">
+                    <input type="checkbox" id="agreeTerms">
+                    <span>I am 18 or older and I agree to the <a href="/terms.html" target="_blank" rel="noopener">Terms of Service</a> and <a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.</span>
+                </label>
                 <button class="login-btn" id="signupBtn" onclick="signUp()">Create Account</button>
                 <div class="login-error" id="signupError"></div>
             </div>
@@ -386,7 +399,7 @@
                 <div class="login-error" id="newPassError"></div>
             </div>
 
-            <div class="login-foot">getliveque.com</div>
+            <div class="login-foot">getliveque.com &middot; <a href="/terms.html" target="_blank" rel="noopener" style="color:inherit;">Terms</a> &middot; <a href="/privacy.html" target="_blank" rel="noopener" style="color:inherit;">Privacy</a></div>
         </div>
       </div>
     </div>
@@ -594,18 +607,18 @@
                 <div style="margin-bottom: 28px;"><div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.6;">Connection Status</div><p style="margin: 0;"><span style="color: #2ed573;">Green</span> means live. <span style="color: #ffd700;">Yellow</span> means reconnecting. <span style="color: #ff4757;">Red</span> means disconnected — refresh the page.</p></div>
             </div>
             <div style="margin-top: 30px; text-align: center;"><button class="auth-btn" onclick="closeHelpModal()" style="background: rgba(255,255,255,0.15); padding: 12px 40px;">Done</button></div>
-            <div style="margin-top: 24px; text-align: center; font-size: 11px; opacity: 0.4;">v6.9.32 · getliveque.com</div>
+            <div style="margin-top: 24px; text-align: center; font-size: 11px; opacity: 0.4;">v6.9.33 · getliveque.com</div>
         </div>
     </div>
     <div id="socialModal" class="modal"><div class="modal-content"><span class="close" onclick="closeSocialModal()">&times;</span><h2>Social Media Settings</h2><div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;"><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Instagram:</label><input type="text" id="instagramInput" class="auth-input" placeholder="username (without @)"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">X (Twitter):</label><input type="text" id="xInput" class="auth-input" placeholder="username (without @)"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">TikTok:</label><input type="text" id="tiktokInput" class="auth-input" placeholder="@username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Facebook:</label><input type="text" id="facebookInput" class="auth-input" placeholder="facebook.com/username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">YouTube:</label><input type="text" id="youtubeInput" class="auth-input" placeholder="@channelname"></div><button class="auth-btn" onclick="saveSocialMedia()">Update Social Profiles</button></div></div></div>
-    <div id="paymentModal" class="modal"><div class="modal-content"><span class="close" onclick="closePaymentModal()">&times;</span><h2>Payment Settings</h2><div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;"><div style="font-size: 13px; opacity: 0.75; line-height: 1.5; text-align: center;">Tips through the app go to your Stripe account and we can confirm they arrived, so a tipped request moves up your queue automatically. A handle pasted here cannot be confirmed, so those tips will not move anything.</div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">CashApp:</label><input type="text" id="cashappInput" class="auth-input" placeholder="$username"></div><button class="auth-btn" onclick="savePaymentMethods()">Save Payment Methods</button></div></div></div>
+    <div id="paymentModal" class="modal"><div class="modal-content"><span class="close" onclick="closePaymentModal()">&times;</span><h2>Payment Settings</h2><div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;"><div style="font-size: 13px; opacity: 0.75; line-height: 1.5; text-align: center;">Tips through the app land in your Stripe account and we can confirm they arrived, so those requests move up your queue automatically. A handle you paste below sends money straight to you, but it happens outside LiveQue, so we cannot see it and <b>it will not move a song up your queue</b>.</div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">PayPal:</label><input type="text" id="paypalInput" class="auth-input" placeholder="paypal.me/username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">CashApp:</label><input type="text" id="cashappInput" class="auth-input" placeholder="$username"></div><button class="auth-btn" onclick="savePaymentMethods()">Save Payment Methods</button></div></div></div>
     <div id="allSongsModal" class="modal"><div class="modal-content"><span class="close" onclick="closeAllSongsModal()">&times;</span><h2>All Songs</h2><input type="text" class="auth-input" placeholder="Search songs..." oninput="searchAllSongs(this.value)" style="margin: 20px 0;"><div id="allSongsList" style="text-align: left; max-height: 50vh; overflow-y: auto;"></div></div></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script>
-console.log('=== LIVEQUE ADMIN v6.9.32 ===');
+console.log('=== LIVEQUE ADMIN v6.9.33 ===');
 
 const SUPABASE_URL = 'https://jttswydixqeyyqvcohnq.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dHN3eWRpeHFleXlxdmNvaG5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNjE3ODYsImV4cCI6MjA3NDkzNzc4Nn0.WlvOfl11qVUVatSCIPy8t6u9-j4u1z5CpnBxXe50BdQ';
@@ -890,6 +903,10 @@ async function signUp() {
     errorEl.textContent = '';
     if (!name) { errorEl.textContent = 'Enter your performer name.'; return; }
     if (!email) { errorEl.textContent = 'Enter your email.'; return; }
+    // Deliberately unchecked by default. A pre-ticked box is not assent, and the FTC
+    // treats a pre-filled age as encouraging falsification.
+    var agree = document.getElementById('agreeTerms');
+    if (agree && !agree.checked) { errorEl.textContent = 'Please confirm you are 18 or older and agree to the Terms and Privacy Policy.'; return; }
     if (password.length < 6) { errorEl.textContent = 'Password must be at least 6 characters.'; return; }
     if (password !== confirm) { errorEl.textContent = "Passwords don't match."; return; }
 
@@ -1196,12 +1213,14 @@ async function markAsComplete(songId) { const completedSong = requestQueue.find(
 
 function updateStats() { document.getElementById('requestCount').textContent = requestQueue.length; document.getElementById('songCount').textContent = songLibrary.length; const tipsInQueue = requestQueue.filter(function(r) { return r.tip > 0; }).length; const totalTipsAmount = requestQueue.reduce(function(sum, r) { return sum + r.tip; }, 0); const tipElement = document.getElementById('tipCount'); if (!showingDollarAmount) { tipElement.textContent = tipsInQueue + ' tips'; } tipElement.style.cursor = 'pointer'; tipElement.onclick = function() { if (!showingDollarAmount) { showingDollarAmount = true; tipElement.textContent = '$' + totalTipsAmount; setTimeout(function() { showingDollarAmount = false; tipElement.textContent = tipsInQueue + ' tips'; }, 3000); } }; }
 
-function openPaymentSettings() { document.getElementById('cashappInput').value = paymentMethods.cashapp || ''; document.getElementById('paymentModal').classList.add('show'); }
-// Venmo, PayPal, Zelle and Apple Pay handles were removed from the UI but are left
-// untouched in the stored object, so restoring those fields restores their values.
-async function savePaymentMethods() { paymentMethods = Object.assign({}, paymentMethods, { cashapp: document.getElementById('cashappInput').value.trim() }); const result = await db.from('artist_settings').upsert({ artist_id: ARTIST_ID, payment_methods: paymentMethods, social_handles: socialMediaHandles, tip_amounts: tipAmounts, current_gig_session_id: currentGigSessionId, updated_at: new Date().toISOString() }); if (!result.error) { renderPaymentMethods(); closePaymentModal(); showToast('Payment methods updated!'); } }
+function openPaymentSettings() { document.getElementById('paypalInput').value = paymentMethods.paypal || ''; document.getElementById('cashappInput').value = paymentMethods.cashapp || ''; document.getElementById('paymentModal').classList.add('show'); }
+// Venmo, Zelle and Apple Pay were removed and are not coming back: Venmo bars
+// personal accounts from commercial use, Zelle has no developer path, and there is
+// no such thing as an Apple Pay handle. Old values are left untouched in the stored
+// object rather than wiped.
+async function savePaymentMethods() { paymentMethods = Object.assign({}, paymentMethods, { paypal: document.getElementById('paypalInput').value.trim(), cashapp: document.getElementById('cashappInput').value.trim() }); const result = await db.from('artist_settings').upsert({ artist_id: ARTIST_ID, payment_methods: paymentMethods, social_handles: socialMediaHandles, tip_amounts: tipAmounts, current_gig_session_id: currentGigSessionId, updated_at: new Date().toISOString() }); if (!result.error) { renderPaymentMethods(); closePaymentModal(); showToast('Payment methods updated!'); } }
 function closePaymentModal() { document.getElementById('paymentModal').classList.remove('show'); }
-function renderPaymentMethods() { const display = document.getElementById('paymentMethodsDisplay'); if (display) { display.innerHTML = ''; const methods = ['cashapp']; const labels = { cashapp: 'CashApp' }; methods.forEach(function(method) { if (paymentMethods[method]) { const info = document.createElement('div'); info.className = 'payment-info'; info.innerHTML = '<span class="payment-label">' + labels[method] + ':</span> ' + paymentMethods[method]; display.appendChild(info); } }); } }
+function renderPaymentMethods() { const display = document.getElementById('paymentMethodsDisplay'); if (display) { display.innerHTML = ''; const methods = ['paypal', 'cashapp']; const labels = { paypal: 'PayPal', cashapp: 'CashApp' }; methods.forEach(function(method) { if (paymentMethods[method]) { const info = document.createElement('div'); info.className = 'payment-info'; info.innerHTML = '<span class="payment-label">' + labels[method] + ':</span> ' + paymentMethods[method]; display.appendChild(info); } }); } }
 
 async function resetAllCooldowns() { if (confirm('Clear all recently played songs? Songs will be immediately available again.')) { await db.from('played_songs').delete().eq('artist_id', ARTIST_ID); showToast('Recently played list has been cleared!'); } }
 async function addNewSong() { const title = document.getElementById('newSongTitle').value.trim(); const artist = document.getElementById('newSongArtist').value.trim(); if (!title || !artist) { showToast('Please enter both song title and artist', 'warning'); return; } const exists = songLibrary.some(function(s) { return s.title.toLowerCase() === title.toLowerCase() && s.artist.toLowerCase() === artist.toLowerCase(); }); if (exists) { showToast('This song is already in the library', 'warning'); return; } const result = await db.from('songs').insert([{ artist_id: ARTIST_ID, title: title, artist_name: artist }]); if (!result.error) { document.getElementById('newSongTitle').value = ''; document.getElementById('newSongArtist').value = ''; await loadFromSupabase(); updateStats(); showToast('"' + title + '" by ' + artist + ' added to library!'); } }
