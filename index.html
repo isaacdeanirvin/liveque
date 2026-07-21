@@ -110,6 +110,8 @@
            so .bare strips it back to just the card. */
         .login-overlay.bare { display: flex; align-items: center; justify-content: center; padding: 24px; }
         .login-overlay.bare .lp { display: none; }
+        /* The divider only makes sense under the pitch. With .bare it orphans above the card. */
+        .login-overlay.bare .lp-cardwrap { border-top: 0; padding-top: 0; }
         .lp-shell { max-width: 900px; margin: 0 auto; padding: 0 20px 60px; }
         .lp-nav { position: sticky; top: 0; z-index: 5; background: rgba(8,8,8,.9); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,.08); margin: 0 -20px 0; padding: 13px 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
         .lp-mark { font-size: 21px; font-weight: 600; letter-spacing: -.5px; color: #fff; }
