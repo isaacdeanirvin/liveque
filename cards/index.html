@@ -3,233 +3,196 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LiveQue business cards — design proof</title>
+<title>LiveQue business cards — final proof</title>
 <style>
-:root{
-  --blk:#0a0a0a; --ink:#fff;
-  --foil:#c9a227; --foilhi:#f2dc8a;
-  --paper:#f6f3ec;      /* uncoated warm white */
-  --pink:#14140f;       /* near-black type on paper */
-  --rule:#cfc9bb;
-}
+:root{ --blk:#0a0a0a; --ink:#fff; --foil:#c9a227; --foilhi:#f2dc8a; }
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#1b1b1b;color:#ddd;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:32px 20px 80px;line-height:1.6}
 .page{max-width:960px;margin:0 auto}
 h1{font-size:22px;font-weight:700;color:#fff}
-.sub{font-size:14px;color:#999;margin:4px 0 24px}
-h2{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#fff;font-weight:700;margin:40px 0 4px}
-.h2sub{font-size:13.5px;color:#999;margin-bottom:16px;max-width:640px}
-.row{display:flex;gap:24px;flex-wrap:wrap;margin-bottom:8px}
+.sub{font-size:14px;color:#999;margin:4px 0 22px}
+h2{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#fff;font-weight:700;margin:38px 0 4px}
+.h2sub{font-size:13.5px;color:#9a9a9a;margin-bottom:16px;max-width:660px}
+.row{display:flex;gap:24px;flex-wrap:wrap;margin-bottom:6px}
 .tag{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#777;margin-bottom:6px}
 .ctl{background:#2c2c2c;border:1px solid #444;color:#ddd;font-size:12.5px;padding:7px 14px;border-radius:7px;cursor:pointer;margin-bottom:18px}
-.ctl:hover{background:#363636}
-.legend{display:flex;gap:20px;flex-wrap:wrap;font-size:12.5px;color:#999;margin-bottom:18px}
-.legend b{display:inline-block;width:11px;height:11px;border-radius:2px;vertical-align:-1px;margin-right:6px}
-.note{background:#20201a;border-left:3px solid #c93;padding:13px 16px;border-radius:6px;font-size:13.5px;margin:22px 0;max-width:780px}
-.note.bad{background:#211;border-left-color:#c33}
+.note{background:#20201a;border-left:3px solid #c93;padding:13px 16px;border-radius:6px;font-size:13.5px;margin:20px 0;max-width:800px}
+.note.bad{background:#231313;border-left-color:#d44}
+.note.good{background:#152015;border-left-color:#5a5}
 .note b{color:#fff}
+table{border-collapse:collapse;width:100%;max-width:800px;font-size:13.5px;margin:10px 0 4px}
+th,td{text-align:left;padding:8px 11px;border-bottom:1px solid #333}
+th{color:#888;font-weight:600;font-size:11px;letter-spacing:.09em;text-transform:uppercase}
 
-/* ── card shell: 3.5 x 2in trim, rendered at 2x ─────────────────── */
-.card{position:relative;width:7in;height:4in;overflow:hidden;border-radius:2px;box-shadow:0 10px 28px rgba(0,0,0,.55)}
-.card.dark{background:var(--blk)}
-.card.light{background:var(--paper)}
+/* card shell, 3.5x2in trim shown at 2x */
+.card{position:relative;width:7in;height:4in;background:var(--blk);overflow:hidden;border-radius:2px;box-shadow:0 10px 28px rgba(0,0,0,.55)}
 .card::before,.card::after{content:'';position:absolute;pointer-events:none;opacity:0}
 .card::before{inset:.25in;outline:1px dashed rgba(255,70,70,.8)}
 .card::after{inset:.5in;outline:1px dashed rgba(70,160,255,.7)}
 body.guides .card::before,body.guides .card::after{opacity:1}
-/* the duplex seam, visible on the trimmed edge */
-.card.duplex{border-bottom:6px solid var(--blk)}
 .inner{position:absolute;inset:.5in;display:flex;flex-direction:column}
 
-.w{color:var(--ink)} .k{color:var(--pink)}
+.w{color:var(--ink)}
 .f{background:linear-gradient(105deg,#8a6d14,var(--foil) 24%,var(--foilhi) 42%,var(--foil) 60%,#8a6d14 84%);
    -webkit-background-clip:text;background-clip:text;color:transparent}
 
-.name{font-size:46px;font-weight:700;letter-spacing:-.6px;line-height:1.02}
-.rule{height:2px;width:60px;margin:15px 0;background:linear-gradient(90deg,#8a6d14,var(--foilhi),#8a6d14)}
-.meta{font-size:14.5px;line-height:1.5}
-.meta span{opacity:.62;display:inline-block;width:.62in}
+.name{font-size:44px;font-weight:700;letter-spacing:-.6px;line-height:1.02}
+.role{font-size:15px;letter-spacing:.24em;text-transform:uppercase;opacity:.6;margin-top:9px}
+.rule{height:1.5px;width:56px;margin:15px 0}
+.rule.wht{background:rgba(255,255,255,.55)}
+.rule.gld{background:linear-gradient(90deg,#8a6d14,var(--foilhi),#8a6d14)}
+.meta{font-size:14px;line-height:1.55;opacity:.9}
 
-/* back */
 .hook{font-size:25px;font-weight:700;line-height:1.2;letter-spacing:-.3px}
-.copy{font-size:14px;line-height:1.5;margin-top:10px;max-width:3.5in;opacity:.82}
+.copy{font-size:14px;line-height:1.5;margin-top:10px;max-width:3.4in;opacity:.8}
 .foot{display:flex;gap:.26in;align-items:flex-end;margin-top:auto}
 .footL{flex:1}
-.site{font-size:15px;font-weight:700;margin-top:12px}
-.qr{flex:0 0 auto;width:1.44in;height:1.44in;padding:.085in;border-radius:1px}
-.qr.onlight{background:#fff;border:1px solid #ddd8cc}
-.qr.ondark{background:#fff}
+.site{font-size:15px;font-weight:700}
+/* QR: white ink lays the light field; the dark modules are bare black stock */
+.qr{flex:0 0 auto;width:1.44in;height:1.44in;background:#fff;padding:.085in;border-radius:1px}
 .qr i{display:block;width:100%;height:100%;
-  background-image:linear-gradient(90deg,#111 50%,transparent 50%),linear-gradient(#111 50%,transparent 50%);
+  background-image:linear-gradient(90deg,var(--blk) 50%,transparent 50%),linear-gradient(var(--blk) 50%,transparent 50%);
   background-size:12.5% 12.5%}
-/* NB: .foot already carries margin-top:auto. A second auto margin here would
-   split the free space between them and float the foot into the middle of the
-   card, so this one is a fixed gap. */
-.writeline{margin-top:11px;border-top:1px solid var(--rule);padding-top:8px;font-size:11px;opacity:.45;letter-spacing:.05em}
-/* the do-not-play front has no .foot, so its writeline does need to be pushed */
-.dnp-front .writeline{margin-top:auto}
-
-/* do-not-play variant */
-.dnp-h{font-size:15px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;opacity:.55}
-.dnp li{list-style:none;font-size:19px;font-weight:600;padding:7px 0;border-bottom:1px solid var(--rule)}
-.dnp li.done{text-decoration:line-through;opacity:.42}
-.dnp{margin-top:10px}
+.center{margin-top:auto;text-align:center}
 
 @media(max-width:1000px){
   .card{width:3.5in;height:2in} .inner{inset:.25in}
-  .card::before{inset:.125in} .card::after{inset:.25in} .card.duplex{border-bottom-width:3px}
-  .name{font-size:23px} .rule{width:30px;margin:7px 0} .meta{font-size:7.2px} .meta span{width:.31in}
-  .hook{font-size:12.5px} .copy{font-size:7px;margin-top:5px} .site{font-size:7.5px;margin-top:6px}
-  .qr{width:.72in;height:.72in;padding:.042in} .foot{gap:.13in}
-  .writeline{font-size:5.5px;padding-top:4px}
-  .dnp-h{font-size:7.5px} .dnp li{font-size:9.5px;padding:3px 0}
+  .card::before{inset:.125in} .card::after{inset:.25in}
+  .name{font-size:22px} .role{font-size:7.5px;margin-top:5px} .rule{width:28px;margin:7px 0}
+  .meta{font-size:7px} .hook{font-size:12.5px} .copy{font-size:7px;margin-top:5px}
+  .site{font-size:7.5px} .qr{width:.72in;height:.72in;padding:.042in} .foot{gap:.13in}
 }
 </style>
 </head>
 <body>
 <div class="page">
 
-<h1>LiveQue business cards</h1>
-<p class="sub">Design proof at 2&times; actual size. Glen is deliverable 1, Isaac is deliverable 2. Two stock options shown, because the evidence and the aesthetics disagree.</p>
+<h1>LiveQue business cards &mdash; final</h1>
+<p class="sub">Glen is deliverable 1, Isaac is deliverable 2. Shown at 2&times; actual size. Two versions, because foil turns out to carry a cost beyond money.</p>
 
 <button class="ctl" onclick="document.body.classList.toggle('guides')">Toggle trim &amp; safe-area guides</button>
 
-<div class="legend">
-  <span><b style="background:#fff"></b>White ink</span>
-  <span><b style="background:linear-gradient(105deg,#8a6d14,#f2dc8a,#8a6d14)"></b>Gold foil</span>
-  <span><b style="background:#0a0a0a;border:1px solid #444"></b>Black ply</span>
-  <span><b style="background:#f6f3ec"></b>Uncoated white ply</span>
+<div class="note bad">
+  <b>You cannot make a reliable QR code out of foil.</b> ISO/IEC 18004 Annex K says
+  it directly: specular reflection off a glossy surface interferes with reading, and
+  matt surfaces are what scanners want. Foil is polished metal. A gold foil QR
+  throws light straight back at the camera and reads inconsistently depending on
+  how the card is tilted.
+  <br><br>
+  On Premium Black there is no ink, only foil, so there is nothing else to build a
+  QR from. <b>The foil version below has no QR.</b> Someone has to type the URL.
 </div>
 
-<div class="note">
-  <b>Why there are two options.</b> White-on-black reads <b>45% slower in darkness</b>
-  (Dobres, Chahine &amp; Reimer, <i>Applied Ergonomics</i> 2017). In bright light polarity
-  makes no difference at all. In a dark room it dominates, and going bigger does not
-  fix it. A load-in is exactly that room. Option A puts the drama on the front and the
-  reading on a white back. Option B is the all-black card, which looks better in photos
-  and worse in the hand.
+<div class="note good">
+  <b>Now confirmed on Jukebox's own page:</b> Colorplan is
+  <i>"through-dyed pulp&hellip; with color-matched edges."</i> No white core, guaranteed.
+  That was the one thing the research could not verify earlier.
 </div>
 
 <div id="out"></div>
 
-<h2>Production spec</h2>
+<h2>The two versions, side by side</h2>
+<table>
+  <tr><th></th><th>White ink</th><th>Gold foil</th></tr>
+  <tr><td>Stock</td><td>18pt Colorplan Ebony</td><td>16pt Classic Crest Epic Black</td></tr>
+  <tr><td>250 cards</td><td><b>$87 CAD</b> &asymp; $63 USD</td><td><b>$505 CAD</b> &asymp; $365 USD</td></tr>
+  <tr><td>500 cards</td><td>$125 CAD &asymp; $91 USD</td><td>$609 CAD &asymp; $440 USD</td></tr>
+  <tr><td>Both brothers, 250 each</td><td><b>~$174 CAD</b></td><td>~$1,010 CAD</td></tr>
+  <tr><td>Working QR</td><td><b>Yes</b></td><td>No</td></tr>
+  <tr><td>Colours available</td><td>White only</td><td>One foil colour, both sides</td></tr>
+  <tr><td>Edges</td><td>Black through</td><td>Black through</td></tr>
+  <tr><td>Body copy legibility</td><td><b>Good</b></td><td>Metallic on black, poor in a dark room</td></tr>
+</table>
+<p class="h2sub" style="margin-top:12px">Jukebox code <b style="color:#ddd">JUL20BC</b> takes 20% off. Prices are Canadian dollars on their site.</p>
+
+<div class="note">
+  <b>If you want both white ink and gold foil on the same card</b>, Jukebox invites a
+  custom quote for exactly that: <i>"Need more than one foil color or a more complex
+  setup? Request a custom quote."</i> That would get you white type that reads plus a
+  gold accent that pops, which is the card you actually described. Worth one email
+  before committing to either version below.
+</div>
+
+<h2>Before this prints</h2>
 <div class="h2sub">
-  Trim 3.5 &times; 2 in. Document 3.75 &times; 2.25 in with 0.125 in bleed per edge.
-  Safe area 3.25 &times; 1.75 in. Option A is duplex: black ply bonded to uncoated white,
-  seam visible at the trim as a deliberate stripe. Option B is dyed-through black
-  (Sirio Ultra Black or Colorplan Ebony), decorated with white screen ink and gold
-  foil, no CMYK. Foil needs 0.5 pt minimum stroke and 8 pt minimum type. QR is
-  1.0 in minimum, vector, 4-module quiet zone, dark-on-light only.
-</div>
-
-<div class="note bad">
-  <b>The QR is a placeholder pattern, not a working code.</b> Replace it with a real
-  vector QR pointing at getliveque.com before this goes anywhere near a printer.
-  Do not invert it, do not put foil or gloss over it, and keep the printed URL
-  beside it.
-</div>
-
-<div class="note bad">
-  <b>Do not send this HTML to a printer.</b> A browser export gives raster or badly
-  structured vector, and a card is read at arm's length where that shows immediately.
-  This is the design and the spec. The print file has to be rebuilt as real vector
-  art with the foil on its own layer.
+  The QR on the white-ink version is a <b style="color:#ddd">placeholder pattern</b>,
+  not a working code. It needs replacing with real vector art pointing at
+  getliveque.com. And this HTML is the design and the spec, not production art:
+  a browser export gives raster or badly structured vector, which shows immediately
+  on something read at arm's length.
 </div>
 
 </div>
 
 <script>
 const PEOPLE = [
-  { first:'GLEN',  last:'IRVIN', email:'glenirvin@gmail.com',  ig:'@irvspanish', n:1 },
-  { first:'ISAAC', last:'IRVIN', email:'isaacirvin@gmail.com', ig:'@isaacirvin', n:2 },
+  { first:'GLEN',  last:'IRVIN', email:'glenirvin@gmail.com',  ig:'@irvspanish',  n:1 },
+  { first:'ISAAC', last:'IRVIN', email:'isaacirvin@gmail.com', ig:'@isaacirvin',  n:2 },
 ];
+const HOOK = '&ldquo;Sorry man,<br>I don&rsquo;t have cash.&rdquo;';
+const BODY = 'Heard that all night? Your crowd can request a song and tip you from their phone. Straight to your bank. It is free, and nobody downloads anything.';
+const SITE = 'getliveque.com';
 
-const COPY = {
-  hook: '&ldquo;Sorry man,<br>I don&rsquo;t have cash.&rdquo;',
-  // "we take nothing" is out: a competitor prints the identical claim. What is
-  // actually defensible is free vs their $9/mo, and real card payments in-flow
-  // instead of punting the fan to a Venmo handoff at 1am.
-  body: 'Heard that all night? Your crowd can request a song and tip you from their phone. Straight to your bank. It is free, and nobody downloads anything.',
-  site: 'getliveque.com'
-};
-
-function frontDark(p){ return `
-  <div class="card dark"><div class="inner">
+// ── white ink on Colorplan Ebony ───────────────────────────────
+const inkFront = p => `
+  <div class="card"><div class="inner">
     <div style="margin-top:auto">
       <div class="name w">${p.first}<br>${p.last}</div>
-      <div class="rule"></div>
-      <div class="meta w"><span>email</span>${p.email}<br><span>ig</span>${p.ig}</div>
+      <div class="role w">Musician</div>
+      <div class="rule wht"></div>
+      <div class="meta w">${p.email}<br>${p.ig}</div>
     </div>
   </div></div>`;
-}
 
-function backLight(p){ return `
-  <div class="card light duplex"><div class="inner">
-    <div class="hook k">${COPY.hook}</div>
-    <p class="copy k">${COPY.body}</p>
+const inkBack = () => `
+  <div class="card"><div class="inner">
+    <div class="hook w">${HOOK}</div>
+    <p class="copy w">${BODY}</p>
     <div class="foot">
-      <div class="footL"><div class="site k">${COPY.site}</div></div>
-      <div class="qr onlight"><i></i></div>
-    </div>
-    <div class="writeline k">notes</div>
-  </div></div>`;
-}
-
-function backDark(p){ return `
-  <div class="card dark"><div class="inner">
-    <div class="hook w">${COPY.hook}</div>
-    <p class="copy w">${COPY.body}</p>
-    <div class="foot">
-      <div class="footL"><div class="site f">${COPY.site}</div></div>
-      <div class="qr ondark"><i></i></div>
+      <div class="footL"><div class="site w">${SITE}</div></div>
+      <div class="qr"><i></i></div>
     </div>
   </div></div>`;
-}
 
-function frontDNP(p){ return `
-  <div class="card light dnp-front"><div class="inner">
-    <div class="dnp-h k">Do not play</div>
-    <ul class="dnp k">
-      <li class="done">Wonderwall</li>
-      <li class="done">Mustang Sally</li>
-      <li>&nbsp;</li>
-    </ul>
-    <div class="writeline k">${p.first} ${p.last} &middot; ${p.ig}</div>
+// ── gold foil on Premium Black. One colour, no ink, no QR. ─────
+const foilFront = p => `
+  <div class="card"><div class="inner">
+    <div style="margin-top:auto">
+      <div class="name f">${p.first}<br>${p.last}</div>
+      <div class="role f">Musician</div>
+      <div class="rule gld"></div>
+      <div class="meta f">${p.email}<br>${p.ig}</div>
+    </div>
   </div></div>`;
-}
+
+const foilBack = () => `
+  <div class="card"><div class="inner">
+    <div class="center">
+      <div class="hook f">${HOOK}</div>
+      <div class="site f" style="margin-top:22px;font-size:19px;letter-spacing:.02em">${SITE}</div>
+    </div>
+  </div></div>`;
 
 let html = '';
 PEOPLE.forEach(p => {
   html += `<h2>${p.first} ${p.last} &mdash; deliverable ${p.n}</h2>`;
 
-  html += `<div class="h2sub"><b style="color:#ddd">Option A &mdash; duplex.</b>
-    Black front for the moment of handover, uncoated white back you can actually
-    read in a bar and write on. About $0.66 a card.</div>`;
+  html += `<div class="h2sub"><b style="color:#ddd">Version 1 &mdash; white ink on Colorplan Ebony.</b>
+    $87 CAD per 250. Readable, has a working QR, true black with matched edges.
+    This is the one I would print.</div>`;
   html += `<div class="row">
-    <div><div class="tag">A &middot; front</div>${frontDark(p)}</div>
-    <div><div class="tag">A &middot; back</div>${backLight(p)}</div>
+    <div><div class="tag">Ink &middot; front</div>${inkFront(p)}</div>
+    <div><div class="tag">Ink &middot; back</div>${inkBack()}</div>
   </div>`;
 
-  html += `<div class="h2sub" style="margin-top:22px"><b style="color:#ddd">Option B &mdash; all black.</b>
-    Dyed-through stock, foil, black edges. The better-looking card and the harder
-    one to read where it gets handed over. About $0.40 a card.</div>`;
+  html += `<div class="h2sub" style="margin-top:20px"><b style="color:#ddd">Version 2 &mdash; gold foil on Premium Black.</b>
+    $505 CAD per 250. Everything is one foil colour because that stock takes no ink,
+    so the card has to be near-empty and the QR is gone.</div>`;
   html += `<div class="row">
-    <div><div class="tag">B &middot; front</div>${frontDark(p)}</div>
-    <div><div class="tag">B &middot; back</div>${backDark(p)}</div>
+    <div><div class="tag">Foil &middot; front</div>${foilFront(p)}</div>
+    <div><div class="tag">Foil &middot; back</div>${foilBack()}</div>
   </div>`;
 });
-
-// The concept the research ranked first, shown once for Glen.
-html += `<h2>Option C &mdash; the do-not-play list</h2>
-  <div class="h2sub">Ranked first by the creative research. Every cover musician has
-  this list, so it reads as one player to another before any pitch lands. Writable by
-  design, which is the only retention mechanism with real evidence behind it.
-  Uncoated white both sides, so no duplex and no foil, which also makes it the
-  cheapest of the three at roughly $0.05 a card.</div>
-  <div class="row">
-    <div><div class="tag">C &middot; front</div>${frontDNP(PEOPLE[0])}</div>
-    <div><div class="tag">C &middot; back</div>${backLight(PEOPLE[0])}</div>
-  </div>`;
 
 document.getElementById('out').innerHTML = html;
 </script>
