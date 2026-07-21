@@ -96,40 +96,40 @@ def new_card():
 
 def front(p):
     img, d = new_card()
-    f_kick = font("Inter-SemiBold.ttf", inch(0.058))
-    f_hook = font("Inter-Bold.ttf", inch(0.30))
-    f_name = font("Inter-Bold.ttf", inch(0.083))
-    f_role = font("Inter-Medium.ttf", inch(0.046))
-    f_meta = font("Inter-Regular.ttf", inch(0.055))
+    f_kick = font("Inter-SemiBold.ttf", inch(0.097))
+    f_hook = font("Inter-Bold.ttf", inch(0.255))
+    f_name = font("Inter-Bold.ttf", inch(0.160))
+    f_role = font("Inter-Medium.ttf", inch(0.104))
+    f_meta = font("Inter-Regular.ttf", inch(0.118))
 
     y = SAFE + inch(0.02)
     tracked(d, (SAFE, y), "WHAT YOU HEAR ALL NIGHT", f_kick, (120, 120, 120), track=inch(0.019))
-    y += inch(0.13)
+    y += inch(0.155)
 
     for line in ["“Sorry, I don’t", "have cash.”"]:
         d.text((SAFE, y), line, font=f_hook, fill=INK)
-        y += inch(0.315)
+        y += inch(0.275)
 
-    ry = y + inch(0.10)
+    ry = y + inch(0.055)
     d.rectangle([SAFE, ry, SAFE + inch(0.42), ry + inch(0.018)], fill=TEAL)
 
     # identity block pinned to the bottom safe edge
-    by = BLEED_H - SAFE - inch(0.30)
+    by = BLEED_H - SAFE - inch(0.40)
     d.text((SAFE, by), f"{p['first']} {p['last']}", font=f_name, fill=INK)
-    tracked(d, (SAFE, by + inch(0.105)), "MUSICIAN", f_role, DIM, track=inch(0.015))
+    tracked(d, (SAFE, by + inch(0.185)), "MUSICIAN", f_role, DIM, track=inch(0.019))
 
     right = BLEED_W - SAFE
     for i, line in enumerate([p["email"], p["ig"]]):
         w = d.textlength(line, font=f_meta)
-        d.text((right - w, by + inch(0.035) + i * inch(0.085)), line, font=f_meta, fill=(175, 175, 175))
+        d.text((right - w, by + inch(0.055) + i * inch(0.145)), line, font=f_meta, fill=(185, 185, 185))
     return img
 
 def back():
     img, d = new_card()
-    f_kick = font("Inter-SemiBold.ttf", inch(0.058))
-    f_hook = font("Inter-Bold.ttf", inch(0.175))
-    f_body = font("Inter-Regular.ttf", inch(0.056))
-    f_site = font("Inter-Bold.ttf", inch(0.075))
+    f_kick = font("Inter-SemiBold.ttf", inch(0.097))
+    f_hook = font("Inter-Bold.ttf", inch(0.170))
+    f_body = font("Inter-Regular.ttf", inch(0.115))
+    f_site = font("Inter-Bold.ttf", inch(0.132))
 
     # QR: above the 0.8in floor in the spec, with a true 4-module quiet zone
     code_px = inch(0.86)
@@ -145,20 +145,20 @@ def back():
 
     y = SAFE
     tracked(d, (SAFE, y), "WHAT TO SAY BACK", f_kick, (120, 120, 120), track=inch(0.019))
-    y += inch(0.125)
+    y += inch(0.155)
 
     for line in ["Your tip jar", "takes cards now."]:
         d.text((SAFE, y), line, font=f_hook, fill=INK)
-        y += inch(0.185)
+        y += inch(0.19)
 
     y += inch(0.05)
     body = ("They scan, ask for a song, and tip from their phone. It lands in "
             "your bank. We take nothing and nobody installs an app.")
     for line in wrap(d, body, f_body, col_w):
         d.text((SAFE, y), line, font=f_body, fill=(178, 178, 178))
-        y += inch(0.078)
+        y += inch(0.152)
 
-    d.text((SAFE, BLEED_H - SAFE - inch(0.09)), "getliveque.com", font=f_site, fill=TEAL)
+    d.text((SAFE, BLEED_H - SAFE - inch(0.155)), "getliveque.com", font=f_site, fill=TEAL)
     return img
 
 def with_guides(img):
