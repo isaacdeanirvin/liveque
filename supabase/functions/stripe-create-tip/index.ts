@@ -69,9 +69,31 @@ serve(async (req) => {
       throw new Error("Invalid tip amount");
     }
 
+    // Pass the card cost through, take nothing on top.
+    //
+    // On destination charges Stripe debits the PLATFORM for its processing fee and
+    // transfers the FULL charge to the connected account. With no application fee we
+    // were paying $0.45 out of pocket on every $5 tip while taking 0%, and the
+    // performer was receiving $5.00 rather than the $4.55 our pricing page states.
+    // Setting application_fee_amount to exactly the Stripe fee routes that cost back
+    // to us to settle with Stripe, leaving LiveQue at zero and the performer at the
+    // published number.
+    //
+    // 500c -> round(14.5)+30 = 45c -> performer 455c. 200c -> round(5.8)+30 = 36c
+    // -> performer 164c. Both match the ledger on the landing page exactly.
+    //
+    // Domestic US card pricing. An international card costs Stripe's extra 1.5%,
+    // which LiveQue absorbs rather than surprising the performer with a variable cut.
+    const amountCents = dollars * 100;
+    const stripeFeeCents = Math.min(
+      Math.round(amountCents * 0.029) + 30,
+      amountCents - 1, // never leave the performer with nothing
+    );
+
     const pi = await stripe("payment_intents", {
-      amount: String(dollars * 100),
+      amount: String(amountCents),
       currency: "usd",
+      application_fee_amount: String(stripeFeeCents),
       // Card + wallets (Apple Pay / Google Pay ride the card rails) only.
       // allow_redirects: never removes redirect-based methods, so the client's
       // confirmPayment (redirect: 'if_required', no return_url) is correct by
@@ -85,6 +107,7 @@ serve(async (req) => {
       "metadata[song_artist]": song_artist || "",
       "metadata[requester_name]": requester_name || "Anonymous",
       "metadata[tip]": String(dollars),
+      "metadata[stripe_fee_cents]": String(stripeFeeCents),
     });
 
     return new Response(JSON.stringify({

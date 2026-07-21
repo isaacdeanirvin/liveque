@@ -69,6 +69,8 @@
         .request-btn:hover { transform: scale(1.05); }
         .request-btn:disabled { background: rgba(255, 255, 255, 0.1); cursor: not-allowed; transform: none; }
         .tip-btn { background: rgba(78, 205, 196, 0.3); border: 2px solid #4ecdc4; padding: 12px 20px; border-radius: 10px; color: white; cursor: pointer; font-size: 16px; transition: all 0.3s ease; margin: 5px; font-weight: bold; }
+        .pay-assent { margin-top: 10px; font-size: 12px; line-height: 1.5; text-align: center; color: rgba(255,255,255,0.7); }
+        .pay-assent a { color: #7fdcd5; text-decoration: underline; text-underline-offset: 2px; }
         .tip-btn:hover { background: #4ecdc4; transform: scale(1.05); }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); z-index: 1000; align-items: center; justify-content: center; }
         .modal.show { display: flex; }
@@ -130,19 +132,19 @@
         <div id="nowPlayingSection" style="display: none;"></div>
         <div class="payment-section"><div class="section-title">🥃 Feeling Tipsy?</div><div class="payment-buttons" id="paymentButtonsContainer"></div><div style="font-size:11px; opacity:0.55; text-align:center; margin-top:10px; line-height:1.5;">These send money straight to the performer. To move a song up the queue, tip with the request itself.</div></div>
         <div class="payment-section"><div class="section-title">Current Queue</div><div id="audienceQueue"></div></div>
-        <div class="payment-section"><div class="section-title">Request a Song</div><input type="text" class="search-bar" placeholder="Search LiveQue..." oninput="searchSongs(this.value)"><div id="songsList"></div></div>
+        <div class="payment-section"><div class="section-title">Request a Song</div><input type="text" class="search-bar" placeholder="Search LiveQue..." oninput="searchSongs(this.value)" aria-label="Search LiveQue"><div id="songsList"></div></div>
         <div class="payment-section" id="reviewSection" style="display:none;">
             <div class="section-title">Rate the show</div>
             <div id="reviewAggregate" style="text-align:center; font-size:13px; opacity:0.8; margin-bottom:10px;"></div>
             <div id="reviewStars" class="review-stars" role="radiogroup" aria-label="Rate the performer"></div>
-            <textarea id="reviewNote" class="search-bar" maxlength="500" placeholder="Add a note (optional)" style="display:none; resize:vertical; min-height:52px;"></textarea>
-            <input type="text" id="reviewName" class="search-bar" maxlength="80" placeholder="Your name (optional)" style="display:none; margin-top:8px;">
+            <textarea id="reviewNote" class="search-bar" maxlength="500" placeholder="Add a note (optional)" style="display:none; resize:vertical; min-height:52px;" aria-label="A note about the show, optional"></textarea>
+            <input type="text" id="reviewName" class="search-bar" maxlength="80" placeholder="Your name (optional)" style="display:none; margin-top:8px;" aria-label="Your name, optional">
             <button id="reviewSubmit" class="tip-btn" style="width:100%; margin-top:10px; display:none;" onclick="submitReview()">Submit rating</button>
             <div id="reviewThanks" style="display:none; text-align:center; font-weight:600; padding:6px 0;">Thanks for rating the show.</div>
             <div id="reviewMsg" style="text-align:center; font-size:12px; min-height:14px; margin-top:6px; opacity:0.85;"></div>
         </div>
     </div>
-    <div id="requestModal" class="modal"><div class="modal-content"><span class="close" onclick="closeModal()">&times;</span><h2>Request Song</h2><div id="modalSongInfo" style="margin: 20px 0;"></div><div id="tipButtonsContainer"></div><div id="paymentArea" style="display:none; margin-top:16px; text-align:left;"><div id="expressCheckoutContainer" style="margin-bottom:8px;"></div><div id="payDivider" class="pay-divider" style="display:none;">or pay with card</div><div id="paymentElementContainer" style="margin-bottom:12px;"></div><button id="payNowBtn" class="tip-btn" style="width:100%; margin:0;" onclick="confirmTipPayment()">Pay</button><div id="paymentMessage" style="margin-top:10px; font-size:13px; min-height:16px; text-align:center;"></div></div></div></div>
+    <div id="requestModal" class="modal"><div class="modal-content"><span class="close" onclick="closeModal()">&times;</span><h2>Request Song</h2><div id="modalSongInfo" style="margin: 20px 0;"></div><div id="tipButtonsContainer"></div><div id="paymentArea" style="display:none; margin-top:16px; text-align:left;"><div id="expressCheckoutContainer" style="margin-bottom:8px;"></div><div id="payDivider" class="pay-divider" style="display:none;">or pay with card</div><div id="paymentElementContainer" style="margin-bottom:12px;"></div><button id="payNowBtn" class="tip-btn" style="width:100%; margin:0;" onclick="confirmTipPayment()">Pay</button><!-- Assent adjacent to the button that spends money. Berman v. Freedom Financial: a click is assent only where the user is told the click means assent. A footer link on a checkout screen was held unenforceable in Tejon v. Zeus Networks (11th Cir. 2026). --><div class="pay-assent">By tapping Pay you agree to the <a href="/terms.html" target="_blank" rel="noopener">Terms</a> and <a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>. Tips are paid to the performer, not to LiveQue.</div><div id="paymentMessage" style="margin-top:10px; font-size:13px; min-height:16px; text-align:center;"></div></div></div></div>
     <div id="tipThanksModal" class="modal"><div class="modal-content"><span class="close" onclick="closeTipThanks()">&times;</span><h2 style="margin-bottom:6px;">Thanks for the tip!</h2><div style="opacity:0.8; margin-bottom:16px;">How is the show? Tap to rate.</div><div class="review-stars" id="tipThanksStars"></div><div id="tipThanksMsg" style="min-height:16px; font-size:13px; margin-top:8px; text-align:center;"></div><button class="control-btn" id="tipThanksSkip" style="margin-top:10px;" onclick="closeTipThanks()">Skip</button></div></div>
     <div id="helpModal" class="modal"><div class="modal-content" style="max-height: 90vh; overflow-y: auto; padding: 24px;"><span class="close" onclick="closeHelpModal()">&times;</span><div style="margin-bottom: 24px;"><div style="font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">LiveQue</div><div style="font-size: 14px; opacity: 0.6; margin-top: 4px;">How It Works</div></div><div style="text-align: left; font-size: 14px; line-height: 1.7;"><div style="margin-bottom: 16px;"><div style="font-weight: 600; margin-bottom: 8px;">Requesting a Song</div><div style="opacity: 0.85;">Tap any song to request it. Your request goes straight to the artist's live queue. Add your name if you'd like a shoutout.</div></div><div style="margin-bottom: 16px;"><div style="font-weight: 600; margin-bottom: 8px;">The Queue</div><div style="opacity: 0.85;">Watch the queue update in real-time. Green means now playing. Songs with tips get priority.</div></div><div style="margin-bottom: 16px;"><div style="font-weight: 600; margin-bottom: 8px;">Cooldowns</div><div style="opacity: 0.85;">Recently played songs show a timer. When it expires, the song can be requested again.</div></div></div><button style="margin-top: 16px; width: 100%; padding: 12px; background: rgba(255,255,255,0.15); border: none; border-radius: 10px; color: white; font-size: 16px; cursor: pointer;" onclick="closeHelpModal()">Done</button><div style="margin-top: 16px; font-size: 11px; opacity: 0.4; text-align: center;">getliveque.com</div></div></div>
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://js.stripe.com/v3/"></script>
@@ -164,7 +166,7 @@ function hasRated(){ try{ return !!localStorage.getItem(reviewRatedKey()); }catc
 function renderReviewStars(){ const wrap=document.getElementById('reviewStars'); if(!wrap) return; let h=''; for(let i=1;i<=5;i++){ h+='<button type="button" class="review-star'+(i<=reviewSelectedRating?' on':'')+'" aria-label="'+i+' star'+(i>1?'s':'')+'" onclick="setReviewRating('+i+')">'+(i<=reviewSelectedRating?'★':'☆')+'</button>'; } wrap.innerHTML=h; }
 function setReviewRating(n){ reviewSelectedRating=n; renderReviewStars(); ['reviewNote','reviewName','reviewSubmit'].forEach(function(id){ const el=document.getElementById(id); if(el) el.style.display=''; }); }
 async function loadReviews(){ if(!ARTIST_ID) return; let res; try{ res=await db.from('reviews').select('stars').eq('artist_id',ARTIST_ID); }catch(_){ return; } if(!res||res.error||!res.data) return; reviewsActive=true; const section=document.getElementById('reviewSection'); if(!section) return; const rows=res.data; const agg=document.getElementById('reviewAggregate'); if(agg){ if(rows.length){ const avg=rows.reduce(function(a,r){return a+(r.stars||0);},0)/rows.length; agg.innerHTML='<span class="review-agg-star">★</span> '+avg.toFixed(1)+' · '+rows.length+' rating'+(rows.length===1?'':'s'); }else{ agg.textContent='Be the first to rate the show.'; } } if(hasRated()){ const st=document.getElementById('reviewStars'); if(st) st.style.display='none'; const th=document.getElementById('reviewThanks'); if(th) th.style.display=''; }else{ renderReviewStars(); } section.style.display=''; }
-async function submitReview(){ if(reviewBusy) return; const msg=document.getElementById('reviewMsg'); if(!reviewSelectedRating){ if(msg) msg.textContent='Tap a star first.'; return; } reviewBusy=true; const btn=document.getElementById('reviewSubmit'); if(btn){ btn.disabled=true; btn.textContent='Sending…'; } const noteEl=document.getElementById('reviewNote'); const nameEl=document.getElementById('reviewName'); const note=noteEl&&noteEl.value?noteEl.value.trim().slice(0,500):null; const name=nameEl&&nameEl.value?nameEl.value.trim().slice(0,80):null; const row={ artist_id:ARTIST_ID, gig_session_id:currentGigSessionId||null, stars:reviewSelectedRating, note:note||null, reviewer_name:name||null }; let res; try{ res=await db.from('reviews').insert([row]); }catch(e){ res={error:e}; } reviewBusy=false; if(res&&res.error){ if(btn){ btn.disabled=false; btn.textContent='Submit rating'; } if(msg) msg.textContent='Could not send — please try again.'; return; } try{ localStorage.setItem(reviewRatedKey(),String(reviewSelectedRating)); }catch(_){} ['reviewStars','reviewNote','reviewName','reviewSubmit'].forEach(function(id){ const el=document.getElementById(id); if(el) el.style.display='none'; }); const th=document.getElementById('reviewThanks'); if(th) th.style.display=''; if(msg) msg.textContent=''; loadReviews(); }
+async function submitReview(){ if(reviewBusy) return; const msg=document.getElementById('reviewMsg'); if(!reviewSelectedRating){ if(msg) msg.textContent='Tap a star first.'; return; } reviewBusy=true; const btn=document.getElementById('reviewSubmit'); if(btn){ btn.disabled=true; btn.textContent='Sending…'; } const noteEl=document.getElementById('reviewNote'); const nameEl=document.getElementById('reviewName'); const note=noteEl&&noteEl.value?noteEl.value.trim().slice(0,500):null; const name=nameEl&&nameEl.value?nameEl.value.trim().slice(0,80):null; const row={ artist_id:ARTIST_ID, gig_session_id:currentGigSessionId||null, stars:reviewSelectedRating, note:note||null, reviewer_name:name||null }; let res; try{ res=await db.from('reviews').insert([row]); }catch(e){ res={error:e}; } reviewBusy=false; if(res&&res.error){ if(btn){ btn.disabled=false; btn.textContent='Submit rating'; } if(msg) msg.textContent='Could not send. Please try again.'; return; } try{ localStorage.setItem(reviewRatedKey(),String(reviewSelectedRating)); }catch(_){} ['reviewStars','reviewNote','reviewName','reviewSubmit'].forEach(function(id){ const el=document.getElementById(id); if(el) el.style.display='none'; }); const th=document.getElementById('reviewThanks'); if(th) th.style.display=''; if(msg) msg.textContent=''; loadReviews(); }
 const _urlParams = new URLSearchParams(window.location.search);
 const ARTIST_ID = _urlParams.get('artist');
 if (!ARTIST_ID) {
@@ -284,7 +286,7 @@ async function loadFromSupabase(){
             stripeChargesEnabled=st.data.stripe_charges_enabled===true;
         }
         
-        // Use .is() for a null session — PostgREST .eq() cannot match SQL NULLs,
+        // Use .is() for a null session. PostgREST .eq() cannot match SQL NULLs,
         // which would hide paid requests on accounts with no active gig (F6).
         let rqQuery=db.from('requests').select('*').eq('artist_id',ARTIST_ID);
         rqQuery=currentGigSessionId?rqQuery.eq('gig_session_id',currentGigSessionId):rqQuery.is('gig_session_id',null);
@@ -913,7 +915,7 @@ function openRequestModal(t,a,sp){
     
     const nameDiv=document.createElement('div');
     nameDiv.style.cssText='margin-bottom: 12px; text-align: left;';
-    nameDiv.innerHTML='<label class="name-label">Your Name (optional):</label><input type="text" id="requesterNameInput" class="name-input-field" placeholder="Anonymous">';
+    nameDiv.innerHTML='<label class="name-label">Your Name (optional):</label><input type="text" id="requesterNameInput" class="name-input-field" placeholder="Anonymous" aria-label="Your name for this request">';
     tc.appendChild(nameDiv);
     
     const freeBtn=document.createElement('button');
@@ -925,7 +927,7 @@ function openRequestModal(t,a,sp){
 
     // Only show paid tip buttons when the performer's Stripe is ready to charge
     // (F2). Otherwise the audience gets the free request plus the external
-    // tip-jar links as a graceful fallback — never a mid-payment error.
+    // tip-jar links as a graceful fallback, never a mid-payment error.
     (stripeChargesEnabled?tipAmounts.filter(function(am){return am>0;}):[]).forEach(function(am){
         const b=document.createElement('button');
         b.className='tip-btn';
@@ -1131,8 +1133,8 @@ function resolvePendingTip(timedOut){
     const amt=pendingTip.amount;
     pendingTip=null;
     showToast(timedOut
-        ? '✓ $'+amt+' tip received — your request will appear shortly!'
-        : '✓ $'+amt+' tip sent — your request is in the queue!');
+        ? '✓ $'+amt+' tip received. Your request will appear shortly!'
+        : '✓ $'+amt+' tip sent. Your request is in the queue!');
     launchTipConfetti(amt);
     closeModal();
     if(reviewsActive && typeof hasRated==='function' && !hasRated()){ setTimeout(showTipThanks,450); }

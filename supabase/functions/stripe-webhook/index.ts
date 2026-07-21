@@ -83,13 +83,28 @@ serve(async (req) => {
 
       if (transferId) {
         try {
-          // Keyed on the dispute id so Stripe's retries cannot double-reverse.
-          await stripe.transfers.createReversal(
-            transferId,
-            { amount: dispute.amount },
-            { idempotencyKey: "liveque-dispute-" + dispute.id },
-          );
-          console.log("Reversed transfer " + transferId + " for dispute " + dispute.id);
+          // The transfer is the charge MINUS the application fee (we pass the Stripe
+          // cost through), so it is smaller than the disputed amount. Reversing
+          // dispute.amount would exceed the transfer and fail, so clamp to what was
+          // actually sent and to what has not already been reversed.
+          const transfer = await stripe.transfers.retrieve(transferId);
+          const reversible = (transfer.amount || 0) - (transfer.amount_reversed || 0);
+          const reverseAmount = Math.min(dispute.amount ?? reversible, reversible);
+
+          if (reverseAmount <= 0) {
+            console.log("Transfer " + transferId + " already fully reversed");
+          } else {
+            // Keyed on the dispute id so Stripe's retries cannot double-reverse.
+            await stripe.transfers.createReversal(
+              transferId,
+              { amount: reverseAmount },
+              { idempotencyKey: "liveque-dispute-" + dispute.id },
+            );
+            console.log(
+              "Reversed " + reverseAmount + "c on transfer " + transferId +
+              " for dispute " + dispute.id,
+            );
+          }
         } catch (revErr) {
           // Usually means the performer was already paid out and their balance is
           // short. Stripe only chases it if debit_negative_balances is on. Loud on
