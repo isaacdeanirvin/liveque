@@ -178,10 +178,27 @@ def with_guides(img):
     d.rectangle([SAFE, SAFE, BLEED_W - SAFE - 1, BLEED_H - SAFE - 1], outline=(70, 160, 255), width=4)
     return g
 
+def verify_qr(img):
+    """Decode the QR back off the rendered art, not off the source string.
+
+    Rendering is where a QR actually dies: wrong module rounding, a quiet zone
+    eaten by the panel edge, a resample that blurs the timing pattern. The only
+    honest check is to read the pixels a scanner would read.
+    """
+    try:
+        import cv2, numpy as np
+    except ImportError:
+        return None
+    val, _, _ = cv2.QRCodeDetector().detectAndDecode(np.array(img.convert("RGB"))[:, :, ::-1])
+    return val or ""
+
+
 def main():
     out = os.path.join(HERE, "output")
     os.makedirs(out, exist_ok=True)
     made = []
+    sheets = []
+
     for p in PEOPLE:
         f = front(p)
         b = back()
@@ -193,12 +210,33 @@ def main():
         with_guides(f).save(os.path.join(out, f"PROOF-{p['first'].lower()}-front.png"), dpi=(DPI, DPI))
         with_guides(b).save(os.path.join(out, f"PROOF-{p['first'].lower()}-back.png"), dpi=(DPI, DPI))
 
+        # Most printers want ONE file per card, page 1 front, page 2 back. Upload
+        # this rather than the singles unless the order form asks for two files.
+        combo = os.path.join(out, f"LiveQue-{p['first'].title()}-Irvin-CARD.pdf")
+        f.save(combo, "PDF", resolution=DPI, save_all=True, append_images=[b])
+        sheets.append(combo)
+
+    # All four artboards in one file, for a proof or a single combined upload.
+    first = front(PEOPLE[0])
+    rest = [back()] + [x for p in PEOPLE[1:] for x in (front(p), back())]
+    first.save(os.path.join(out, "LiveQue-CARDS-ALL.pdf"), "PDF",
+               resolution=DPI, save_all=True, append_images=rest)
+
     print(f"{DPI} DPI")
     print(f"bleed {BLEED_W}x{BLEED_H}px = 3.75x2.25in")
     print(f"trim  {TRIM_W}x{TRIM_H}px = 3.5x2.0in")
-    print("files:", len(made) * 2 + 4)
-    for m in made:
-        print("  ", m + ".png /", m + ".pdf")
+
+    decoded = verify_qr(back())
+    if decoded is None:
+        print("QR   : NOT VERIFIED (opencv missing) - do not order without a phone test")
+    elif decoded == URL:
+        print(f"QR   : decodes to {decoded}")
+    else:
+        raise SystemExit(f"QR FAILED: rendered code reads {decoded!r}, expected {URL!r}")
+
+    print("\nupload these:")
+    for s in sheets:
+        print("  ", os.path.basename(s))
 
 if __name__ == "__main__":
     main()
