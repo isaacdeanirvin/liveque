@@ -845,14 +845,23 @@ function toggleCoverFees(){
 function openPayment(m,h){
     let u='';
 
+    // Each service names its handle differently and performers paste whatever they have
+    // to hand - a bare name, an @handle, a $cashtag, or the whole profile URL copied out
+    // of the app. Strip it back to the identifier, then rebuild the link the way that
+    // service actually wants it. Being tolerant here is what stops a typo in a settings
+    // box from turning into a dead button in a loud room.
     if(m==='paypal'){
-        u = h.includes('paypal.me/') ? 'https://'+h.replace(/^https?:\/\//,'') : 'https://paypal.me/'+h;
+        // paypal.me/<username>
+        var ph = h.replace(/^(https?:\/\/)?(www\.)?paypal\.me\//i,'').replace(/^@/,'');
+        u='https://paypal.me/'+encodeURIComponent(ph);
     }else if(m==='cashapp'){
-        u='https://cash.app/'+h;
+        // $<cashtag>. cash.app tolerates a missing $ and redirects, but send the
+        // canonical form rather than relying on that.
+        var ch = h.replace(/^(https?:\/\/)?(www\.)?cash\.app\//i,'').replace(/^[$@]/,'');
+        u='https://cash.app/$'+encodeURIComponent(ch);
     }else if(m==='venmo'){
-        // Tolerate a pasted profile URL or a bare @handle, and land on the current
-        // /u/ path, which is what both the app and the web profile resolve.
-        var vh = h.replace(/^https?:\/\/(www\.)?(account\.)?venmo\.com\/(u\/)?/,'').replace(/^@/,'');
+        // @<username>, but the link path takes it without the @.
+        var vh = h.replace(/^(https?:\/\/)?(www\.)?(account\.)?venmo\.com\/(u\/)?/i,'').replace(/^@/,'');
         u='https://venmo.com/u/'+encodeURIComponent(vh);
     }else if(m==='applepay'){
         // Apple Cash is sent inside Messages and has no URL scheme to hand off to, so

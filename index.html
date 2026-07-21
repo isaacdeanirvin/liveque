@@ -674,18 +674,18 @@
                 <div style="margin-bottom: 28px;"><div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.6;">Connection Status</div><p style="margin: 0;"><span style="color: #2ed573;">Green</span> means live. <span style="color: #ffd700;">Yellow</span> means reconnecting. <span style="color: #ff4757;">Red</span> means disconnected. Refresh the page.</p></div>
             </div>
             <div style="margin-top: 30px; text-align: center;"><button class="auth-btn" onclick="closeHelpModal()" style="background: rgba(255,255,255,0.15); padding: 12px 40px;">Done</button></div>
-            <div style="margin-top: 24px; text-align: center; font-size: 11px; opacity: 0.4;">v6.9.49 · getliveque.com</div>
+            <div style="margin-top: 24px; text-align: center; font-size: 11px; opacity: 0.4;">v6.9.50 · getliveque.com</div>
         </div>
     </div>
     <div id="socialModal" class="modal"><div class="modal-content"><span class="close" onclick="closeSocialModal()">&times;</span><h2>Social Media Settings</h2><div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;"><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Instagram:</label><input type="text" id="instagramInput" class="auth-input" placeholder="username (without @)" aria-label="Instagram username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">X (Twitter):</label><input type="text" id="xInput" class="auth-input" placeholder="username (without @)" aria-label="X username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">TikTok:</label><input type="text" id="tiktokInput" class="auth-input" placeholder="@username" aria-label="TikTok username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Facebook:</label><input type="text" id="facebookInput" class="auth-input" placeholder="facebook.com/username" aria-label="Facebook page"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">YouTube:</label><input type="text" id="youtubeInput" class="auth-input" placeholder="@channelname" aria-label="@channelname"></div><button class="auth-btn" onclick="saveSocialMedia()">Update Social Profiles</button></div></div></div>
-    <div id="paymentModal" class="modal"><div class="modal-content"><span class="close" onclick="closePaymentModal()">&times;</span><h2>Payment Settings</h2><div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;"><div style="font-size: 13px; opacity: 0.75; line-height: 1.5; text-align: center;">Requests are <b>free</b> right now. These handles send money straight to you, outside LiveQue, so we never see it and it does not move a song up your queue.</div><div style="font-size: 12px; line-height: 1.5; text-align: left; background: rgba(255,180,0,0.10); border: 1px solid rgba(255,180,0,0.35); border-radius: 10px; padding: 10px 12px;"><b>Venmo: use a business profile, not your personal one.</b> Venmo's own rules bar personal accounts from taking business or commercial payments, and gig tips count. People have had funds frozen for it. A business profile is free and takes a minute in the Venmo app.</div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Venmo:</label><input type="text" id="venmoInput" class="auth-input" placeholder="business-profile-username" aria-label="Your Venmo business profile username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">PayPal:</label><input type="text" id="paypalInput" class="auth-input" placeholder="paypal.me/username" aria-label="Your PayPal.me link"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">CashApp:</label><input type="text" id="cashappInput" class="auth-input" placeholder="$username" aria-label="Your Cash App cashtag"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Apple Cash:</label><input type="text" id="applepayInput" class="auth-input" placeholder="phone number or email" aria-label="Phone or email for Apple Cash"><div style="font-size: 11px; opacity: 0.6; margin-top: 4px; text-align: center;">Apple Cash has no link. Your crowd taps to copy this, then sends it in Messages.</div></div><button class="auth-btn" onclick="savePaymentMethods()">Save Payment Methods</button></div></div></div>
+    <div id="paymentModal" class="modal"><div class="modal-content"><span class="close" onclick="closePaymentModal()">&times;</span><h2>Payment Settings</h2><div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;"><div style="font-size: 13px; opacity: 0.75; line-height: 1.5; text-align: center;">Requests are <b>free</b> right now. These handles send money straight to you, outside LiveQue, so we never see it and it does not move a song up your queue.</div><div style="font-size: 12px; line-height: 1.5; text-align: left; background: rgba(255,180,0,0.10); border: 1px solid rgba(255,180,0,0.35); border-radius: 10px; padding: 10px 12px;"><b>Venmo: use a business profile, not your personal one.</b> Venmo's own rules bar personal accounts from taking business or commercial payments, and gig tips count. People have had funds frozen for it. A business profile is free and takes a minute in the Venmo app.</div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Venmo:</label><input type="text" id="venmoInput" class="auth-input" placeholder="@yourusername" aria-label="Your Venmo username"><div style="font-size: 11px; opacity: 0.6; margin-top: 4px; text-align: center;">Your <b>@username</b>. Pasting the full profile link works too.</div></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">PayPal:</label><input type="text" id="paypalInput" class="auth-input" placeholder="paypal.me/yourname" aria-label="Your PayPal.me link"><div style="font-size: 11px; opacity: 0.6; margin-top: 4px; text-align: center;">Your <b>PayPal.me</b> name.</div></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Cash App:</label><input type="text" id="cashappInput" class="auth-input" placeholder="$yourcashtag" aria-label="Your Cash App cashtag"><div style="font-size: 11px; opacity: 0.6; margin-top: 4px; text-align: center;">Your <b>$cashtag</b>, with the dollar sign.</div></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Apple Cash:</label><input type="text" id="applepayInput" class="auth-input" placeholder="555-123-4567 or you@email.com" aria-label="Phone or email for Apple Cash"><div style="font-size: 11px; opacity: 0.6; margin-top: 4px; text-align: center;"><b>Not a username.</b> Apple Cash has no @handle. It goes to a phone number or email inside Messages, so your crowd taps to copy it.</div></div><button class="auth-btn" onclick="savePaymentMethods()">Save Payment Methods</button></div></div></div>
     <div id="allSongsModal" class="modal"><div class="modal-content"><span class="close" onclick="closeAllSongsModal()">&times;</span><h2>All Songs</h2><input type="text" class="auth-input" placeholder="Search songs..." oninput="searchAllSongs(this.value)" style="margin: 20px 0;" aria-label="Search songs"><div id="allSongsList" style="text-align: left; max-height: 50vh; overflow-y: auto;"></div></div></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script>
-console.log('=== LIVEQUE ADMIN v6.9.49 ===');
+console.log('=== LIVEQUE ADMIN v6.9.50 ===');
 
 const SUPABASE_URL = 'https://jttswydixqeyyqvcohnq.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dHN3eWRpeHFleXlxdmNvaG5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNjE3ODYsImV4cCI6MjA3NDkzNzc4Nn0.WlvOfl11qVUVatSCIPy8t6u9-j4u1z5CpnBxXe50BdQ';
@@ -1285,7 +1285,44 @@ function openPaymentSettings() { document.getElementById('venmoInput').value = p
 // personal accounts from commercial use, Zelle has no developer path, and there is
 // no such thing as an Apple Pay handle. Old values are left untouched in the stored
 // object rather than wiped.
-async function savePaymentMethods() { paymentMethods = Object.assign({}, paymentMethods, { venmo: document.getElementById('venmoInput').value.trim().replace(/^@/, ''), paypal: document.getElementById('paypalInput').value.trim(), cashapp: document.getElementById('cashappInput').value.trim(), applepay: document.getElementById('applepayInput').value.trim() }); const result = await db.from('artist_settings').upsert({ artist_id: ARTIST_ID, payment_methods: paymentMethods, social_handles: socialMediaHandles, tip_amounts: tipAmounts, current_gig_session_id: currentGigSessionId, updated_at: new Date().toISOString() }); if (!result.error) { renderPaymentMethods(); closePaymentModal(); showToast('Payment methods updated!'); } }
+// Every service names its handle differently, and a performer will paste whatever is
+// on their screen: a bare name, an @handle, a $cashtag, or the whole profile URL. Store
+// one canonical form per service so the dashboard shows something they recognise and
+// the audience page can build a working link. customer.html is tolerant of all of these
+// on read as well, so old saved values keep working.
+function normalizeHandle(kind, raw) {
+    var v = (raw || '').trim();
+    if (!v) return '';
+    // Protocol optional throughout: people copy "venmo.com/x" out of a browser bar as
+    // often as they copy the full https:// URL.
+    if (kind === 'venmo')   return '@' + v.replace(/^(https?:\/\/)?(www\.)?(account\.)?venmo\.com\/(u\/)?/i, '').replace(/^@/, '');
+    if (kind === 'cashapp') return '$' + v.replace(/^(https?:\/\/)?(www\.)?cash\.app\//i, '').replace(/^[$@]/, '');
+    if (kind === 'paypal')  return 'paypal.me/' + v.replace(/^(https?:\/\/)?(www\.)?paypal\.me\//i, '').replace(/^@/, '');
+    return v;
+}
+
+// Apple Cash is the one people get wrong, because every other row on this form is a
+// username. It has no @handle at all - it is sent to a phone number or an email inside
+// Messages. Catch it here rather than letting a dead string reach a bar.
+function looksLikePhoneOrEmail(v) {
+    if (!v) return true;
+    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return true;
+    return (v.replace(/\D/g, '').length >= 7);
+}
+
+async function savePaymentMethods() {
+    var applepay = document.getElementById('applepayInput').value.trim();
+    if (!looksLikePhoneOrEmail(applepay)) {
+        showToast('Apple Cash needs a phone number or email, not a username', 'error');
+        return;
+    }
+    paymentMethods = Object.assign({}, paymentMethods, {
+        venmo: normalizeHandle('venmo', document.getElementById('venmoInput').value),
+        paypal: normalizeHandle('paypal', document.getElementById('paypalInput').value),
+        cashapp: normalizeHandle('cashapp', document.getElementById('cashappInput').value),
+        applepay: applepay
+    });
+    const result = await db.from('artist_settings').upsert({ artist_id: ARTIST_ID, payment_methods: paymentMethods, social_handles: socialMediaHandles, tip_amounts: tipAmounts, current_gig_session_id: currentGigSessionId, updated_at: new Date().toISOString() }); if (!result.error) { renderPaymentMethods(); closePaymentModal(); showToast('Payment methods updated!'); } }
 function closePaymentModal() { document.getElementById('paymentModal').classList.remove('show'); }
 function renderPaymentMethods() { const display = document.getElementById('paymentMethodsDisplay'); if (display) { display.innerHTML = ''; const methods = ['venmo', 'paypal', 'cashapp', 'applepay']; const labels = { venmo: 'Venmo', paypal: 'PayPal', cashapp: 'CashApp', applepay: 'Apple Cash' }; methods.forEach(function(method) { if (paymentMethods[method]) { const info = document.createElement('div'); info.className = 'payment-info'; info.innerHTML = '<span class="payment-label">' + labels[method] + ':</span> ' + paymentMethods[method]; display.appendChild(info); } }); } }
 
