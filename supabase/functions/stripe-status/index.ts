@@ -48,7 +48,27 @@ serve(async (req) => {
       headers: { "Authorization": "Bearer " + STRIPE_SECRET_KEY },
     });
     const acct = await res.json();
-    if (!res.ok) throw new Error(acct.error?.message || "Stripe error");
+
+    if (!res.ok) {
+      // The stored account does not exist under the key we are running on, which
+      // is what every test acct_ looks like after the switch to live keys.
+      // Surfacing Stripe's raw error would strand the performer on a dashboard
+      // showing a failure they cannot act on. Clear the dead id instead so the UI
+      // falls back to "Set Up Payouts" and they can simply onboard again.
+      if (res.status === 404 || acct?.error?.code === "resource_missing") {
+        console.log("Clearing stale account " + artist.stripe_account_id + " for artist " + artist.id);
+        await admin.from("artists")
+          .update({ stripe_account_id: null, stripe_onboarded: false })
+          .eq("id", artist.id);
+        await admin.from("artist_settings")
+          .update({ stripe_charges_enabled: false })
+          .eq("artist_id", artist.id);
+        return new Response(JSON.stringify({ has_account: false, onboarded: false, reset: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      throw new Error(acct.error?.message || "Stripe error");
+    }
 
     const onboarded = !!(acct.charges_enabled && acct.payouts_enabled && acct.details_submitted);
     if (onboarded !== artist.stripe_onboarded) {

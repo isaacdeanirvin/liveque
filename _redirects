@@ -1,0 +1,15 @@
+# Collapse the old Netlify subdomain onto the real domain.
+#
+# soft-nasturtium-c51aac.netlify.app was serving a full 200 copy of the app, not a
+# redirect. Two live origins is not a cosmetic problem here: a Supabase session
+# lives in one origin's localStorage, so a performer who finished Stripe onboarding
+# and got returned to the subdomain landed on a LOGGED OUT copy. stripe-status never
+# ran, readiness never synced, and they showed up to a gig unable to take tips with
+# no error anywhere. stripe-onboard now sends everyone to getliveque.com; this closes
+# the other half by making the subdomain unreachable as a place to be logged in.
+#
+# The trailing ! forces the redirect even where a matching file exists, which is
+# required here because every one of these paths does exist on the subdomain.
+
+https://soft-nasturtium-c51aac.netlify.app/*  https://getliveque.com/:splat  301!
+http://soft-nasturtium-c51aac.netlify.app/*   https://getliveque.com/:splat  301!

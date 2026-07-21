@@ -110,29 +110,47 @@ serve(async (req) => {
       throw new Error("Could not calculate the fee-covered total");
     }
 
-    const pi = await stripe("payment_intents", {
-      amount: String(chargeCents),
-      currency: "usd",
-      application_fee_amount: String(stripeFeeCents),
-      // Card + wallets (Apple Pay / Google Pay ride the card rails) only.
-      // allow_redirects: never removes redirect-based methods, so the client's
-      // confirmPayment (redirect: 'if_required', no return_url) is correct by
-      // construction and can never throw at confirm time.
-      "automatic_payment_methods[enabled]": "true",
-      "automatic_payment_methods[allow_redirects]": "never",
-      "transfer_data[destination]": artist.stripe_account_id,
-      "statement_descriptor_suffix": "TIP",
-      "metadata[artist_id]": artist_id,
-      "metadata[song_title]": song_title || "",
-      "metadata[song_artist]": song_artist || "",
-      "metadata[requester_name]": requester_name || "Anonymous",
-      // metadata[tip] is what the PERFORMER earned, which is what the queue and the
-      // recap should show. It is not what the fan was charged when they covered fees.
-      "metadata[tip]": String(dollars),
-      "metadata[stripe_fee_cents]": String(stripeFeeCents),
-      "metadata[charged_cents]": String(chargeCents),
-      "metadata[fees_covered]": coverFees ? "1" : "0",
-    });
+    // A destination account that is dead in the current mode (every test acct_ is,
+    // once live keys are in) would otherwise put Stripe's raw text in front of a fan
+    // standing in a bar. Translate it, and stand the performer down so the tip
+    // buttons disappear until they re-onboard rather than failing on every tap.
+    let pi;
+    try {
+      pi = await stripe("payment_intents", {
+        amount: String(chargeCents),
+        currency: "usd",
+        application_fee_amount: String(stripeFeeCents),
+        // Card + wallets (Apple Pay / Google Pay ride the card rails) only.
+        // allow_redirects: never removes redirect-based methods, so the client's
+        // confirmPayment (redirect: 'if_required', no return_url) is correct by
+        // construction and can never throw at confirm time.
+        "automatic_payment_methods[enabled]": "true",
+        "automatic_payment_methods[allow_redirects]": "never",
+        "transfer_data[destination]": artist.stripe_account_id,
+        "statement_descriptor_suffix": "TIP",
+        "metadata[artist_id]": artist_id,
+        "metadata[song_title]": song_title || "",
+        "metadata[song_artist]": song_artist || "",
+        "metadata[requester_name]": requester_name || "Anonymous",
+        // metadata[tip] is what the PERFORMER earned, which is what the queue and the
+        // recap should show. It is not what the fan was charged when they covered fees.
+        "metadata[tip]": String(dollars),
+        "metadata[stripe_fee_cents]": String(stripeFeeCents),
+        "metadata[charged_cents]": String(chargeCents),
+        "metadata[fees_covered]": coverFees ? "1" : "0",
+      });
+    } catch (piErr) {
+      const msg = String(piErr?.message || "");
+      if (/destination|No such account|resource_missing/i.test(msg)) {
+        console.log("Dead destination for artist " + artist_id + ": " + msg);
+        await admin.from("artists")
+          .update({ stripe_onboarded: false }).eq("id", artist.id);
+        await admin.from("artist_settings")
+          .update({ stripe_charges_enabled: false }).eq("artist_id", artist_id);
+        throw new Error("This performer isn't set up for in-app tips yet");
+      }
+      throw piErr;
+    }
 
     return new Response(JSON.stringify({
       client_secret: pi.client_secret,
