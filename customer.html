@@ -161,7 +161,7 @@
         </div>
     </div>
     <div id="requestModal" class="modal"><div class="modal-content"><span class="close" onclick="closeModal()">&times;</span><h2>Request Song</h2><div id="modalSongInfo" style="margin: 20px 0;"></div><div id="tipButtonsContainer"></div><div id="paymentArea" style="display:none; margin-top:16px; text-align:left;"><div id="expressCheckoutContainer" style="margin-bottom:8px;"></div><div id="payDivider" class="pay-divider" style="display:none;">or pay with card</div><div id="paymentElementContainer" style="margin-bottom:12px;"></div><div id="coverFeesRow" class="cf-row" style="display:none;" onclick="toggleCoverFees()"><div class="cf-txt"><div id="coverFeesMain" class="cf-main"></div><div id="coverFeesSub" class="cf-sub"></div></div><span class="cf-sw"><input type="checkbox" id="coverFees" aria-label="Cover the card processing cost so the performer receives the full tip" onclick="event.stopPropagation();renderCoverFees()"><span class="cf-track"></span></span></div><button id="payNowBtn" class="tip-btn" style="width:100%; margin:0;" onclick="confirmTipPayment()">Pay</button><!-- Assent adjacent to the button that spends money. Berman v. Freedom Financial: a click is assent only where the user is told the click means assent. A footer link on a checkout screen was held unenforceable in Tejon v. Zeus Networks (11th Cir. 2026). --><div class="pay-assent">By tapping Pay you agree to the <a href="/terms.html" target="_blank" rel="noopener">Terms</a> and <a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>. Tips are paid to the performer, not to LiveQue.</div><div id="paymentMessage" style="margin-top:10px; font-size:13px; min-height:16px; text-align:center;"></div></div></div></div>
-    <div id="tipThanksModal" class="modal"><div class="modal-content"><span class="close" onclick="closeTipThanks()">&times;</span><h2 style="margin-bottom:6px;">Thanks for the tip!</h2><div style="opacity:0.8; margin-bottom:16px;">How is the show? Tap to rate.</div><div class="review-stars" id="tipThanksStars"></div><div id="tipThanksMsg" style="min-height:16px; font-size:13px; margin-top:8px; text-align:center;"></div><button class="control-btn" id="tipThanksSkip" style="margin-top:10px;" onclick="closeTipThanks()">Skip</button></div></div>
+    <div id="tipThanksModal" class="modal"><div class="modal-content"><span class="close" onclick="closeTipThanks()">&times;</span><h2 style="margin-bottom:6px;">Thanks for the tip!</h2><div style="opacity:0.8; margin-bottom:16px;">How is the show? Tap to rate.</div><div class="review-stars" id="tipThanksStars"></div><div id="tipThanksMsg" style="min-height:16px; font-size:13px; margin-top:8px; text-align:center;"></div><button class="control-btn" id="tipThanksSkip" style="margin-top:10px;" onclick="closeTipThanks()">Skip</button><div style="margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.1);"><button class="control-btn" id="shareArtistBtn" style="width:100%;" onclick="shareThisArtist(this)">Share this page</button><div style="font-size:11px; opacity:0.5; margin-top:7px; line-height:1.45;">Send it to whoever you came with.</div></div></div></div>
     <div id="helpModal" class="modal"><div class="modal-content" style="max-height: 90vh; overflow-y: auto; padding: 24px;"><span class="close" onclick="closeHelpModal()">&times;</span><div style="margin-bottom: 24px;"><div style="font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">LiveQue</div><div style="font-size: 14px; opacity: 0.6; margin-top: 4px;">How It Works</div></div><div style="text-align: left; font-size: 14px; line-height: 1.7;"><div style="margin-bottom: 16px;"><div style="font-weight: 600; margin-bottom: 8px;">Requesting a Song</div><div style="opacity: 0.85;">Tap any song to request it. Your request goes straight to the artist's live queue. Add your name if you'd like a shoutout.</div></div><div style="margin-bottom: 16px;"><div style="font-weight: 600; margin-bottom: 8px;">The Queue</div><div style="opacity: 0.85;">Watch the queue update in real-time. Green means now playing. Songs with tips get priority.</div></div><div style="margin-bottom: 16px;"><div style="font-weight: 600; margin-bottom: 8px;">Cooldowns</div><div style="opacity: 0.85;">Recently played songs show a timer. When it expires, the song can be requested again.</div></div></div><button style="margin-top: 16px; width: 100%; padding: 12px; background: rgba(255,255,255,0.15); border: none; border-radius: 10px; color: white; font-size: 16px; cursor: pointer;" onclick="closeHelpModal()">Done</button><div style="margin-top: 16px; font-size: 11px; opacity: 0.4; text-align: center;">getliveque.com</div></div></div>
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://js.stripe.com/v3/"></script>
     <script>
@@ -1169,6 +1169,35 @@ async function confirmTipPayment(){
         payBtn.disabled=false;
         payBtn.textContent='Pay $'+stripeTipState.amount;
     }
+}
+
+// Share, three tiers. navigator.share is the OS sheet on a phone, which is the
+// only place this realistically gets used. Clipboard covers desktop. The prompt
+// is the last resort: clipboard writes fail outside a secure context and inside
+// some in-app browsers.
+async function shareLink(url, title, text, btn){
+    var label = btn && btn.textContent;
+    if(navigator.share){
+        try{ await navigator.share({title:title, text:text, url:url}); return; }
+        catch(e){ if(e && e.name==='AbortError') return; }
+    }
+    try{
+        await navigator.clipboard.writeText(url);
+        showToast('Link copied');
+        if(btn){ btn.textContent='Copied'; setTimeout(function(){ btn.textContent=label; },1600); }
+        return;
+    }catch(_){}
+    window.prompt('Copy this link:', url);
+}
+function shareThisArtist(btn){
+    var who = (typeof ARTIST_NAME!=='undefined' && ARTIST_NAME) ? String(ARTIST_NAME).trim() : '';
+    shareLink(
+        window.location.href,
+        who ? (who + ' on LiveQue') : 'Request a song',
+        who ? ('Request a song from ' + who + ' and tip from your phone.')
+            : 'Request a song and tip from your phone.',
+        btn
+    );
 }
 
 function launchTipConfetti(amount){

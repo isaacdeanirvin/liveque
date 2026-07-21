@@ -135,6 +135,8 @@
         .signup-agree input { flex: 0 0 auto; width: 18px; height: 18px; margin-top: 1px; accent-color: #4ecdc4; cursor: pointer; }
         .signup-agree span { font-size: 13px; line-height: 1.5; color: rgba(255,255,255,.72); }
         .signup-agree a { color: #4ecdc4; text-decoration: underline; text-underline-offset: 2px; }
+        .lp-share { margin-top: 16px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.16); color: #fff; font-weight: 600; font-size: 14px; padding: 11px 22px; border-radius: 10px; cursor: pointer; font-family: inherit; }
+        .lp-share:hover { background: rgba(255,255,255,.11); border-color: rgba(255,255,255,.26); }
         .lp-demo { max-width: 330px; margin: 0 auto 30px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 12px; text-align: left; }
         .lp-demotop { display: flex; justify-content: space-between; align-items: center; padding: 2px 4px 10px; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,.5); font-weight: 600; }
         .lp-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #4ecdc4; margin-right: 6px; vertical-align: middle; }
@@ -302,6 +304,7 @@
             <div class="lp-us">
               <div class="lp-av">G&amp;I</div>
               <p>We're <b>Glen and Isaac Irvin</b>. We play live shows, we work the same rooms you do, and we built this to make more money on the nights we were already playing. Something not working? Just let us know and we'll fix it. And if it earns you a good night, tell your friends and family about LiveQue.</p>
+              <button class="lp-share" onclick="shareLiveQue(this)">Share LiveQue</button>
             </div>
           </div>
 
@@ -586,6 +589,8 @@
                 </div>
                 <div style="max-width: 240px; margin: 0 auto;">
                     <button class="auth-btn" onclick="downloadQRPDF()" style="width: 100%; background: white; color: #000; font-weight: 600; font-size: 14px; padding: 12px; border-radius: 10px;">Download for Print</button>
+                    <button class="auth-btn" id="shareMyLinkBtn" onclick="shareMyLink()" style="width: 100%; margin-top: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16); color: #fff; font-weight: 600; font-size: 14px; padding: 12px; border-radius: 10px;">Share my link</button>
+                    <div style="font-size: 11.5px; opacity: 0.5; text-align: center; margin-top: 8px; line-height: 1.45;">Text it to the room, put it in your bio, or post it before the gig.</div>
                 </div>
                 <div style="text-align: center; margin-top: 16px;">
                     <a href="https://www.amazon.com/s?k=table+number+holder+stand+wire+clip" target="_blank" rel="noopener noreferrer" style="color: rgba(255,255,255,0.4); font-size: 11px; text-decoration: none;" onmouseover="this.style.color='rgba(255,255,255,0.6)'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Need a table stand? →</a>
@@ -608,7 +613,7 @@
                 <div style="margin-bottom: 28px;"><div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.6;">Connection Status</div><p style="margin: 0;"><span style="color: #2ed573;">Green</span> means live. <span style="color: #ffd700;">Yellow</span> means reconnecting. <span style="color: #ff4757;">Red</span> means disconnected. Refresh the page.</p></div>
             </div>
             <div style="margin-top: 30px; text-align: center;"><button class="auth-btn" onclick="closeHelpModal()" style="background: rgba(255,255,255,0.15); padding: 12px 40px;">Done</button></div>
-            <div style="margin-top: 24px; text-align: center; font-size: 11px; opacity: 0.4;">v6.9.40 · getliveque.com</div>
+            <div style="margin-top: 24px; text-align: center; font-size: 11px; opacity: 0.4;">v6.9.41 · getliveque.com</div>
         </div>
     </div>
     <div id="socialModal" class="modal"><div class="modal-content"><span class="close" onclick="closeSocialModal()">&times;</span><h2>Social Media Settings</h2><div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;"><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Instagram:</label><input type="text" id="instagramInput" class="auth-input" placeholder="username (without @)" aria-label="Instagram username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">X (Twitter):</label><input type="text" id="xInput" class="auth-input" placeholder="username (without @)" aria-label="X username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">TikTok:</label><input type="text" id="tiktokInput" class="auth-input" placeholder="@username" aria-label="TikTok username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Facebook:</label><input type="text" id="facebookInput" class="auth-input" placeholder="facebook.com/username" aria-label="Facebook page"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">YouTube:</label><input type="text" id="youtubeInput" class="auth-input" placeholder="@channelname" aria-label="@channelname"></div><button class="auth-btn" onclick="saveSocialMedia()">Update Social Profiles</button></div></div></div>
@@ -619,7 +624,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script>
-console.log('=== LIVEQUE ADMIN v6.9.40 ===');
+console.log('=== LIVEQUE ADMIN v6.9.41 ===');
 
 const SUPABASE_URL = 'https://jttswydixqeyyqvcohnq.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dHN3eWRpeHFleXlxdmNvaG5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNjE3ODYsImV4cCI6MjA3NDkzNzc4Nn0.WlvOfl11qVUVatSCIPy8t6u9-j4u1z5CpnBxXe50BdQ';
@@ -1557,6 +1562,59 @@ function initQRCode() {
 }
 
 function updateQRCardLive() { const artistName = document.getElementById('qrArtistName').value.trim() || 'Your Name'; document.getElementById('qrArtistDisplay').textContent = artistName; }
+
+// Share, with three tiers. navigator.share opens the real OS share sheet on a
+// phone, which is where this actually gets used. Clipboard is the desktop path.
+// The prompt is the last resort, because clipboard writes are blocked outside a
+// secure context and in some in-app browsers.
+async function shareLink(url, title, text, btn) {
+    var label = btn && btn.textContent;
+    function done(msg) {
+        showToast(msg);
+        if (btn) { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = label; }, 1600); }
+    }
+    if (navigator.share) {
+        try {
+            await navigator.share({ title: title, text: text, url: url });
+            return;                         // the sheet handles its own feedback
+        } catch (e) {
+            // AbortError just means they backed out. Anything else, fall through.
+            if (e && e.name === 'AbortError') return;
+        }
+    }
+    try {
+        await navigator.clipboard.writeText(url);
+        done('Link copied');
+        return;
+    } catch (_) {}
+    window.prompt('Copy your link:', url);
+}
+
+function myRequestLink() {
+    return 'https://getliveque.com/customer.html?artist=' + encodeURIComponent(ARTIST_ID || '');
+}
+
+function shareMyLink() {
+    if (!ARTIST_ID) { showToast('Sign in first.', 'warning'); return; }
+    var who = (document.getElementById('qrArtistName') || {}).value || ARTIST_NAME || '';
+    who = String(who).trim();
+    shareLink(
+        myRequestLink(),
+        who ? (who + ' on LiveQue') : 'Request a song',
+        who ? ('Request a song from ' + who + ' and tip from your phone.')
+            : 'Request a song and tip from your phone.',
+        document.getElementById('shareMyLinkBtn')
+    );
+}
+
+function shareLiveQue(btn) {
+    shareLink(
+        'https://getliveque.com',
+        'LiveQue',
+        'Take song requests and tips from your phone. Built by two brothers who gig.',
+        btn
+    );
+}
 
 async function downloadQRPDF() {
     const artistName = document.getElementById('qrArtistName').value.trim() || 'Artist Name';
