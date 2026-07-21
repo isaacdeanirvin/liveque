@@ -188,13 +188,8 @@ let currentGigSessionId=null;
 let stripeChargesEnabled=false;
 let pendingTip=null;
 
-// Payment icons as SVG strings
 const paymentIcons = {
-    venmo: '💸',
-    paypal: '💳',
-    cashapp: '💵',
-    zelle: '🏦',
-    applepay: '🍎'
+    cashapp: '💵'
 };
 
 // Social icons
@@ -659,22 +654,10 @@ function renderPaymentMethods(){
     
     let hasPaymentMethods=false;
     
-    if(paymentMethods.venmo){
-        hasPaymentMethods=true;
-        const b=document.createElement('button');
-        b.className='payment-btn';
-        b.innerHTML=paymentIcons.venmo+' Venmo';
-        b.onclick=function(){openPayment('venmo',paymentMethods.venmo);};
-        c.appendChild(b);
-    }
-    if(paymentMethods.paypal){
-        hasPaymentMethods=true;
-        const b=document.createElement('button');
-        b.className='payment-btn';
-        b.innerHTML=paymentIcons.paypal+' PayPal';
-        b.onclick=function(){openPayment('paypal',paymentMethods.paypal);};
-        c.appendChild(b);
-    }
+    // Venmo, PayPal and Zelle buttons removed. None of them could confirm the money
+    // arrived, so a tip through them never moved the request up the queue. Venmo also
+    // bars personal accounts from taking commercial payments, which is what a pasted
+    // @handle was doing.
     if(paymentMethods.cashapp){
         hasPaymentMethods=true;
         const b=document.createElement('button');
@@ -683,23 +666,6 @@ function renderPaymentMethods(){
         b.onclick=function(){openPayment('cashapp',paymentMethods.cashapp);};
         c.appendChild(b);
     }
-    if(paymentMethods.zelle){
-        hasPaymentMethods=true;
-        const b=document.createElement('button');
-        b.className='payment-btn';
-        b.innerHTML=paymentIcons.zelle+' Zelle';
-        b.onclick=function(){openPayment('zelle',paymentMethods.zelle);};
-        c.appendChild(b);
-    }
-    if(paymentMethods.applepay){
-        hasPaymentMethods=true;
-        const b=document.createElement('button');
-        b.className='payment-btn';
-        b.innerHTML=paymentIcons.applepay+' Apple Pay';
-        b.onclick=function(){openPayment('applepay',paymentMethods.applepay);};
-        c.appendChild(b);
-    }
-    
     if(!hasPaymentMethods){
         c.innerHTML='<div class="no-payment-msg">Payment methods not configured yet</div>';
     }
@@ -707,11 +673,7 @@ function renderPaymentMethods(){
 
 function renderModalBackupTips(tc){
     var methods=[];
-    if(paymentMethods.venmo) methods.push(['venmo','Venmo',paymentMethods.venmo]);
-    if(paymentMethods.paypal) methods.push(['paypal','PayPal',paymentMethods.paypal]);
     if(paymentMethods.cashapp) methods.push(['cashapp','Cash App',paymentMethods.cashapp]);
-    if(paymentMethods.zelle) methods.push(['zelle','Zelle',paymentMethods.zelle]);
-    if(paymentMethods.applepay) methods.push(['applepay','Apple Pay',paymentMethods.applepay]);
     if(methods.length===0) return;
     var wrap=document.createElement('div');
     wrap.style.cssText='margin-top:14px; border-top:1px solid rgba(255,255,255,0.12); padding-top:12px; text-align:center;';
@@ -732,27 +694,11 @@ function renderModalBackupTips(tc){
 
 function openPayment(m,h){
     let u='';
-    
-    if(m==='venmo'){
-        u='https://venmo.com/u/'+h.replace('@','');
-    }else if(m==='paypal'){
-        if(h.includes('paypal.me/')){
-            u='https://'+h;
-        }else if(h.startsWith('paypal.me/')){
-            u='https://'+h;
-        }else{
-            u='https://paypal.me/'+h;
-        }
-    }else if(m==='cashapp'){
+
+    if(m==='cashapp'){
         u='https://cash.app/'+h;
-    }else if(m==='zelle'){
-        showToast('Send to: '+h,'warning');
-        return;
-    }else if(m==='applepay'){
-        showToast('Send via Apple Pay to: '+h,'warning');
-        return;
     }
-    
+
     if(u){
         window.open(u,'_blank');
     }
