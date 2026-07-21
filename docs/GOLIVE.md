@@ -40,6 +40,27 @@ until this clears and it can take days.
 One irreversible detail on that page: after activation you **cannot change the
 business origin country**.
 
+Checked in the live dashboard 2026-07-21 — most of this is already filled in.
+Outstanding: **Business details**, **Verification document**, **Add your bank**,
+Secure your account, Add extras, **Review and submit**.
+
+---
+
+## Step 1b — Complete the CONNECT PLATFORM PROFILE
+
+Separate from Step 1, separately incomplete, and easy to miss because the
+activation checklist does not mention it. Settings → Connect → Platform profile
+currently reads **"Onboarding incomplete"**, with two outstanding items:
+
+- Refunds and chargebacks liability acknowledgement
+- Ongoing seller compliance acknowledgement
+
+Read the first one rather than clicking through it. It is the legal counterpart
+to the exposure in the last section of this document: on destination charges
+Stripe debits the **platform** for disputes, and at 0% margin one $5 chargeback
+puts LiveQue negative by $5 plus the dispute fee. `stripe-webhook` reverses the
+transfer to claw it back, but only while the performer still has a balance.
+
 ---
 
 ## Step 2 — Ship the livemode guard  ✅ DONE
@@ -138,12 +159,61 @@ Copy the **new** `whsec_...`. It is different from the test one:
 
 New Account Links against live keys. New `acct_` IDs.
 
-Run this **in parallel with test mode still serving gigs**. Ideally store the
-live ID in a separate column so both modes work during the transition and so
-rollback stays cheap.
+This used to be impossible. `stripe-onboard` reused the stored `acct_`, which is
+dead under live keys, so `account_links` hard-errored and no performer could get
+back in — on the one step nobody else can do for them. Both `stripe-onboard` and
+`stripe-status` now detect an account that does not exist in the current mode,
+clear it, and fall back to a fresh onboarding. The performer just taps **Set Up
+Payouts** again.
 
-Each performer has their own KYC gate — `card_payments` and `transfers`
-capabilities stay inactive until it clears, and live mode is stricter than test.
+Note on the detection: Stripe **does not document** which error a cross-mode
+account id produces. `resource_missing` and `livemode_mismatch` are both
+plausible and the runtime message everyone quotes for this
+("a similar object exists in test mode") appears nowhere in the official docs.
+The code accepts either code or a bare 404 and deliberately does **not** match on
+message text.
+
+### Do not add the `card_payments` capability
+
+Tempting, because readiness is gated on `charges_enabled`. It is the wrong move.
+
+`charges_enabled` is not card-specific:
+
+> "`charges_enabled` confirms that your full charge path including the charge and
+> transfer works correctly and evaluates if either `card_payments` or `transfers`
+> capabilities are active."
+> — <https://docs.stripe.com/connect/api-onboarding>
+
+Either/or, so a transfers-only Express account reaches `charges_enabled: true`.
+Destination charges need `transfers`, not `card_payments`:
+
+> "Payments using the `transfers` capability include Destination charges and
+> Separate charges and transfers."
+> — <https://docs.stripe.com/connect/account-capabilities>
+
+And requesting it carries real downside:
+
+> "To reduce onboarding effort, only request the capabilities that your accounts
+> need. Requesting more capabilities means the onboarding flow must verify more
+> information."
+
+> "If a connected account has both `card_payments` and `transfers`, and the
+> `status` of either one is `inactive`, then both capabilities are disabled."
+
+So a `card_payments` that fails verification would disable a working `transfers`.
+Some capabilities are also permanent once requested, and Stripe never enumerates
+which. Leave it alone.
+
+The one thing that would change this: if LiveQue ever onboards a performer
+outside the platform's region, `on_behalf_of` becomes mandatory, and that **does**
+require `card_payments`.
+
+Readiness therefore checks `charges_enabled && payouts_enabled &&
+details_submitted`, plus `capabilities.transfers === "active"` where present —
+because `charges_enabled` alone cannot distinguish which capability satisfied it,
+and Stripe warns a capability can drop back out of active after go-live.
+
+Each performer has their own KYC gate, and live mode is stricter than test.
 
 ---
 

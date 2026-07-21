@@ -22,7 +22,16 @@ async function stripe(path: string, params: Record<string, string>) {
     body: new URLSearchParams(params).toString(),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error?.message || "Stripe error");
+  if (!res.ok) {
+    // Carry the machine-readable code through. Callers need to branch on the
+    // cause without matching on Stripe's prose, which is undocumented and free
+    // to change.
+    const err: Error & { code?: string; status?: number } =
+      new Error(data.error?.message || "Stripe error");
+    err.code = data.error?.code;
+    err.status = res.status;
+    throw err;
+  }
   return data;
 }
 
@@ -140,9 +149,19 @@ serve(async (req) => {
         "metadata[fees_covered]": coverFees ? "1" : "0",
       });
     } catch (piErr) {
-      const msg = String(piErr?.message || "");
-      if (/destination|No such account|resource_missing/i.test(msg)) {
-        console.log("Dead destination for artist " + artist_id + ": " + msg);
+      // Branch on the error CODE. Stripe documents no mapping from this scenario
+      // to a status or a message, and the string people quote for a cross-mode
+      // account is not in the docs at all, so text matching is only a last-ditch
+      // fallback here, never the primary signal.
+      const code = (piErr as { code?: string })?.code;
+      const msg = String((piErr as Error)?.message || "");
+      const deadDestination =
+        code === "resource_missing" ||
+        code === "livemode_mismatch" ||
+        code === "account_invalid" ||
+        /No such destination|No such account/i.test(msg);
+      if (deadDestination) {
+        console.log("Dead destination for artist " + artist_id + ": [" + code + "] " + msg);
         await admin.from("artists")
           .update({ stripe_onboarded: false }).eq("id", artist.id);
         await admin.from("artist_settings")

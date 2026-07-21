@@ -55,7 +55,11 @@ serve(async (req) => {
       // Surfacing Stripe's raw error would strand the performer on a dashboard
       // showing a failure they cannot act on. Clear the dead id instead so the UI
       // falls back to "Set Up Payouts" and they can simply onboard again.
-      if (res.status === 404 || acct?.error?.code === "resource_missing") {
+      // Stripe never documents which error a cross-mode account id returns, and
+      // the runtime message people quote for it is not in the docs either, so
+      // accept either plausible code rather than matching on text.
+      const code = acct?.error?.code;
+      if (res.status === 404 || code === "resource_missing" || code === "livemode_mismatch") {
         console.log("Clearing stale account " + artist.stripe_account_id + " for artist " + artist.id);
         await admin.from("artists")
           .update({ stripe_account_id: null, stripe_onboarded: false })
@@ -70,7 +74,17 @@ serve(async (req) => {
       throw new Error(acct.error?.message || "Stripe error");
     }
 
-    const onboarded = !!(acct.charges_enabled && acct.payouts_enabled && acct.details_submitted);
+    // charges_enabled is satisfied by EITHER card_payments or transfers being
+    // active, so on its own it does not prove the leg LiveQue actually uses. We
+    // only ever move money by transfer on a destination charge, and Stripe warns
+    // a capability can drop back out of active after go-live, so check it
+    // directly. Tolerant of the field being absent: sandboxes are documented to
+    // under-report capabilities and this must not strand a working test account.
+    const transfers = acct.capabilities?.transfers;
+    const transfersOk = transfers === undefined || transfers === "active";
+    const onboarded = !!(
+      acct.charges_enabled && acct.payouts_enabled && acct.details_submitted && transfersOk
+    );
     if (onboarded !== artist.stripe_onboarded) {
       await admin.from("artists").update({ stripe_onboarded: onboarded }).eq("id", artist.id);
     }

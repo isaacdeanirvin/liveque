@@ -168,7 +168,14 @@ serve(async (req) => {
   if (event.type === "account.updated") {
     const acct = event.data.object;
     try {
-      const onboarded = !!(acct.charges_enabled && acct.payouts_enabled && acct.details_submitted);
+      // Same rule as stripe-status, and it has to stay the same rule: these two
+      // are the only writers of readiness, so if they ever disagree a performer
+      // flips between ready and not depending on which one ran last.
+      const transfers = acct.capabilities?.transfers;
+      const transfersOk = transfers === undefined || transfers === "active";
+      const onboarded = !!(
+        acct.charges_enabled && acct.payouts_enabled && acct.details_submitted && transfersOk
+      );
       const admin = createClient(SUPABASE_URL, SERVICE_ROLE);
 
       const { data: artist } = await admin

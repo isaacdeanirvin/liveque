@@ -60,7 +60,15 @@ async function accountExists(id: string): Promise<boolean> {
   });
   if (res.ok) return true;
   const body = await res.json().catch(() => ({}));
-  if (res.status === 404 || body?.error?.code === "resource_missing") return false;
+  const code = body?.error?.code;
+  // Stripe does not document which error a cross-mode account id produces. Both
+  // resource_missing and livemode_mismatch are plausible, and the runtime string
+  // people quote for this ("a similar object exists in test mode") appears
+  // nowhere in the official docs, so it is not safe to match on text. Accept
+  // either code, or a bare 404, as "absent in this mode".
+  if (res.status === 404 || code === "resource_missing" || code === "livemode_mismatch") {
+    return false;
+  }
   // 401/403 mean the key is wrong or the account belongs to another platform.
   // Treating those as "missing" would mint a duplicate and orphan the original,
   // so fail loudly instead.
