@@ -123,7 +123,9 @@
         .lp-hero { padding: 52px 0 40px; text-align: center; }
         .lp-said { color: rgba(255,255,255,.5); font-size: 12px; letter-spacing: .2em; text-transform: uppercase; font-weight: 600; margin-bottom: 16px; }
         .lp-h1 { font-size: clamp(1.7rem,7vw,3rem); line-height: 1.14; font-weight: 700; letter-spacing: -.02em; margin-bottom: 18px; color: #fff; }
-        .lp-sub { font-size: clamp(1rem,2.3vw,1.1rem); color: rgba(255,255,255,.78); max-width: 520px; margin: 0 auto 30px; line-height: 1.6; }
+        .lp-sub { font-size: clamp(1rem,2.3vw,1.1rem); color: rgba(255,255,255,.78); max-width: 520px; margin: 0 auto 14px; line-height: 1.6; }
+        .lp-story { font-size: 14px; color: rgba(255,255,255,.5); max-width: 470px; margin: 0 auto 30px; line-height: 1.6; }
+        .lp-cap { font-size: 12.5px; color: rgba(255,255,255,.45); margin: -18px auto 28px; max-width: 330px; line-height: 1.5; }
         .lp-btn { display: inline-block; background: linear-gradient(45deg,#4ecdc4,#44a08d); border: none; color: #06251f; font-weight: 700; font-size: 16px; padding: 15px 32px; border-radius: 10px; cursor: pointer; box-shadow: 0 8px 24px rgba(78,205,196,.2); }
         .lp-note { display: block; font-size: 12.5px; color: rgba(255,255,255,.5); margin-top: 13px; }
         .lp-already { display: block; font-size: 14px; color: rgba(255,255,255,.62); margin-top: 18px; }
@@ -239,7 +241,8 @@
           <div class="lp-hero">
             <div class="lp-said">What you hear all night</div>
             <h1 class="lp-h1">&ldquo;Sorry, I don't<br>have cash.&rdquo;</h1>
-            <p class="lp-sub">Four hours. Packed room. Eleven dollars in the jar. Everybody paid the bar with a card. That was our Saturday, so we built this.</p>
+            <p class="lp-sub">Your crowd requests songs and tips you from their phone. It lands in your bank, and we take 0% of it.</p>
+            <p class="lp-story">Four hours, packed room, eleven dollars in the jar. That was our Saturday, so we built this.</p>
 
             <div class="lp-demo" aria-label="A request queue reordering when a tip arrives">
               <div class="lp-demotop"><span><span class="lp-dot"></span>Your queue</span><span id="lpDq">3 waiting</span></div>
@@ -251,16 +254,11 @@
                 <div class="lp-qi"><div class="t"><div class="n">Landslide</div><div class="a">Fleetwood Mac</div></div><span class="tag">$5</span></div>
               </div>
             </div>
+            <p class="lp-cap">Your phone during a set. A tip moves that song up the list.</p>
 
             <button class="lp-btn" onclick="goToLogin('up')">Create your free account</button>
-            <span class="lp-note">About five minutes. No app for you or your crowd.</span>
+            <span class="lp-note">Free forever. About five minutes to set up.</span>
             <span class="lp-already">Already have an account? <button type="button" onclick="goToLogin('in')">Sign in</button></span>
-          </div>
-
-          <div class="lp-sec">
-            <div class="lp-kick">The first thing every player asks</div>
-            <h2 class="lp-h2">No, they can't make you play Wonderwall.</h2>
-            <p class="lp-lede">Requests land in a list on your phone. You play what you want, skip what you don't, and delete anything you never want to see again. A tip moves a song up your list. It never puts a song on your stage.</p>
           </div>
 
           <div class="lp-sec">
@@ -276,8 +274,8 @@
 
           <div class="lp-sec">
             <div class="lp-kick">What it costs</div>
-            <h2 class="lp-h2">We take nothing.</h2>
-            <p class="lp-lede">No percentage, no monthly fee. The only thing that comes out is what the card company charges, and that is the same everywhere you take a card.</p>
+            <h2 class="lp-h2">We take 0%.</h2>
+            <p class="lp-lede">No percentage, no monthly fee, no cut of your tips. The only money that comes out is what Stripe charges to process a card, and that is the same rate you would pay anywhere.</p>
             <div class="lp-led">
               <div class="r"><span class="lbl">Someone tips you</span><span class="amt">$5.00</span></div>
               <div class="r out"><span class="lbl">Stripe card processing<small>2.9% plus 30 cents</small></span><span class="amt">&minus;$0.45</span></div>
@@ -288,11 +286,17 @@
           </div>
 
           <div class="lp-sec">
+            <div class="lp-kick">Your setlist</div>
+            <h2 class="lp-h2">You approve every request.</h2>
+            <p class="lp-lede">A tip moves a song up your list. It never puts a song on your stage. You play what you want, skip what you don't, and anything you delete never comes back.</p>
+          </div>
+
+          <div class="lp-sec">
             <div class="lp-kick">Who made this</div>
             <h2 class="lp-h2">Two brothers who gig.</h2>
             <div class="lp-us">
-              <div class="lp-av">I&amp;G</div>
-              <p>We're <b>Isaac and Glen Irvin</b>. We play out. We built the thing we kept wishing existed on the drive home. If something breaks or annoys you, write to us. A person reads it.</p>
+              <div class="lp-av">G&amp;I</div>
+              <p>We're <b>Glen and Isaac Irvin</b>. We play live shows, we work the same rooms you do, and we built this to make more money on the nights we were already playing. If something breaks or annoys you, write to us. A person reads it.</p>
             </div>
           </div>
 
@@ -590,7 +594,7 @@
                 <div style="margin-bottom: 28px;"><div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.6;">Connection Status</div><p style="margin: 0;"><span style="color: #2ed573;">Green</span> means live. <span style="color: #ffd700;">Yellow</span> means reconnecting. <span style="color: #ff4757;">Red</span> means disconnected — refresh the page.</p></div>
             </div>
             <div style="margin-top: 30px; text-align: center;"><button class="auth-btn" onclick="closeHelpModal()" style="background: rgba(255,255,255,0.15); padding: 12px 40px;">Done</button></div>
-            <div style="margin-top: 24px; text-align: center; font-size: 11px; opacity: 0.4;">v6.9.29 · getliveque.com</div>
+            <div style="margin-top: 24px; text-align: center; font-size: 11px; opacity: 0.4;">v6.9.30 · getliveque.com</div>
         </div>
     </div>
     <div id="socialModal" class="modal"><div class="modal-content"><span class="close" onclick="closeSocialModal()">&times;</span><h2>Social Media Settings</h2><div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;"><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Instagram:</label><input type="text" id="instagramInput" class="auth-input" placeholder="username (without @)"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">X (Twitter):</label><input type="text" id="xInput" class="auth-input" placeholder="username (without @)"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">TikTok:</label><input type="text" id="tiktokInput" class="auth-input" placeholder="@username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">Facebook:</label><input type="text" id="facebookInput" class="auth-input" placeholder="facebook.com/username"></div><div><label style="display: block; margin-bottom: 4px; font-weight: bold; text-align: center;">YouTube:</label><input type="text" id="youtubeInput" class="auth-input" placeholder="@channelname"></div><button class="auth-btn" onclick="saveSocialMedia()">Update Social Profiles</button></div></div></div>
@@ -601,7 +605,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script>
-console.log('=== LIVEQUE ADMIN v6.9.29 ===');
+console.log('=== LIVEQUE ADMIN v6.9.30 ===');
 
 const SUPABASE_URL = 'https://jttswydixqeyyqvcohnq.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dHN3eWRpeHFleXlxdmNvaG5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNjE3ODYsImV4cCI6MjA3NDkzNzc4Nn0.WlvOfl11qVUVatSCIPy8t6u9-j4u1z5CpnBxXe50BdQ';
