@@ -59,7 +59,7 @@
         .top-song-number { background: linear-gradient(45deg, #ffd700, #ffa500); color: #1a1a2e; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; margin: 0 auto 10px; }
         .view-all-btn { background: linear-gradient(45deg, #4ecdc4, #44a08d); border: none; padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; margin-bottom: 16px; font-size: 16px; }
         .view-all-btn:hover { transform: scale(1.02); box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4); }
-        .shuffle-btn { background: linear-gradient(135deg, #ffd700, #ffed4e); color: #1a1a2e; font-weight: bold; font-size: 16px; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; min-width: 45px; margin-left: 8px; }
+        .shuffle-btn { background: linear-gradient(135deg, #ffd700, #ffed4e); color: #1a1a2e; font-weight: bold; font-size: 16px; border: none; padding: 11px 12px; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; min-width: 45px; min-height: 44px; margin-left: 8px; }
         .shuffle-btn:hover { transform: scale(1.1); box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4); }
         .song-item { background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; transition: all 0.3s ease; }
         .song-item:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-2px); }
@@ -125,7 +125,8 @@
         .pay-divider::before{margin-right:10px;}
         .pay-divider::after{margin-left:10px;}
         .review-stars{display:flex;justify-content:center;gap:6px;margin:2px 0 10px;}
-        .review-star{font-size:34px;line-height:1;cursor:pointer;color:rgba(255,255,255,0.28);background:none;border:none;padding:2px 4px;transition:transform .12s ease,color .12s ease;}
+        /* 44px minimum: these get tapped one-handed in a dark bar */
+        .review-star{font-size:34px;line-height:1;cursor:pointer;color:rgba(255,255,255,0.28);background:none;border:none;padding:6px 8px;min-width:44px;min-height:44px;transition:transform .12s ease,color .12s ease;}
         .review-star.on{color:#ffd700;}
         .review-star:active{transform:scale(1.12);}
         .review-agg-star{color:#ffd700;}
