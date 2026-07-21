@@ -30,7 +30,10 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
     const body = await req.json();
-    const { artist_id, amount, song_title, song_artist, requester_name } = body;
+    const { artist_id, amount, song_title, song_artist, requester_name, cover_fees } = body;
+    // Strictly boolean. Anything truthy-but-not-true is treated as not covering, so a
+    // malformed client can only ever undercharge the fan, never overcharge them.
+    const coverFees = cover_fees === true;
 
     if (!artist_id) throw new Error("Missing artist");
 
@@ -84,14 +87,31 @@ serve(async (req) => {
     //
     // Domestic US card pricing. An international card costs Stripe's extra 1.5%,
     // which LiveQue absorbs rather than surprising the performer with a variable cut.
-    const amountCents = dollars * 100;
+    const tipCents = dollars * 100;
+
+    // If the fan opts to cover the card cost, gross up so the performer nets the full
+    // tip. The fee applies to the LARGER total, so it is not simply tip + fee:
+    //   charge - (0.029*charge + 30) = tip   ->   charge = (tip + 30) / 0.971
+    // A $5 tip covered costs the fan $5.46, not $5.45. Ceiling rather than round, so
+    // the performer is never a cent short.
+    const chargeCents = coverFees
+      ? Math.ceil((tipCents + 30) / 0.971)
+      : tipCents;
+
     const stripeFeeCents = Math.min(
-      Math.round(amountCents * 0.029) + 30,
-      amountCents - 1, // never leave the performer with nothing
+      Math.round(chargeCents * 0.029) + 30,
+      chargeCents - 1, // never leave the performer with nothing
     );
 
+    // Sanity gate. If the gross-up ever fails to leave the performer whole, or the
+    // fan would be charged more than a sane multiple of the tip, refuse rather than
+    // quietly overcharge someone standing in a bar.
+    if (coverFees && (chargeCents - stripeFeeCents < tipCents || chargeCents > tipCents * 2 + 100)) {
+      throw new Error("Could not calculate the fee-covered total");
+    }
+
     const pi = await stripe("payment_intents", {
-      amount: String(amountCents),
+      amount: String(chargeCents),
       currency: "usd",
       application_fee_amount: String(stripeFeeCents),
       // Card + wallets (Apple Pay / Google Pay ride the card rails) only.
@@ -106,13 +126,22 @@ serve(async (req) => {
       "metadata[song_title]": song_title || "",
       "metadata[song_artist]": song_artist || "",
       "metadata[requester_name]": requester_name || "Anonymous",
+      // metadata[tip] is what the PERFORMER earned, which is what the queue and the
+      // recap should show. It is not what the fan was charged when they covered fees.
       "metadata[tip]": String(dollars),
       "metadata[stripe_fee_cents]": String(stripeFeeCents),
+      "metadata[charged_cents]": String(chargeCents),
+      "metadata[fees_covered]": coverFees ? "1" : "0",
     });
 
     return new Response(JSON.stringify({
       client_secret: pi.client_secret,
       publishable_key: STRIPE_PUBLISHABLE_KEY,
+      // The server is the authority on money. The client displays these, it does not
+      // compute them, so the total shown always matches the total charged.
+      charged_cents: chargeCents,
+      performer_gets_cents: chargeCents - stripeFeeCents,
+      fees_covered: coverFees,
     }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
     return new Response(JSON.stringify({ error: e.message }), {

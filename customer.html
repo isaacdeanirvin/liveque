@@ -69,6 +69,22 @@
         .request-btn:hover { transform: scale(1.05); }
         .request-btn:disabled { background: rgba(255, 255, 255, 0.1); cursor: not-allowed; transform: none; }
         .tip-btn { background: rgba(78, 205, 196, 0.3); border: 2px solid #4ecdc4; padding: 12px 20px; border-radius: 10px; color: white; cursor: pointer; font-size: 16px; transition: all 0.3s ease; margin: 5px; font-weight: bold; }
+        /* Cover-the-fees row. Whole row is the hit area, not just the switch, because
+           this gets tapped one-handed in a dark bar. State is legible from the text as
+           well as the colour, so it does not rely on colour alone. */
+        .cf-row { display:flex; align-items:center; gap:12px; width:100%; text-align:left; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:13px 14px; margin-bottom:12px; cursor:pointer; transition:border-color .2s, background .2s; }
+        .cf-row.on { border-color:rgba(255,215,0,0.38); background:rgba(255,215,0,0.06); }
+        .cf-txt { flex:1; min-width:0; }
+        .cf-main { font-size:15px; font-weight:600; color:#fff; line-height:1.35; }
+        .cf-sub { font-size:12.5px; color:rgba(255,255,255,0.5); margin-top:3px; line-height:1.4; }
+        .cf-row.on .cf-sub { color:#ffd700; }
+        .cf-sw { position:relative; flex:0 0 auto; width:52px; height:32px; }
+        .cf-sw input { position:absolute; inset:0; width:100%; height:100%; opacity:0; margin:0; cursor:pointer; z-index:2; }
+        .cf-track { position:absolute; inset:0; border-radius:32px; background:rgba(255,255,255,0.14); transition:background .2s; pointer-events:none; }
+        .cf-track::after { content:''; position:absolute; top:3px; left:3px; width:26px; height:26px; border-radius:50%; background:#fff; transition:transform .2s; }
+        .cf-sw input:checked ~ .cf-track { background:#4ecdc4; }
+        .cf-sw input:checked ~ .cf-track::after { transform:translateX(20px); background:#06251f; }
+        .cf-sw input:focus-visible ~ .cf-track { outline:2px solid #4ecdc4; outline-offset:2px; }
         .pay-assent { margin-top: 10px; font-size: 12px; line-height: 1.5; text-align: center; color: rgba(255,255,255,0.7); }
         .pay-assent a { color: #7fdcd5; text-decoration: underline; text-underline-offset: 2px; }
         .tip-btn:hover { background: #4ecdc4; transform: scale(1.05); }
@@ -144,7 +160,7 @@
             <div id="reviewMsg" style="text-align:center; font-size:12px; min-height:14px; margin-top:6px; opacity:0.85;"></div>
         </div>
     </div>
-    <div id="requestModal" class="modal"><div class="modal-content"><span class="close" onclick="closeModal()">&times;</span><h2>Request Song</h2><div id="modalSongInfo" style="margin: 20px 0;"></div><div id="tipButtonsContainer"></div><div id="paymentArea" style="display:none; margin-top:16px; text-align:left;"><div id="expressCheckoutContainer" style="margin-bottom:8px;"></div><div id="payDivider" class="pay-divider" style="display:none;">or pay with card</div><div id="paymentElementContainer" style="margin-bottom:12px;"></div><button id="payNowBtn" class="tip-btn" style="width:100%; margin:0;" onclick="confirmTipPayment()">Pay</button><!-- Assent adjacent to the button that spends money. Berman v. Freedom Financial: a click is assent only where the user is told the click means assent. A footer link on a checkout screen was held unenforceable in Tejon v. Zeus Networks (11th Cir. 2026). --><div class="pay-assent">By tapping Pay you agree to the <a href="/terms.html" target="_blank" rel="noopener">Terms</a> and <a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>. Tips are paid to the performer, not to LiveQue.</div><div id="paymentMessage" style="margin-top:10px; font-size:13px; min-height:16px; text-align:center;"></div></div></div></div>
+    <div id="requestModal" class="modal"><div class="modal-content"><span class="close" onclick="closeModal()">&times;</span><h2>Request Song</h2><div id="modalSongInfo" style="margin: 20px 0;"></div><div id="tipButtonsContainer"></div><div id="paymentArea" style="display:none; margin-top:16px; text-align:left;"><div id="expressCheckoutContainer" style="margin-bottom:8px;"></div><div id="payDivider" class="pay-divider" style="display:none;">or pay with card</div><div id="paymentElementContainer" style="margin-bottom:12px;"></div><div id="coverFeesRow" class="cf-row" style="display:none;" onclick="toggleCoverFees()"><div class="cf-txt"><div id="coverFeesMain" class="cf-main"></div><div id="coverFeesSub" class="cf-sub"></div></div><span class="cf-sw"><input type="checkbox" id="coverFees" aria-label="Cover the card processing cost so the performer receives the full tip" onclick="event.stopPropagation();renderCoverFees()"><span class="cf-track"></span></span></div><button id="payNowBtn" class="tip-btn" style="width:100%; margin:0;" onclick="confirmTipPayment()">Pay</button><!-- Assent adjacent to the button that spends money. Berman v. Freedom Financial: a click is assent only where the user is told the click means assent. A footer link on a checkout screen was held unenforceable in Tejon v. Zeus Networks (11th Cir. 2026). --><div class="pay-assent">By tapping Pay you agree to the <a href="/terms.html" target="_blank" rel="noopener">Terms</a> and <a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>. Tips are paid to the performer, not to LiveQue.</div><div id="paymentMessage" style="margin-top:10px; font-size:13px; min-height:16px; text-align:center;"></div></div></div></div>
     <div id="tipThanksModal" class="modal"><div class="modal-content"><span class="close" onclick="closeTipThanks()">&times;</span><h2 style="margin-bottom:6px;">Thanks for the tip!</h2><div style="opacity:0.8; margin-bottom:16px;">How is the show? Tap to rate.</div><div class="review-stars" id="tipThanksStars"></div><div id="tipThanksMsg" style="min-height:16px; font-size:13px; margin-top:8px; text-align:center;"></div><button class="control-btn" id="tipThanksSkip" style="margin-top:10px;" onclick="closeTipThanks()">Skip</button></div></div>
     <div id="helpModal" class="modal"><div class="modal-content" style="max-height: 90vh; overflow-y: auto; padding: 24px;"><span class="close" onclick="closeHelpModal()">&times;</span><div style="margin-bottom: 24px;"><div style="font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">LiveQue</div><div style="font-size: 14px; opacity: 0.6; margin-top: 4px;">How It Works</div></div><div style="text-align: left; font-size: 14px; line-height: 1.7;"><div style="margin-bottom: 16px;"><div style="font-weight: 600; margin-bottom: 8px;">Requesting a Song</div><div style="opacity: 0.85;">Tap any song to request it. Your request goes straight to the artist's live queue. Add your name if you'd like a shoutout.</div></div><div style="margin-bottom: 16px;"><div style="font-weight: 600; margin-bottom: 8px;">The Queue</div><div style="opacity: 0.85;">Watch the queue update in real-time. Green means now playing. Songs with tips get priority.</div></div><div style="margin-bottom: 16px;"><div style="font-weight: 600; margin-bottom: 8px;">Cooldowns</div><div style="opacity: 0.85;">Recently played songs show a timer. When it expires, the song can be requested again.</div></div></div><button style="margin-top: 16px; width: 100%; padding: 12px; background: rgba(255,255,255,0.15); border: none; border-radius: 10px; color: white; font-size: 16px; cursor: pointer;" onclick="closeHelpModal()">Done</button><div style="margin-top: 16px; font-size: 11px; opacity: 0.4; text-align: center;">getliveque.com</div></div></div>
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://js.stripe.com/v3/"></script>
@@ -704,6 +720,57 @@ function renderModalBackupTips(tc){
     tc.appendChild(wrap);
 }
 
+// ── Cover the card cost ──────────────────────────────────────────────────────
+// Off by default, and there is deliberately no "remember my choice". FTC staff
+// treat a fee the payer cannot effectively decline (default billing, pre-checked
+// boxes, opt-out) as a MANDATORY fee. Pre-checking this would stop it being a
+// voluntary gratuity and turn it into a surcharge, which is banned outright in
+// CT, MA and ME. The unchecked default is the thing that makes this lawful.
+//
+// The uplift is computed from the tip alone and is identical for debit, credit,
+// Apple Pay and Link. Never vary it by card type: Mastercard's second definition
+// catches "any fee charged in connection with a Transaction that is not charged
+// if another payment method is used."
+var COVER_FEES_ENABLED = true;   // kill switch: set false to pull the feature
+
+function coverFeeCents(tipCents){
+    // charge - (0.029*charge + 30) = tip  ->  charge = (tip + 30) / 0.971
+    return Math.ceil((tipCents + 30) / 0.971) - tipCents;
+}
+function coverFeesOn(){
+    var el = document.getElementById('coverFees');
+    return !!(el && el.checked);
+}
+function renderCoverFees(tipDollars){
+    var row = document.getElementById('coverFeesRow');
+    if(!row) return;
+    // Remember the amount on the row itself. A re-render triggered by the toggle then
+    // never depends on outside state, so flipping the switch cannot blank the row.
+    if(tipDollars) row.dataset.tip = String(tipDollars);
+    else tipDollars = Number(row.dataset.tip || 0);
+    if(!COVER_FEES_ENABLED || !tipDollars){ row.style.display='none'; return; }
+    var tipCents = Math.round(tipDollars*100);
+    var addCents = coverFeeCents(tipCents);
+    var add = (addCents/100).toFixed(2);
+    var total = ((tipCents+addCents)/100).toFixed(2);
+    var without = ((tipCents - (Math.round(tipCents*0.029)+30))/100).toFixed(2);
+    var who = (window.ARTIST_NAME && String(window.ARTIST_NAME).trim()) || 'the performer';
+    row.style.display='';
+    document.getElementById('coverFeesMain').textContent =
+        'Add $'+add+' so '+who+' gets the full $'+tipDollars;
+    document.getElementById('coverFeesSub').textContent = coverFeesOn()
+        ? who+' gets $'+tipDollars+'.00. You pay $'+total+'.'
+        : 'Right now '+who+' gets $'+without+'. Card processing takes the rest.';
+    row.classList.toggle('on', coverFeesOn());
+    var btn = document.getElementById('payNowBtn');
+    if(btn && !btn.disabled) btn.textContent = 'Pay $'+(coverFeesOn()?total:tipDollars);
+}
+function toggleCoverFees(){
+    var el=document.getElementById('coverFees');
+    if(el) el.checked=!el.checked;
+    renderCoverFees();
+}
+
 function openPayment(m,h){
     let u='';
 
@@ -940,7 +1007,7 @@ function openRequestModal(t,a,sp){
     renderModalBackupTips(tc);
 
     const pa=document.getElementById('paymentArea');
-    if(pa){ pa.style.display='none'; document.getElementById('paymentElementContainer').innerHTML=''; document.getElementById('paymentMessage').textContent=''; }
+    if(pa){ pa.style.display='none'; document.getElementById('paymentElementContainer').innerHTML=''; document.getElementById('paymentMessage').textContent=''; var _cf=document.getElementById('coverFees'); if(_cf) _cf.checked=false; var _cfr=document.getElementById('coverFeesRow'); if(_cfr){ _cfr.style.display='none'; _cfr.classList.remove('on'); delete _cfr.dataset.tip; } }
     stripeTipState=null;
     
     document.getElementById('requestModal').classList.add('show');
@@ -1001,7 +1068,8 @@ async function startTipPayment(amount){
                 amount: amount,
                 song_title: currentSong.title,
                 song_artist: currentSong.artist,
-                requester_name: requesterName
+                requester_name: requesterName,
+                cover_fees: coverFeesOn()
             }
         });
         if(error){
@@ -1036,6 +1104,7 @@ async function startTipPayment(amount){
         payBtn.textContent='Pay $'+amount;
         payBtn.disabled=false;
         payBtn.style.opacity='1';
+        renderCoverFees(amount);
     }catch(e){
         pa.style.display='none';
         tc.querySelectorAll('button').forEach(function(b){ b.disabled=false; b.style.opacity='1'; });
@@ -1162,7 +1231,7 @@ function closeModal(){
     if(pendingTip){ if(pendingTip.timer) clearTimeout(pendingTip.timer); pendingTip=null; }
     stripeTipState=null;
     const pa=document.getElementById('paymentArea');
-    if(pa){ pa.style.display='none'; document.getElementById('paymentElementContainer').innerHTML=''; document.getElementById('paymentMessage').textContent=''; }
+    if(pa){ pa.style.display='none'; document.getElementById('paymentElementContainer').innerHTML=''; document.getElementById('paymentMessage').textContent=''; var _cf=document.getElementById('coverFees'); if(_cf) _cf.checked=false; var _cfr=document.getElementById('coverFeesRow'); if(_cfr){ _cfr.style.display='none'; _cfr.classList.remove('on'); delete _cfr.dataset.tip; } }
 }
 
 function openHelp(){
