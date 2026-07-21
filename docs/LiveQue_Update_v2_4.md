@@ -28,6 +28,8 @@ The files are in a shippable state. Nothing was left mid-surgery.
 
 ## 1. Environment notes discovered this session
 
+- **RESOLVED 2026-07-20: the project is on Supabase PRO. Auto-pause no longer
+  applies and this item is closed. Historical record below.**
 - **The Supabase project had auto-paused.** Free-tier inactivity (last activity
   ~June 1) put project `jttswydixqeyyqvcohnq` to sleep, which removes its DNS
   record — so the live site (audience + admin) was silently dead until it was
@@ -221,7 +223,8 @@ Work strictly through these to finish the mission.
 
 ## 6. Known issues / deferred (nothing silently disappears)
 
-- **Supabase free-tier auto-pause will recur** and take the live site down silently
+- ~~**Supabase free-tier auto-pause will recur**~~ CLOSED 2026-07-20, account is on
+  Pro. Original note kept for history: would take the live site down silently
   (~1 week idle). Prioritize the **Supabase Pro** upgrade. No DB backups today.
 - **Glen is not Stripe-onboarded** — his audience page correctly shows free-only.
   He must finish Stripe Connect (Setup tab → Set Up Payouts) to take card tips.
