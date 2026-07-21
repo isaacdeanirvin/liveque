@@ -165,11 +165,15 @@ Filing is $350 per class.
   performances found the default anchor is the dominant lever on tip size, with
   £10 at +0.85 and £20 at +1.16 against a £3 reference, and no backlash. Our $5
   default sits at the bottom of the tested range. See `LiveQue_CopyResearch.md`.
-- **Business address** on the site. Stripe's website checklist asks for it.
-- **`landing.html`** is now a stale duplicate of the front page. Left live on purpose
-  in case Glen has the link. Say the word and I will redirect it to `/`.
-- **Real QR vector art** before the business cards print. The current one is a
-  placeholder pattern and needs a test scan off a printed proof, not a screen.
+- **A working contact address.** `getliveque.com` has **no MX records**, so mail to
+  `support@getliveque.com` bounces. That address is published in both the Terms
+  (line 99) and the Privacy Policy (lines 78 and 93) as the way to reach us and to
+  exercise data rights, so both documents currently promise a channel that does not
+  exist. DNS is at Namecheap, which includes free email forwarding, so pointing
+  `support@` at a real inbox is a couple of minutes in their dashboard.
+- **Business address** on the site. Stripe's website checklist asks for it. Worth a
+  deliberate decision rather than a default: the address on the Stripe account is a
+  residential one, and publishing it is not reversible.
 
 ---
 
