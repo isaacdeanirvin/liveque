@@ -226,16 +226,15 @@ let pendingRequest=null;
 let songLibrary=[];
 let popularSongsShuffled=[];
 let currentGigSessionId=null;
-// KILL SWITCH: in-app card tipping is OFF for this release.
+// In-app card tipping is LIVE. Stripe activated 25 July 2026, keys swapped to
+// sk_live/pk_live, both webhook secrets set, all performers reset to re-onboard.
+// A performer's tip buttons still only appear once THEY re-onboard on live keys
+// and Stripe marks them ready (stripe_charges_enabled), so this switch being on
+// is safe even before everyone has reconnected.
 //
-// Stripe is still in test mode, so a card tapped here would move no real money while
-// looking exactly like it had. Every request is free and tips go through the
-// performer's own handles instead. Flip this back to true only after the go-live
-// runbook is finished and a real card has been tested off-peak (docs/GOLIVE.md).
-//
-// Deliberately a constant rather than deleted code: the whole Stripe path is intact
-// underneath, so turning tips back on is a one-word change, not a rebuild.
-const STRIPE_TIPS_ENABLED = false;
+// Left as a constant so it can be flipped back to false in one word if a rollback
+// is ever needed, without touching the Stripe path underneath.
+const STRIPE_TIPS_ENABLED = true;
 
 let stripeChargesEnabled=false;
 let pendingTip=null;
