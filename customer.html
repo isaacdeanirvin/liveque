@@ -184,7 +184,7 @@
         </div>
     </div>
     <div id="requestModal" class="modal"><div class="modal-content"><span class="close" onclick="closeModal()">&times;</span><h2>Request Song</h2><div id="modalSongInfo" style="margin: 20px 0;"></div><div id="tipButtonsContainer"></div><div id="paymentArea" style="display:none; margin-top:16px; text-align:left;"><div id="expressCheckoutContainer" style="margin-bottom:8px;"></div><div id="payDivider" class="pay-divider" style="display:none;">or pay with card</div><div id="paymentElementContainer" style="margin-bottom:12px;"></div><div id="coverFeesRow" class="cf-row" style="display:none;" onclick="toggleCoverFees()"><div class="cf-txt"><div id="coverFeesMain" class="cf-main"></div><div id="coverFeesSub" class="cf-sub"></div></div><span class="cf-sw"><input type="checkbox" id="coverFees" aria-label="Cover the card processing cost so the performer receives the full tip" onclick="event.stopPropagation();renderCoverFees()"><span class="cf-track"></span></span></div><button id="payNowBtn" class="tip-btn" style="width:100%; margin:0;" onclick="confirmTipPayment()">Pay</button><!-- Assent adjacent to the button that spends money. Berman v. Freedom Financial: a click is assent only where the user is told the click means assent. A footer link on a checkout screen was held unenforceable in Tejon v. Zeus Networks (11th Cir. 2026). --><div class="pay-assent">By tapping Pay you agree to the <a href="/terms.html" target="_blank" rel="noopener">Terms</a> and <a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>. Tips are paid to the performer, not to LiveQue.</div><div id="paymentMessage" style="margin-top:10px; font-size:13px; min-height:16px; text-align:center;"></div></div></div></div>
-    <div id="tipThanksModal" class="modal"><div class="modal-content"><span class="close" onclick="closeTipThanks()">&times;</span><h2 style="margin-bottom:6px;">Thanks for the tip!</h2><div style="opacity:0.8; margin-bottom:16px;">How is the show? Tap to rate.</div><div class="review-stars" id="tipThanksStars"></div><div id="tipThanksMsg" style="min-height:16px; font-size:13px; margin-top:8px; text-align:center;"></div><button class="control-btn" id="tipThanksSkip" style="margin-top:10px;" onclick="closeTipThanks()">Skip</button><div style="margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.1);"><button class="control-btn" id="shareArtistBtn" style="width:100%;" onclick="shareThisArtist(this)">Share this page</button><div style="font-size:11px; opacity:0.5; margin-top:7px; line-height:1.45;">Send it to whoever you came with.</div></div></div></div>
+    <div id="tipThanksModal" class="modal"><div class="modal-content"><span class="close" onclick="closeTipThanks()">&times;</span><h2 id="tipThanksTitle" style="margin-bottom:6px;">Thanks!</h2><div style="opacity:0.8; margin-bottom:16px;">How is the show? Tap to rate.</div><div class="review-stars" id="tipThanksStars"></div><div id="tipThanksMsg" style="min-height:16px; font-size:13px; margin-top:8px; text-align:center;"></div><button class="control-btn" id="tipThanksSkip" style="margin-top:10px;" onclick="closeTipThanks()">Skip</button><div style="margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.1);"><button class="control-btn" id="shareArtistBtn" style="width:100%;" onclick="shareThisArtist(this)">Share this page</button><div style="font-size:11px; opacity:0.5; margin-top:7px; line-height:1.45;">Send it to whoever you came with.</div></div></div></div>
     <div id="helpModal" class="modal"><div class="modal-content" style="max-height: 90vh; overflow-y: auto; padding: 24px;"><span class="close" onclick="closeHelpModal()">&times;</span><div style="margin-bottom: 24px;"><div style="font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">LiveQue</div><div style="font-size: 14px; opacity: 0.6; margin-top: 4px;">How It Works</div></div><div style="text-align: left; font-size: 14px; line-height: 1.7;"><div style="margin-bottom: 16px;"><div style="font-weight: 600; margin-bottom: 8px;">Requesting a Song</div><div style="opacity: 0.85;">Tap any song to request it. Your request goes straight to the artist's live queue. Add your name if you'd like a shoutout.</div></div><div style="margin-bottom: 16px;"><div style="font-weight: 600; margin-bottom: 8px;">The Queue</div><div style="opacity: 0.85;">Watch the queue update in real-time. Green means now playing. Songs with tips get priority.</div></div><div style="margin-bottom: 16px;"><div style="font-weight: 600; margin-bottom: 8px;">Cooldowns</div><div style="opacity: 0.85;">Recently played songs show a timer. When it expires, the song can be requested again.</div></div></div><button style="margin-top: 16px; width: 100%; padding: 12px; background: rgba(255,255,255,0.15); border: none; border-radius: 10px; color: white; font-size: 16px; cursor: pointer;" onclick="closeHelpModal()">Done</button><div style="margin-top: 16px; font-size: 11px; opacity: 0.4; text-align: center;">getliveque.com</div></div></div>
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://js.stripe.com/v3/"></script>
     <script>
@@ -220,6 +220,8 @@ let paymentMethods={};
 let socialMediaHandles={};
 let showingAllSongs=false;
 let tipAmounts=[0,2,5,10];
+let drinkMode=true;
+let drinkPrice=8;
 let realtimeChannel=null;
 let broadcastChannel=null;
 let pendingRequest=null;
@@ -334,6 +336,8 @@ async function loadFromSupabase(){
             paymentMethods=st.data.payment_methods||{};
             socialMediaHandles=st.data.social_handles||{};
             tipAmounts=st.data.tip_amounts||[0,2,5,10];
+            drinkMode=st.data.drink_mode!==false;
+            drinkPrice=(typeof st.data.drink_price==='number'&&st.data.drink_price>0)?st.data.drink_price:8;
             stripeChargesEnabled = STRIPE_TIPS_ENABLED && st.data.stripe_charges_enabled===true;
         }
         
@@ -1087,24 +1091,56 @@ function openRequestModal(t,a,sp){
     nameDiv.innerHTML='<label class="name-label">Your Name (optional):</label><input type="text" id="requesterNameInput" class="name-input-field" placeholder="Anonymous" aria-label="Your name for this request">';
     tc.appendChild(nameDiv);
     
-    const freeBtn=document.createElement('button');
-    freeBtn.className='tip-btn';
-    freeBtn.style.cssText='display:block; width:100%; margin:6px 0;';
-    freeBtn.textContent='Request (Free)';
-    freeBtn.onclick=function(){requestSong(0);};
-    tc.appendChild(freeBtn);
-
     // Only show paid tip buttons when the performer's Stripe is ready to charge
     // (F2). Otherwise the audience gets the free request plus the external
     // tip-jar links as a graceful fallback, never a mid-payment error.
-    (stripeChargesEnabled?tipAmounts.filter(function(am){return am>0;}):[]).forEach(function(am){
+    var paidTiers=[];
+    if(stripeChargesEnabled){
+        if(drinkMode){
+            paidTiers=[
+                {amt:drinkPrice, hero:true, label:'\uD83C\uDF7A Buy the band a drink \u00B7 $'+drinkPrice},
+                {amt:drinkPrice*2, hero:false, label:'\uD83C\uDF7B Buy a round \u00B7 $'+(drinkPrice*2)}
+            ];
+        }else{
+            paidTiers=tipAmounts.filter(function(am){return am>0;}).map(function(am){
+                return {amt:am, hero:true, label:'Request + Tip $'+am+' \uD83C\uDFB5'};
+            });
+        }
+    }
+
+    // Free request. In drink mode, WHEN paid options are shown, free is demoted
+    // below them and styled quiet (salience + serial-position) while staying one
+    // clear tap. With no paid options (performer not charge-ready) or in classic
+    // mode, free is the normal primary request button \u2014 never a lonely "No thanks".
+    var quietFree = drinkMode && paidTiers.length>0;
+    const freeBtn=document.createElement('button');
+    freeBtn.className='tip-btn';
+    freeBtn.onclick=function(){requestSong(0);};
+    if(quietFree){
+        freeBtn.style.cssText='display:block; width:100%; margin:12px 0 4px; background:transparent; border:1px solid rgba(255,255,255,0.22); color:rgba(255,255,255,0.72); font-weight:600;';
+        freeBtn.textContent='No thanks \u2014 just request it';
+    }else{
+        freeBtn.style.cssText='display:block; width:100%; margin:6px 0;';
+        freeBtn.textContent='Request (Free)';
+    }
+
+    // Non-quiet free leads. Quiet free follows the paid hero.
+    if(!quietFree) tc.appendChild(freeBtn);
+
+    paidTiers.forEach(function(t){
         const b=document.createElement('button');
         b.className='tip-btn';
-        b.style.cssText='display:block; width:100%; margin:6px 0; background:linear-gradient(45deg,#ffd700,#ffa500); color:#1a1a2e; border-color:#ffd700;';
-        b.textContent='Request + Tip $'+am+' \uD83C\uDFB5';
-        b.onclick=function(){startTipPayment(am);};
+        if(t.hero){
+            b.style.cssText='display:block; width:100%; margin:6px 0; background:linear-gradient(45deg,#ffd700,#ffa500); color:#1a1a2e; border-color:#ffd700;';
+        }else{
+            b.style.cssText='display:block; width:100%; margin:6px 0; background:rgba(255,215,0,0.14); color:#ffd700; border:2px solid rgba(255,215,0,0.55);';
+        }
+        b.textContent=t.label;
+        b.onclick=function(){startTipPayment(t.amt);};
         tc.appendChild(b);
     });
+
+    if(quietFree) tc.appendChild(freeBtn);
 
     renderModalBackupTips(tc);
 
@@ -1302,15 +1338,15 @@ function launchTipConfetti(amount){
     var dpr=Math.min(window.devicePixelRatio||1,2);
     canvas.width=vw*dpr; canvas.height=vh*dpr; ctx.scale(dpr,dpr);
     var colors=['#ffd700','#4ecdc4','#ff4b9b','#635bff','#ffffff','#ffb300'];
-    var notes=['♪','♫','♬','♩','♭'];
+    var notes=drinkMode?['🍺','🍻','🥂','♪','♫','♬']:['♪','♫','♬','♩','♭'];
     var parts=[];
     for(var i=0;i<150;i++){
       var lane=i%3; var ox=lane===0?vw*0.12:lane===1?vw*0.88:vw*0.5; var oy=vh*0.94;
       var ang=-Math.PI/2+(lane===0?0.5:lane===1?-0.5:0)+(Math.random()-0.5)*0.9;
-      var speed=9+Math.random()*9; var isNote=Math.random()<0.42;
+      var speed=9+Math.random()*9; var isNote=Math.random()<0.58;
       parts.push({x:ox,y:oy,vx:Math.cos(ang)*speed,vy:Math.sin(ang)*speed,g:0.22+Math.random()*0.14,size:isNote?(16+Math.random()*16):(7+Math.random()*7),color:colors[(Math.random()*colors.length)|0],rot:Math.random()*6.28,vr:(Math.random()-0.5)*0.4,isNote:isNote,note:notes[(Math.random()*notes.length)|0],life:1});
     }
-    var flourish=amount?{t:0,txt:'$'+amount}:null;
+    var flourish=amount?{t:0,txt:(drinkMode?'🍺 $':'$')+amount}:null;
     var start=null;
     function frame(ts){
       if(start===null)start=ts; var el=(ts-start)/1000;
@@ -1323,7 +1359,7 @@ function launchTipConfetti(amount){
   }catch(e){}
 }
 var tipThanksBusy=false;
-function showTipThanks(){ var m=document.getElementById('tipThanksModal'); if(!m) return; var wrap=document.getElementById('tipThanksStars'); if(wrap){ var h=''; for(var i=1;i<=5;i++){ h+='<button type="button" class="review-star" onclick="pickTipStar('+i+')">☆</button>'; } wrap.innerHTML=h; } var msg=document.getElementById('tipThanksMsg'); if(msg) msg.textContent=''; var sk=document.getElementById('tipThanksSkip'); if(sk) sk.style.display=''; tipThanksBusy=false; m.classList.add('show'); }
+function showTipThanks(){ var m=document.getElementById('tipThanksModal'); if(!m) return; var tt=document.getElementById('tipThanksTitle'); if(tt) tt.textContent=drinkMode?'🍺 Thanks for the round!':'Thanks for the tip!'; var wrap=document.getElementById('tipThanksStars'); if(wrap){ var h=''; for(var i=1;i<=5;i++){ h+='<button type="button" class="review-star" onclick="pickTipStar('+i+')">☆</button>'; } wrap.innerHTML=h; } var msg=document.getElementById('tipThanksMsg'); if(msg) msg.textContent=''; var sk=document.getElementById('tipThanksSkip'); if(sk) sk.style.display=''; tipThanksBusy=false; m.classList.add('show'); }
 function closeTipThanks(){ var m=document.getElementById('tipThanksModal'); if(m) m.classList.remove('show'); }
 async function pickTipStar(n){ if(tipThanksBusy) return; tipThanksBusy=true; var wrap=document.getElementById('tipThanksStars'); if(wrap){ var kids=wrap.querySelectorAll('.review-star'); for(var i=0;i<kids.length;i++){ if(i<n){ kids[i].textContent='★'; kids[i].classList.add('on'); } else { kids[i].textContent='☆'; } } } var msg=document.getElementById('tipThanksMsg'); if(msg) msg.textContent='Sending…'; var row={ artist_id:ARTIST_ID, gig_session_id:currentGigSessionId||null, stars:n, note:null, reviewer_name:null }; var res; try{ res=await db.from('reviews').insert([row]); }catch(e){ res={error:e}; } if(res&&res.error){ if(msg) msg.textContent='Thanks anyway!'; } else { try{ localStorage.setItem(reviewRatedKey(),String(n)); }catch(_){} if(msg) msg.textContent='Thanks for rating!'; var sk=document.getElementById('tipThanksSkip'); if(sk) sk.style.display='none'; if(typeof loadReviews==='function') loadReviews(); } setTimeout(closeTipThanks,1400); }
 function resolvePendingTip(timedOut){
@@ -1332,9 +1368,11 @@ function resolvePendingTip(timedOut){
     if(pendingTip.timer) clearTimeout(pendingTip.timer);
     const amt=pendingTip.amount;
     pendingTip=null;
-    showToast(timedOut
-        ? '✓ $'+amt+' tip received. Your request will appear shortly!'
-        : '✓ $'+amt+' tip sent. Your request is in the queue!');
+    showToast(drinkMode
+        ? (timedOut ? '🍺 Cheers! $'+amt+' received — your song will appear shortly!'
+                    : '🍺 Cheers! $'+amt+' sent — your song is in the queue!')
+        : (timedOut ? '✓ $'+amt+' tip received. Your request will appear shortly!'
+                    : '✓ $'+amt+' tip sent. Your request is in the queue!'));
     launchTipConfetti(amt);
     closeModal();
     if(reviewsActive && typeof hasRated==='function' && !hasRated()){ setTimeout(showTipThanks,450); }

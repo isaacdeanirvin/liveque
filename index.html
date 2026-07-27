@@ -297,7 +297,7 @@
             <div class="lp-said">What you hear all night</div>
             <h1 class="lp-h1">&ldquo;Sorry, I don't<br>have cash.&rdquo;</h1>
             <p class="lp-sub">Your crowd requests songs and tips you from their phone. It lands in your bank, and we take 0% of it.</p>
-            <p class="lp-story">Four hours, packed room, eleven dollars in the jar. That was our Saturday, so we built this.</p>
+            <p class="lp-story">Four hours, packed room, eleven dollars in the tip jar. That was our Saturday nights, until we built this.</p>
 
             <div class="lp-demo" aria-label="A request queue reordering when a tip arrives">
               <div class="lp-demotop"><span><span class="lp-dot"></span>Your queue</span><span id="lpDq">3 waiting</span></div>
@@ -318,9 +318,9 @@
 
           <div class="lp-sec">
             <div class="lp-kick">How it works</div>
-            <h2 class="lp-h2">One code on the table.</h2>
+            <h2 class="lp-h2">One QR code on the table.</h2>
             <div class="lp-steps">
-              <div class="lp-step"><div class="num">1</div><div><h3>They scan it</h3><p>Your song list opens in their browser. Nothing to install, no account to make.</p></div></div>
+              <div class="lp-step"><div class="num">1</div><div><h3>They scan it with their phone camera</h3><p>They point their camera at the QR code, tap the link that pops up, and your song list opens right in their browser. Nothing to install, no account to make.</p></div></div>
               <div class="lp-step"><div class="num">2</div><div><h3>They pick a song</h3><p>Free, or with a tip. Apple Pay, Google Pay, or a card.</p></div></div>
               <div class="lp-step"><div class="num">3</div><div><h3>It shows up on your phone</h3><p>Tipped requests sit at the top with the amount on them. Silent, so nothing beeps at you mid song.</p></div></div>
               <div class="lp-step"><div class="num">4</div><div><h3>The money is already yours</h3><p>It goes to your own Stripe account and out to your bank on your normal schedule. We take none of it.</p></div></div>
@@ -353,7 +353,7 @@
             <h2 class="lp-h2">Two brothers who gig.</h2>
             <div class="lp-us">
               <div class="lp-av">G&amp;I</div>
-              <p>We're <b>Glen and Isaac Irvin</b>. We play live shows. Somebody in that room wants to hear a song, and would happily buy you a drink for playing it, and until now they had no way to tell you. That is the whole thing we built. Something not working? Just let us know and we'll fix it. And if it earns you a good night, <a href="https://getliveque.com" class="lp-sharelink" onclick="shareLiveQue(this); return false;">tell your friends and family about LiveQue</a>.</p>
+              <p>We're <b>Glen and Isaac Irvin</b>. We play live shows. Somebody in that room wants to hear a song and would happily buy you a drink for playing it &mdash; but most people will tap their phone long before they'll walk up to a stranger mid-set. Now they can, and it's a little fun for both of you. That is the whole thing we built. Got a suggestion, a question, or something not working? <a href="mailto:getliveque@gmail.com" style="color:#4ecdc4;">Email us</a> &mdash; we're real people, and we're here. And if it earns you a good night, <a href="https://getliveque.com" class="lp-sharelink" onclick="shareLiveQue(this); return false;">tell your friends and family about LiveQue</a>.</p>
             </div>
             <div class="lp-endcta">
               <button class="lp-btn" onclick="goToLogin('up')">Create your free account</button>
@@ -363,7 +363,7 @@
 
           <div class="lp-foot">
             <div><b style="color:rgba(255,255,255,.72);font-weight:600;">LiveQue</b> &middot; Los Angeles, California</div>
-            <div>Questions, problems, or a refund: <a href="mailto:getliveque@gmail.com">getliveque@gmail.com</a></div>
+            <div>Questions or problems: <a href="mailto:getliveque@gmail.com">getliveque@gmail.com</a></div>
             <div>
               <a href="/terms.html#refunds">Refunds</a><span class="sep">&middot;</span><a href="/terms.html">Terms</a><span class="sep">&middot;</span><a href="/privacy.html">Privacy</a><span class="sep">&middot;</span><a href="/help.html">Help</a><span class="sep">&middot;</span><a href="/changelog.html">Changelog</a>
             </div>
@@ -541,7 +541,7 @@
             </div>
             <div class="payment-section"><div class="section-title">Payment Settings</div><div style="margin-bottom: 12px; font-size: 12px; opacity: 0.6; text-align: center;">Requests are free right now. These are how your crowd tips you.</div><div id="paymentMethodsDisplay"></div><div style="text-align: center;"><button class="auth-btn" onclick="openPaymentSettings()">Configure Payment Methods</button></div></div>
             <div class="payment-section"><div class="section-title">Social Media</div><div id="socialMediaDisplay"></div><div style="text-align: center;"><button class="auth-btn" onclick="openSocialSettings()">Update Social Profiles</button></div></div>
-            <div class="payment-section"><div class="section-title">Tip Options</div><div style="margin-bottom: 12px; font-size: 12px; opacity: 0.7; text-align: center;">Set the tip amounts that appear when fans request songs</div><div class="tip-settings-grid" id="tipSettingsGrid"></div><div style="text-align: center;"><button class="auth-btn" onclick="saveTipSettings()" style="background: linear-gradient(45deg, #ffd700, #ffa500);">Save Tip Settings</button></div><div style="margin-top: 12px; text-align: center;"><button class="control-btn" onclick="resetTipSettings()">Reset to Default (0, 2, 5, 10)</button></div></div>
+            <div class="payment-section"><div class="section-title">🍺 Buy-a-Drink Mode</div><div style="margin-bottom: 12px; font-size: 12px; opacity: 0.7; text-align: center;">Frame tips as buying the band a drink — you set what a drink costs at your gigs. On by default.</div><label style="display:flex; align-items:center; justify-content:space-between; gap:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:12px 14px; margin-bottom:12px; cursor:pointer;"><span style="font-weight:600;">Show tips as &ldquo;buy a drink&rdquo;</span><input type="checkbox" id="drinkModeToggle" onchange="onDrinkModeToggle()" style="width:20px; height:20px; accent-color:#ffd700; flex:none;"></label><div id="drinkPriceRow" style="text-align:center;"><label for="drinkPriceInput" style="display:block; margin-bottom:6px; font-weight:bold;">A drink at my gigs costs</label><div style="font-size:22px; font-weight:800;">$<input type="number" id="drinkPriceInput" min="1" max="99" value="8" style="width:80px; text-align:center; font-size:22px; font-weight:800; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:10px; color:#fff; padding:6px;" aria-label="Price of one drink in dollars"></div><div style="font-size:11px; opacity:0.65; margin-top:8px; line-height:1.55;">Fans see <b>🍺 Buy the band a drink · $<span id="drinkPrevOne">8</span></b><br>and <b>🍻 Buy a round · $<span id="drinkPrevTwo">16</span></b>.</div></div><div style="text-align: center; margin-top:14px;"><button class="auth-btn" onclick="saveDrinkSettings()" style="background: linear-gradient(45deg, #ffd700, #ffa500);">Save Drink Settings</button></div></div><div class="payment-section"><div class="section-title">Tip Options</div><div style="margin-bottom: 12px; font-size: 12px; opacity: 0.7; text-align: center;">Used only when Buy-a-Drink mode is off. Sets the tip amounts fans see.</div><div class="tip-settings-grid" id="tipSettingsGrid"></div><div style="text-align: center;"><button class="auth-btn" onclick="saveTipSettings()" style="background: linear-gradient(45deg, #ffd700, #ffa500);">Save Tip Settings</button></div><div style="margin-top: 12px; text-align: center;"><button class="control-btn" onclick="resetTipSettings()">Reset to Default (0, 2, 5, 10)</button></div></div>
             <div class="payment-section">
                 <div class="section-title">Song Library</div>
 
@@ -713,6 +713,8 @@ let dailyTipsCount = 0;
 let lastResetDate = new Date().toDateString();
 let showingAllSongs = false;
 let tipAmounts = [0, 2, 5, 10];
+let drinkMode = true;
+let drinkPrice = 8;
 let artistSettings = null;
 let realtimeChannel = null;
 let broadcastChannel = null;
@@ -1207,7 +1209,7 @@ async function loadFromSupabase() {
     const playedResult = await db.from('played_songs').select('*').eq('artist_id', ARTIST_ID);
     if (playedResult.data && !playedResult.error) { playedSongs = {}; playedResult.data.forEach(function(p) { const songKey = p.song_title + '-' + p.song_artist; playedSongs[songKey] = new Date(p.played_at).getTime(); }); }
     const settingsResult = await db.from('artist_settings').select('*').eq('artist_id', ARTIST_ID).single();
-    if (settingsResult.data && !settingsResult.error) { artistSettings = settingsResult.data; paymentMethods = settingsResult.data.payment_methods || {}; socialMediaHandles = settingsResult.data.social_handles || {}; tipAmounts = settingsResult.data.tip_amounts || [0, 2, 5, 10]; currentGigSessionId = settingsResult.data.current_gig_session_id || null; updateSessionBadge(); } loadPerformerReviews(); loadGigHistory();
+    if (settingsResult.data && !settingsResult.error) { artistSettings = settingsResult.data; paymentMethods = settingsResult.data.payment_methods || {}; socialMediaHandles = settingsResult.data.social_handles || {}; tipAmounts = settingsResult.data.tip_amounts || [0, 2, 5, 10]; drinkMode = settingsResult.data.drink_mode !== false; drinkPrice = (typeof settingsResult.data.drink_price === 'number' && settingsResult.data.drink_price > 0) ? settingsResult.data.drink_price : 8; currentGigSessionId = settingsResult.data.current_gig_session_id || null; updateSessionBadge(); renderDrinkSettings(); } loadPerformerReviews(); loadGigHistory();
     const songsResult = await db.from('songs').select('*').eq('artist_id', ARTIST_ID).order('title', { ascending: true });
     if (songsResult.data && !songsResult.error && songsResult.data.length > 0) { songLibrary = songsResult.data.map(function(s) { return { id: s.id, title: s.title, artist: s.artist_name, spanish: s.spanish || false }; }); }
 }
@@ -1261,6 +1263,10 @@ async function startNewGig() { const confirmMessage = 'START NEW GIG?\n\nThis wi
 function renderTipSettings() { const grid = document.getElementById('tipSettingsGrid'); if (!grid) return; grid.innerHTML = ''; for (let i = 0; i < 4; i++) { const container = document.createElement('div'); const label = i === 0 ? 'Free Request' : 'Option ' + (i + 1); if (i === 0) { container.innerHTML = '<div class="tip-label">' + label + '</div><input type="number" class="tip-amount-input" id="tipAmount' + i + '" value="0" min="0" max="0" disabled style="opacity: 0.6; cursor: not-allowed;" placeholder="$" aria-label="Free request, fixed at zero">'; } else { container.innerHTML = '<div class="tip-label">' + label + '</div><input type="number" class="tip-amount-input" id="tipAmount' + i + '" value="' + tipAmounts[i] + '" min="0" max="999" placeholder="$" aria-label="' + label + ' tip amount in dollars">'; } grid.appendChild(container); } }
 async function saveTipSettings() { const newAmounts = []; for (let i = 0; i < 4; i++) { const input = document.getElementById('tipAmount' + i); if (input) { newAmounts.push(Math.max(0, Math.min(999, parseInt(input.value) || 0))); } } newAmounts.sort(function(a, b) { return a - b; }); tipAmounts = newAmounts; const result = await db.from('artist_settings').upsert({ artist_id: ARTIST_ID, payment_methods: paymentMethods, social_handles: socialMediaHandles, tip_amounts: tipAmounts, current_gig_session_id: currentGigSessionId, updated_at: new Date().toISOString() }); if (!result.error) { renderTipSettings(); showToast('Tip options updated: ' + tipAmounts.join(', ')); } else { showToast('Error saving tip settings', 'error'); } }
 async function resetTipSettings() { if (confirm('Reset tip amounts to default ($0, $2, $5, $10)?')) { tipAmounts = [0, 2, 5, 10]; const result = await db.from('artist_settings').upsert({ artist_id: ARTIST_ID, payment_methods: paymentMethods, social_handles: socialMediaHandles, tip_amounts: tipAmounts, current_gig_session_id: currentGigSessionId, updated_at: new Date().toISOString() }); if (!result.error) { renderTipSettings(); showToast('Tip amounts reset to default!'); } else { showToast('Error resetting tip settings', 'error'); } } }
+function renderDrinkSettings(){ var t=document.getElementById('drinkModeToggle'); if(t) t.checked=(drinkMode!==false); var p=document.getElementById('drinkPriceInput'); if(p){ p.value=drinkPrice||8; if(!p._wired){ p._wired=true; p.addEventListener('input', updateDrinkPreview); } } var row=document.getElementById('drinkPriceRow'); if(row) row.style.opacity=(drinkMode!==false)?'1':'0.4'; updateDrinkPreview(); }
+function updateDrinkPreview(){ var p=document.getElementById('drinkPriceInput'); var v=Math.max(1,Math.min(99,parseInt(p&&p.value)||8)); var one=document.getElementById('drinkPrevOne'); var two=document.getElementById('drinkPrevTwo'); if(one) one.textContent=v; if(two) two.textContent=v*2; }
+function onDrinkModeToggle(){ var t=document.getElementById('drinkModeToggle'); var row=document.getElementById('drinkPriceRow'); if(row) row.style.opacity=(t&&t.checked)?'1':'0.4'; }
+async function saveDrinkSettings(){ var t=document.getElementById('drinkModeToggle'); var p=document.getElementById('drinkPriceInput'); drinkMode=!!(t&&t.checked); drinkPrice=Math.max(1,Math.min(99,parseInt(p&&p.value)||8)); var result = await db.from('artist_settings').upsert({ artist_id: ARTIST_ID, payment_methods: paymentMethods, social_handles: socialMediaHandles, tip_amounts: tipAmounts, drink_mode: drinkMode, drink_price: drinkPrice, current_gig_session_id: currentGigSessionId, updated_at: new Date().toISOString() }); if (!result.error) { updateDrinkPreview(); showToast(drinkMode ? ('Saved — a drink is $'+drinkPrice) : 'Saved — drink mode off (classic tips)'); } else { showToast('Error saving drink settings', 'error'); } }
 
 function switchTab(index) { const tabs = document.querySelectorAll('.tab'); const contents = document.querySelectorAll('.tab-content'); tabs.forEach(function(tab) { tab.classList.remove('active'); }); contents.forEach(function(content) { content.classList.remove('active'); }); const tabNames = ['dashboardTab', 'livequeueTab', 'qrcodeTab']; tabs[index].classList.add('active'); document.getElementById(tabNames[index]).classList.add('active'); if (index < 2) { localStorage.setItem('liveque-active-tab', index); } if (index === 1) { renderQuickAdd(); } if (index === 2) { initQRCode(); } }
 function shuffleQuickAdd() { renderQuickAdd(); showToast('Songs shuffled'); }
