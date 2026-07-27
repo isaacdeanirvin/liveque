@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1a1a2e">
-    <title>Request a song — LiveQue</title>
+    <title>Request a song · LiveQue</title>
     <meta name="description" content="Request a song and tip the performer straight from your phone. No app to install.">
 
     <link rel="icon" href="/assets/favicon.ico" sizes="any">
@@ -1369,8 +1369,8 @@ function resolvePendingTip(timedOut){
     const amt=pendingTip.amount;
     pendingTip=null;
     showToast(drinkMode
-        ? (timedOut ? '🍺 Cheers! $'+amt+' received — your song will appear shortly!'
-                    : '🍺 Cheers! $'+amt+' sent — your song is in the queue!')
+        ? (timedOut ? '🍺 Cheers! $'+amt+' received, your song will appear shortly!'
+                    : '🍺 Cheers! $'+amt+' sent, your song is in the queue!')
         : (timedOut ? '✓ $'+amt+' tip received. Your request will appear shortly!'
                     : '✓ $'+amt+' tip sent. Your request is in the queue!'));
     launchTipConfetti(amt);
