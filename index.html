@@ -172,7 +172,9 @@
         .login-logo .lq-logo { height: 32px; vertical-align: -5px; }
         .lp-hero { padding: 52px 0 40px; text-align: center; }
         .lp-said { color: rgba(255,255,255,.5); font-size: 12px; letter-spacing: .2em; text-transform: uppercase; font-weight: 600; margin-bottom: 16px; }
-        .lp-h1 { font-size: clamp(1.7rem,7vw,3rem); line-height: 1.14; font-weight: 700; letter-spacing: -.02em; margin-bottom: 18px; color: #fff; }
+        .lp-h1 { font-size: clamp(1.7rem,7vw,3rem); line-height: 1.14; font-weight: 700; letter-spacing: -.02em; margin-bottom: 18px; color: #fff; min-height: 2.28em; }
+        .lp-said, .lp-h1 { transition: opacity .5s ease; }
+        .hero-fade { opacity: 0; }
         .lp-sub { font-size: clamp(1rem,2.3vw,1.1rem); color: rgba(255,255,255,.78); max-width: 520px; margin: 0 auto 14px; line-height: 1.6; }
         .lp-story { font-size: 14px; color: rgba(255,255,255,.5); max-width: 470px; margin: 0 auto 30px; line-height: 1.6; }
         .lp-cap { font-size: 12.5px; color: rgba(255,255,255,.45); margin: -18px auto 28px; max-width: 330px; line-height: 1.5; }
@@ -317,8 +319,8 @@
           </div>
 
           <div class="lp-hero">
-            <div class="lp-said">What you hear all night</div>
-            <h1 class="lp-h1">&ldquo;Sorry, I don't<br>have cash.&rdquo;</h1>
+            <div class="lp-said" id="heroKick">What you hear all night</div>
+            <h1 class="lp-h1" id="heroH1">&ldquo;Sorry, I don't<br>have cash.&rdquo;</h1>
             <p class="lp-sub">Your crowd requests songs and tips you from their phone. It lands in your bank, and we take 0% of it.</p>
             <p class="lp-story" style="margin-bottom:14px;"><b style="color:rgba(255,255,255,.72);">We never sell or share your information.</b> It's only ever used to run LiveQue. Nothing else.</p>
             <p class="lp-story">Four hours, packed room, eleven dollars in the tip jar. That was our Saturday nights, until we built this.</p>
@@ -1774,5 +1776,28 @@ async function downloadQRPDF() {
     } catch(error) { showToast('Failed to generate PDF', 'error'); }
 }
     </script>
+<script>
+/* Hero cycle: the heckle, then the answer. The brand line is the second beat.
+   prefers-reduced-motion leaves the page static on slide one. */
+(function(){
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var kick = document.getElementById('heroKick'), h1 = document.getElementById('heroH1');
+  if (!kick || !h1) return;
+  var slides = [
+    { k: 'What you hear all night', h: '\u201CSorry, I don\u2019t<br>have cash.\u201D' },
+    { k: 'What you say back', h: 'The request line<br>is open.' }
+  ];
+  var i = 0;
+  setInterval(function(){
+    kick.classList.add('hero-fade'); h1.classList.add('hero-fade');
+    setTimeout(function(){
+      i = (i + 1) % slides.length;
+      kick.textContent = slides[i].k;
+      h1.innerHTML = slides[i].h;
+      kick.classList.remove('hero-fade'); h1.classList.remove('hero-fade');
+    }, 500);
+  }, 6000);
+})();
+</script>
 </body>
 </html>
