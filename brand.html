@@ -20,22 +20,19 @@ body{background:#0B0F12;color:#E8EDF0;font-family:system-ui,-apple-system,sans-s
              center, staggered so the signal never stops                    */
 .dotg{transform-box:fill-box;transform-origin:center;
       animation: rise .9s cubic-bezier(.2,.8,.25,1.08) .3s both,
-                 beat 2s ease-in-out 1.9s infinite}
+                 beat 2s ease-in-out 1.6s infinite}
 @keyframes rise{from{transform:translateY(52px)}to{transform:translateY(0)}}
 @keyframes beat{0%,100%{transform:scale(1)}4%{transform:scale(1.14)}12%{transform:scale(1)}}
-/* triple-ring transmitter: rings hold at their resting opacity, then
-   boop-boop-boop - each ring flashes bright in sequence, inner to outer,
-   once per 2s cycle. Rings appear only after the reveal (1.5s). */
+/* radar transmitter: rings are dark between pulses. Each cycle the ping
+   travels outward - ring 1 flashes and fades off, then 2, then 3 - and
+   everything sits at zero until the next pulse. */
 .em{opacity:0}
-.e1{animation:appear1 .3s ease-out 1.5s both, boop1 2s ease-out 1.9s infinite}
-.e2{animation:appear2 .3s ease-out 1.65s both, boop2 2s ease-out 1.9s infinite}
-.e3{animation:appear3 .3s ease-out 1.8s both, boop3 2s ease-out 1.9s infinite}
-@keyframes appear1{from{opacity:0}to{opacity:.6}}
-@keyframes appear2{from{opacity:0}to{opacity:.35}}
-@keyframes appear3{from{opacity:0}to{opacity:.18}}
-@keyframes boop1{0%{opacity:.6}5%{opacity:1}22%{opacity:.6}100%{opacity:.6}}
-@keyframes boop2{0%,7%{opacity:.35}12%{opacity:1}29%{opacity:.35}100%{opacity:.35}}
-@keyframes boop3{0%,14%{opacity:.18}19%{opacity:1}36%{opacity:.18}100%{opacity:.18}}
+.e1{animation:boop1 2s ease-out 1.6s infinite}
+.e2{animation:boop2 2s ease-out 1.6s infinite}
+.e3{animation:boop3 2s ease-out 1.6s infinite}
+@keyframes boop1{0%{opacity:0}5%{opacity:1}32%{opacity:0}100%{opacity:0}}
+@keyframes boop2{0%,7%{opacity:0}13%{opacity:1}40%{opacity:0}100%{opacity:0}}
+@keyframes boop3{0%,15%{opacity:0}21%{opacity:1}48%{opacity:0}100%{opacity:0}}
 @media (prefers-reduced-motion:reduce){
   .dotg,.em{animation:none}
   .e1{opacity:.6}.e2{opacity:.35}.e3{opacity:.18}
