@@ -4,239 +4,64 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>LiveQue - Brand</title>
+<title>LiveQue - Logo lab</title>
 <link rel="icon" href="/assets/favicon.ico" sizes="any">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0B0F12;color:#E8EDF0;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;padding:40px 20px 80px}
-.wrap{max-width:920px;margin:0 auto}
-h1{font-size:26px;font-weight:700;letter-spacing:-.4px}
-.sub{color:#8A949C;font-size:14px;margin:6px 0 34px}
-h2{font-size:15px;font-weight:700;color:#17B7AE;text-transform:uppercase;letter-spacing:.12em;margin:44px 0 16px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-.cell{background:#11161C;border-radius:14px;padding:18px}
-.cell-art{height:110px;display:flex;align-items:center;justify-content:center}
-.cell-art svg{max-width:100%;max-height:100%}
-.cell-lbl{font-size:12.5px;color:#8A949C;margin-top:10px;text-align:center}
-.dl{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
-.dl a{display:inline-block;background:#11161C;border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#E8EDF0;text-decoration:none;font-size:13px;font-weight:600;padding:11px 16px}
-.dl a:hover{border-color:#17B7AE;color:#4ECDC4}
+body{background:#0B0F12;color:#E8EDF0;font-family:system-ui,-apple-system,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 18px;gap:34px}
+.tag{color:#8A949C;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+.hero{width:min(680px,92vw);height:auto;overflow:visible}
 
-  @font-face {
-    font-family: 'ManropeXB';
-    src: url('/brand/onair/Manrope-ExtraBold.ttf') format('truetype');
-    font-weight: 800;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:#0B0F12; color:#E8EDF0; font-family:system-ui; padding:36px 24px 60px; }
-  h1 { font-size:15px; font-weight:600; color:#8A949C; margin-bottom:6px; letter-spacing:.12em; text-transform:uppercase; }
-  p.sub { font-size:13px; color:#8A949C; margin-bottom:30px; }
-  .card { background:#11161C; border-radius:16px; padding:34px 38px 24px; margin-bottom:20px; max-width:760px; }
-  .tag { font-size:11px; font-weight:700; color:#17B7AE; letter-spacing:.1em; margin-bottom:4px; }
-  .note { font-size:12px; color:#8A949C; margin-top:14px; line-height:1.5; }
-  .wm { font-family:'ManropeXB'; font-size:76px; letter-spacing:-1.5px; color:#E8EDF0; position:relative; display:inline-block; line-height:1.15; }
-  /* inline-block so each anchor is a deterministic containing block */
-  .wm .i, .wm .q { position:relative; display:inline-block; }
-
-  /* shared beacon pieces */
-  .dot, .halo, .born, .arc { position:absolute; pointer-events:none; }
-  .dot { background:#4ECDC4; border-radius:50%; }
-  .halo { border:2.5px solid #4ECDC4; border-radius:50%; opacity:.35; }
-  .born { border:2px solid #4ECDC4; border-radius:50%; opacity:0; }
-
-  /* A · TITTLE — dot only; ring exists only as motion */
-  .vA .dot  { width:13px; height:13px; left:50%; top:2px; transform:translateX(-50%); animation:beat 2.4s ease-in-out infinite; }
-  .vA .born { width:13px; height:13px; left:50%; top:2px; transform:translateX(-50%); animation:sonar 2.4s cubic-bezier(.22,.61,.36,1) infinite; }
-
-  /* B · HALO — dot + hairline halo that breathes */
-  .vB .dot  { width:11px; height:11px; left:50%; top:3px; transform:translateX(-50%); animation:beat 2.4s ease-in-out infinite; }
-  .vB .halo { width:23px; height:23px; left:50%; top:-3px; transform:translateX(-50%); animation:breathe 2.4s ease-in-out infinite; }
-
-  /* C · SIGNAL — dot + two transmitter arcs lighting in sequence */
-  .vC .dot { width:11px; height:11px; left:50%; top:3px; transform:translateX(-50%); }
-  .vC .arc { width:22px; height:22px; left:calc(50% - 4px); top:-8px;
-             border:2.5px solid #4ECDC4; border-radius:50%;
-             border-color:#4ECDC4 transparent transparent transparent;
-             transform:rotate(38deg); opacity:.25; animation:sig 2.4s ease-in-out infinite; }
-  .vC .arc.a2 { width:34px; height:34px; left:calc(50% - 10px); top:-14px; animation-delay:.18s; }
-
-  /* D · Q-BEACON — normal wordmark, the dot lives in the Q counter */
-  .vD .dot { width:13px; height:13px; left:calc(44% - 6.5px); top:40px; animation:beatplain 2.4s ease-in-out infinite; }
-  .vD .born { width:13px; height:13px; left:calc(44% - 6.5px); top:40px; animation:sonarplain 2.4s cubic-bezier(.22,.61,.36,1) infinite; }
-
-  /* F · TWIN SIGNAL — lowered dot, wifi fans both sides (half-circle emission) */
-  .vF .dot { width:11px; height:11px; left:50%; top:8px; transform:translateX(-50%); }
-  .vF .arc { border:2.5px solid #4ECDC4; border-radius:50%;
-             border-color:#4ECDC4 transparent transparent transparent;
-             opacity:.25; animation:sig 2.4s ease-in-out infinite; }
-  .vF .arc.r1 { width:22px; height:22px; left:calc(50% - 1px); top:-2px; transform:rotate(32deg); }
-  .vF .arc.r2 { width:34px; height:34px; left:calc(50% - 6px); top:-8px; transform:rotate(32deg); animation-delay:.18s; }
-  .vF .arc.l1 { width:22px; height:22px; left:calc(50% - 21px); top:-2px; transform:rotate(-32deg); }
-  .vF .arc.l2 { width:34px; height:34px; left:calc(50% - 28px); top:-8px; transform:rotate(-32deg); animation-delay:.18s; }
-
-  /* E · PING — tittle dot + one born ring, tighter, faster decay (radar blip) */
-  .vE .dot  { width:10px; height:10px; left:50%; top:4px; transform:translateX(-50%); animation:beat 3.2s ease-in-out infinite; }
-  .vE .born { width:10px; height:10px; left:50%; top:4px; transform:translateX(-50%); animation:blip 3.2s cubic-bezier(.3,.7,.4,1) infinite; }
-
-  @keyframes beat {
-    0%, 100% { transform:translateX(-50%) scale(1); }
-    8%       { transform:translateX(-50%) scale(1.18); }
-    16%      { transform:translateX(-50%) scale(1); }
-  }
-  @keyframes sonar {
-    0%   { transform:translateX(-50%) scale(1);   opacity:.55; }
-    60%  { transform:translateX(-50%) scale(3.1); opacity:0; }
-    100% { transform:translateX(-50%) scale(3.1); opacity:0; }
-  }
-  @keyframes blip {
-    0%   { transform:translateX(-50%) scale(1);   opacity:.5; }
-    38%  { transform:translateX(-50%) scale(2.4); opacity:0; }
-    100% { transform:translateX(-50%) scale(2.4); opacity:0; }
-  }
-  @keyframes breathe {
-    0%, 100% { transform:translateX(-50%) scale(1);   opacity:.35; }
-    50%      { transform:translateX(-50%) scale(1.22); opacity:.14; }
-  }
-  @keyframes sig {
-    0%, 100% { opacity:.18; }
-    12%      { opacity:.85; }
-    40%      { opacity:.18; }
-  }
-  @keyframes beatplain {
-    0%,100% { transform:scale(1); } 8% { transform:scale(1.18); } 16% { transform:scale(1); }
-  }
-  @keyframes sonarplain {
-    0%   { transform:scale(1);   opacity:.55; }
-    60%  { transform:scale(3.1); opacity:0; }
-    100% { transform:scale(3.1); opacity:0; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .dot, .halo, .born, .arc { animation:none !important; }
-    .born { display:none; }
-  }
-
-body .card{max-width:920px}
+/* SEQUENCE:
+   0.0-0.3s  nothing - dot sits hidden behind the i stem (drawn under the text)
+   0.3-1.2s  the rise: dot slides up from behind the letters, small overshoot,
+             lands in the real tittle position
+   1.5s+     the transmitter: dot beats, three half-circle arcs emit from its
+             center, staggered so the signal never stops                    */
+.dotg{transform-box:fill-box;transform-origin:center;
+      animation: rise .9s cubic-bezier(.2,.8,.25,1.08) .3s both,
+                 beat 2.4s ease-in-out 1.5s infinite}
+@keyframes rise{from{transform:translateY(52px)}to{transform:translateY(0)}}
+@keyframes beat{0%,100%{transform:scale(1)}6%{transform:scale(1.12)}16%{transform:scale(1)}}
+.em{opacity:0;animation:emit 2.4s cubic-bezier(.16,1,.3,1) infinite}
+.e1{animation-delay:1.5s}.e2{animation-delay:2.3s}.e3{animation-delay:3.1s}
+@keyframes emit{0%{transform:scale(.3);opacity:.75}70%{transform:scale(1.15);opacity:0}100%{transform:scale(1.15);opacity:0}}
+@media (prefers-reduced-motion:reduce){
+  .dotg,.em{animation:none}
+  .e1{opacity:.6;transform:scale(.56)}.e2{opacity:.35;transform:scale(.83)}.e3{opacity:.18;transform:scale(1.1)}
+}
+.replay{background:#11161C;border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#E8EDF0;font-size:13px;font-weight:600;padding:10px 18px;cursor:pointer}
+.replay:hover{border-color:#17B7AE;color:#4ECDC4}
+.chip{background:#fff;border-radius:16px;padding:26px 34px;width:min(680px,92vw)}
+.chip svg{width:100%;height:auto}
+.note{color:#8A949C;font-size:13px;text-align:center;max-width:540px;line-height:1.6}
 </style>
 </head>
 <body>
-<div class="wrap">
-<h1>LiveQue brand</h1>
-<div class="sub">Internal page. The living variations below are animating; everything is downloadable at the bottom.</div>
-
-<h2>On-Air variations (chosen direction)</h2>
-<div class="card vA">
-    <div class="tag">A · TITTLE</div>
-    <span class="wm">L<span class="i">ı<span class="dot"></span><span class="born"></span></span>veQue</span>
-    <div class="note">Dot is exactly tittle-weight — no static ring at all. The ring exists <b>only in motion</b>: born from the dot, expands, fades. Cleanest at rest, most alive in motion.</div>
-  </div><div class="card vB">
-    <div class="tag">B · HALO</div>
-    <span class="wm">L<span class="i">ı<span class="dot"></span><span class="halo"></span></span>veQue</span>
-    <div class="note">Smaller dot + one hairline halo that breathes. Keeps the "on-air" ring at rest but at a third of the current visual weight.</div>
-  </div><div class="card vC">
-    <div class="tag">C · SIGNAL</div>
-    <span class="wm">L<span class="i">ı<span class="dot"></span><span class="arc"></span><span class="arc a2"></span></span>veQue</span>
-    <div class="note">Transmitter arcs radiating up-right instead of a full ring — lights in sequence like a broadcast feed. The most literal "satellite" read.</div>
-  </div><div class="card vD">
-    <div class="tag">D · Q-BEACON</div>
-    <span class="wm">Live<span class="q">Q<span class="dot"></span><span class="born"></span></span>ue</span>
-    <div class="note">The i keeps its normal tittle; the beacon moves into the <b>Q counter</b> — ties the live signal to the queue, and the Q alone becomes the app icon.</div>
-  </div><div class="card vF">
-    <div class="tag">F · TWIN SIGNAL</div>
-    <span class="wm">L<span class="i">ı<span class="dot"></span><span class="arc l1"></span><span class="arc l2"></span><span class="arc r1"></span><span class="arc r2"></span></span>veQue</span>
-    <div class="note">Dot lowered onto the stem; two wifi fans emitting left and right, a half-circle broadcast split into two signals. They light in sequence, inner then outer.</div>
-  </div><div class="card vE">
-    <div class="tag">E · PING</div>
-    <span class="wm">L<span class="i">ı<span class="dot"></span><span class="born"></span></span>veQue</span>
-    <div class="note">Smallest dot, slower 3.2s cycle, tight radar blip. The quietest option — barely-there until you notice it, then you can't unsee it.</div>
-  </div>
-
-<h2>The ten original concepts</h2>
-<div class="grid">
-<div class="cell"><div class="cell-art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-<circle cx="30" cy="30" r="18.5" fill="none" stroke="#E8EDF0" stroke-width="9"/>
-<line x1="38" y1="38" x2="52" y2="52" stroke="#E8EDF0" stroke-width="9" stroke-linecap="round"/>
-<circle cx="30" cy="30" r="5.5" fill="#4ECDC4"/>
-</svg></div><div class="cell-lbl">1 · On-Air Q (the coin)</div></div>
-<div class="cell"><div class="cell-art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-<rect x="6" y="22" width="30" height="8" rx="4" fill="#E8EDF0"/>
-<rect x="6" y="36" width="38" height="8" rx="4" fill="#E8EDF0"/>
-<rect x="6" y="50" width="22" height="8" rx="4" fill="#E8EDF0"/>
-<rect x="6" y="8" width="44" height="8" rx="4" fill="#4ECDC4"/>
-<circle cx="56" cy="12" r="4" fill="#4ECDC4"/>
-</svg></div><div class="cell-lbl">2 · Queue Jump</div></div>
-<div class="cell"><div class="cell-art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 503.2 175">
-<path transform="translate(16.00 120.00) scale(0.10000 -0.10000)" d="M589 0H40V670H190V135H589Z" fill="#E8EDF0"/>
-<path transform="translate(74.90 120.00) scale(0.10000 -0.10000)" d="M190 552H40V670H190ZM190 0H40V501H190Z" fill="#E8EDF0"/>
-<path transform="translate(95.80 120.00) scale(0.10000 -0.10000)" d="M413 0H228L0 501H167L317 146H327L478 501H642Z" fill="#E8EDF0"/>
-<path transform="translate(158.00 120.00) scale(0.10000 -0.10000)" d="M306 -10Q176 -10 100.5 55.5Q25 121 25 250Q25 369 101.5 440.0Q178 511 303.0 511.0Q428 511 502.0 447.5Q576 384 576 268Q576 254 572 220H164Q167 161 198.0 135.5Q229 110 301 110Q366 110 393.5 126.5Q421 143 421 176V186H571V175Q571 93 498.0 41.5Q425 -10 306 -10ZM166 299H432Q429 349 397.5 371.5Q366 394 300.0 394.0Q234 394 202.5 371.0Q171 348 166 299Z" fill="#E8EDF0"/>
-<path transform="translate(216.00 120.00) scale(0.10000 -0.10000)" d="M654 -141H459L355 -9Q202 0 113.5 92.5Q25 185 25 335Q25 492 122.0 586.0Q219 680 385 680Q554 680 651.5 586.5Q749 493 749 335Q749 213 689.5 127.5Q630 42 521 9ZM229.0 179.0Q274 134 385.0 134.0Q496 134 542.5 179.0Q589 224 589.0 335.0Q589 446 542.5 491.0Q496 536 385.0 536.0Q274 536 229.0 491.0Q184 446 184.0 335.0Q184 224 229.0 179.0Z" fill="#E8EDF0"/>
-<path transform="translate(291.40 120.00) scale(0.10000 -0.10000)" d="M247 -10Q145 -10 92.0 45.5Q39 101 39 189V501H189V239Q189 178 218.5 151.0Q248 124 318 124Q390 124 420.5 153.0Q451 182 451 247V501H601V0H461V153H453Q442 83 390.5 36.5Q339 -10 247 -10Z" fill="#E8EDF0"/>
-<path transform="translate(353.20 120.00) scale(0.10000 -0.10000)" d="M306 -10Q176 -10 100.5 55.5Q25 121 25 250Q25 369 101.5 440.0Q178 511 303.0 511.0Q428 511 502.0 447.5Q576 384 576 268Q576 254 572 220H164Q167 161 198.0 135.5Q229 110 301 110Q366 110 393.5 126.5Q421 143 421 176V186H571V175Q571 93 498.0 41.5Q425 -10 306 -10ZM166 299H432Q429 349 397.5 371.5Q366 394 300.0 394.0Q234 394 202.5 371.0Q171 348 166 299Z" fill="#E8EDF0"/>
-<rect x="189.888" y="137" width="283.312" height="12" rx="6" fill="#4ECDC4"/>
-<circle cx="471.2" cy="143" r="17" fill="#4ECDC4"/>
-</svg></div><div class="cell-lbl">3 · Cue Line</div></div>
-<div class="cell"><div class="cell-art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-<circle cx="50" cy="50" r="44" fill="none" stroke="#17B7AE" stroke-width="6" stroke-dasharray="3 3.4"/>
-<circle cx="50" cy="50" r="29" fill="none" stroke="#17B7AE" stroke-width="22"/>
-<line x1="72" y1="72" x2="86" y2="86" stroke="#17B7AE" stroke-width="13" stroke-linecap="round"/>
-<circle cx="50" cy="50" r="6" fill="#F5A524"/>
-</svg></div><div class="cell-lbl">4 · Crown Cap Q</div></div>
-<div class="cell"><div class="cell-art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-<path d="M7 50 L19 34 L28 44 L38 22 L47 34 L57 10" fill="none" stroke="#E8EDF0" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-<circle cx="57" cy="10" r="6" fill="#4ECDC4"/>
-</svg></div><div class="cell-lbl">5 · Live Rise</div></div>
-<div class="cell"><div class="cell-art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-<circle cx="26" cy="30" r="17" fill="none" stroke="#E8EDF0" stroke-width="8.5"/>
-<rect x="38" y="42" width="6" height="12" rx="3" fill="#E8EDF0"/>
-<rect x="47" y="34" width="6" height="20" rx="3" fill="#E8EDF0"/>
-<rect x="56" y="26" width="6" height="28" rx="3" fill="#E8EDF0"/>
-<circle cx="59" cy="21" r="4" fill="#4ECDC4"/>
-</svg></div><div class="cell-lbl">6 · Queue Riser Q</div></div>
-<div class="cell"><div class="cell-art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-<circle cx="30" cy="30" r="18" fill="none" stroke="#E8EDF0" stroke-width="5"/>
-<circle cx="30" cy="30" r="11" fill="none" stroke="#E8EDF0" stroke-width="3"/>
-<circle cx="30" cy="30" r="2.5" fill="#E8EDF0"/>
-<line x1="40" y1="40" x2="53" y2="53" stroke="#E8EDF0" stroke-width="5.5" stroke-linecap="round"/>
-<circle cx="54.5" cy="54.5" r="4.5" fill="#4ECDC4"/>
-</svg></div><div class="cell-lbl">7 · Needle Drop Q</div></div>
-<div class="cell"><div class="cell-art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 443.5 190">
-<path transform="translate(16.00 130.00) scale(0.05000 -0.05000)" d="M160 0V1440H432V254H1052V0Z" fill="#E8EDF0"/>
-<path transform="translate(68.10 130.00) scale(0.05000 -0.05000)" d="M160 0V1080H432V0Z" fill="#E8EDF0"/>
-<path transform="translate(95.70 130.00) scale(0.05000 -0.05000)" d="M432 0 40 1080H312L568 332L824 1080H1096L704 0Z" fill="#E8EDF0"/>
-<path transform="translate(150.50 130.00) scale(0.05000 -0.05000)" d="M642 -30Q476 -30 349.5 41.5Q223 113 151.5 238.5Q80 364 80 526Q80 703 150.0 834.0Q220 965 343.0 1037.5Q466 1110 626 1110Q796 1110 915.0 1030.0Q1034 950 1091.0 805.0Q1148 660 1131 464H862V564Q862 729 809.5 801.5Q757 874 638 874Q499 874 433.5 789.5Q368 705 368 540Q368 389 433.5 306.5Q499 224 626 224Q706 224 763.0 259.0Q820 294 850 360L1122 282Q1061 134 929.5 52.0Q798 -30 642 -30ZM284 464V666H1000V464Z" fill="#E8EDF0"/>
-<path transform="translate(209.30 130.00) scale(0.05000 -0.05000)" d="M1266 -30 846 388 1014 556 1432 138ZM758 -30Q542 -30 385.5 64.0Q229 158 144.5 327.0Q60 496 60 720Q60 944 144.5 1113.0Q229 1282 385.5 1376.0Q542 1470 758 1470Q974 1470 1130.5 1376.0Q1287 1282 1371.5 1113.0Q1456 944 1456 720Q1456 496 1371.5 327.0Q1287 158 1130.5 64.0Q974 -30 758 -30ZM758 226Q895 224 986.0 285.0Q1077 346 1122.5 458.0Q1168 570 1168 720Q1168 870 1122.5 980.0Q1077 1090 986.0 1151.0Q895 1212 758 1214Q621 1216 530.0 1155.0Q439 1094 393.5 982.0Q348 870 348 720Q348 570 393.5 460.0Q439 350 530.0 289.0Q621 228 758 226Z" fill="#E8EDF0"/>
-<path transform="translate(283.10 130.00) scale(0.05000 -0.05000)" d="M542 -32Q415 -32 335.0 11.0Q255 54 210.5 120.0Q166 186 147.0 257.5Q128 329 124.0 388.0Q120 447 120 474V1080H396V570Q396 533 400.0 475.5Q404 418 425.0 360.0Q446 302 493.5 263.0Q541 224 628 224Q663 224 703.0 235.0Q743 246 778.0 277.5Q813 309 835.5 370.5Q858 432 858 532L1014 458Q1014 330 962.0 218.0Q910 106 805.5 37.0Q701 -32 542 -32ZM892 0V358H858V1080H1132V0Z" fill="#E8EDF0"/>
-<path transform="translate(344.70 130.00) scale(0.05000 -0.05000)" d="M642 -30Q476 -30 349.5 41.5Q223 113 151.5 238.5Q80 364 80 526Q80 703 150.0 834.0Q220 965 343.0 1037.5Q466 1110 626 1110Q796 1110 915.0 1030.0Q1034 950 1091.0 805.0Q1148 660 1131 464H862V564Q862 729 809.5 801.5Q757 874 638 874Q499 874 433.5 789.5Q368 705 368 540Q368 389 433.5 306.5Q499 224 626 224Q706 224 763.0 259.0Q820 294 850 360L1122 282Q1061 134 929.5 52.0Q798 -30 642 -30ZM284 464V666H1000V464Z" fill="#E8EDF0"/>
-<circle cx="82.9" cy="32" r="12" fill="#4ECDC4"/>
-<circle cx="82.9" cy="32" r="20" fill="none" stroke="#4ECDC4" stroke-width="4" opacity="0.45"/>
-</svg></div><div class="cell-lbl">8 · On-Air (chosen direction)</div></div>
-<div class="cell"><div class="cell-art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 481.8 235">
-<path transform="translate(16.00 200.00) scale(0.10000 -0.10000)" d="M605 0H30V670H218V169H605Z" fill="#E8EDF0"/>
-<path transform="translate(77.50 185.00) scale(0.10000 -0.10000)" d="M218 550H30V670H218ZM218 0H30V504H218Z" fill="#E8EDF0"/>
-<path transform="translate(101.30 170.00) scale(0.10000 -0.10000)" d="M451 0H219L-5 504H205L331 183H344L471 504H677Z" fill="#E8EDF0"/>
-<path transform="translate(167.50 155.00) scale(0.10000 -0.10000)" d="M311 -10Q175 -10 97.5 53.0Q20 116 20 252Q20 373 99.5 443.5Q179 514 307 514Q440 514 516.0 449.5Q592 385 592 265Q592 244 589 217H194Q196 172 219.5 155.5Q243 139 304 139Q359 139 379.5 149.0Q400 159 400 182V193H588V181Q588 96 512.5 43.0Q437 -10 311 -10ZM303 370Q251 370 227.0 357.0Q203 344 197 312H410Q405 344 380.5 357.0Q356 370 303 370Z" fill="#E8EDF0"/>
-<path transform="translate(227.70 140.00) scale(0.10000 -0.10000)" d="M702 -141H455L346 -8Q193 4 106.5 96.0Q20 188 20 335Q20 493 119.0 586.5Q218 680 391 680Q568 680 667.0 587.0Q766 494 766 335Q766 218 712.0 136.0Q658 54 556 17ZM391 170Q494 170 530.0 203.0Q566 236 566.0 335.0Q566 434 530.0 467.0Q494 500 391 500Q289 500 254.5 467.0Q220 434 220.0 335.0Q220 236 254.5 203.0Q289 170 391 170Z" fill="#E8EDF0"/>
-<path transform="translate(305.30 125.00) scale(0.10000 -0.10000)" d="M237 -10Q135 -10 82.5 42.5Q30 95 30 181V504H218V250Q218 197 242.5 177.5Q267 158 331.0 158.0Q395 158 417.0 176.0Q439 194 439 244V504H627V0H451V153H441Q432 82 382.5 36.0Q333 -10 237 -10Z" fill="#E8EDF0"/>
-<path transform="translate(369.60 110.00) scale(0.10000 -0.10000)" d="M311 -10Q175 -10 97.5 53.0Q20 116 20 252Q20 373 99.5 443.5Q179 514 307 514Q440 514 516.0 449.5Q592 385 592 265Q592 244 589 217H194Q196 172 219.5 155.5Q243 139 304 139Q359 139 379.5 149.0Q400 159 400 182V193H588V181Q588 96 512.5 43.0Q437 -10 311 -10ZM303 370Q251 370 227.0 357.0Q203 344 197 312H410Q405 344 380.5 357.0Q356 370 303 370Z" fill="#E8EDF0"/>
-<circle cx="455.8" cy="32" r="15" fill="#4ECDC4"/>
-</svg></div><div class="cell-lbl">9 · Queue Climb</div></div>
-<div class="cell"><div class="cell-art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-<rect x="9" y="9" width="82" height="82" rx="16" fill="none" stroke="#17B7AE" stroke-width="4"/>
-<rect x="15.5" y="15.5" width="69" height="69" rx="11" fill="none" stroke="#17B7AE" stroke-width="1.6"/>
-<circle cx="50" cy="50" r="21" fill="none" stroke="#17B7AE" stroke-width="7"/>
-<line x1="58" y1="58" x2="75" y2="75" stroke="#17B7AE" stroke-width="7" stroke-linecap="round"/>
-<circle cx="50" cy="50" r="5" fill="#F5A524"/>
-</svg></div><div class="cell-lbl">10 · Coaster Seal</div></div>
-
-</div>
-
-<h2>Downloads</h2>
-<div class="dl">
-<a href="/brand/LiveQue_Logo_Deck.pdf">10-concept deck (PDF)</a>
-<a href="/brand/onair/LiveQue_OnAir_Deck.pdf">On-Air deck (PDF)</a>
-<a href="/brand/LiveQue_Logos_SVG.zip">All 10 logos (SVG zip)</a>
-<a href="/brand/onair/LiveQue_OnAir_SVG.zip">On-Air variations (SVG zip)</a>
-</div>
-</div>
+<div class="tag">LiveQue logo lab &middot; G &middot; Emit</div>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 10 433.5 132" class="hero" role="img" aria-label="LiveQue">
+<g class="dotg"><path transform="translate(68.10 130.00) scale(0.05000 -0.05000)" d="M160 1230V1470H432V1230Z" fill="#4ECDC4"/></g>
+<g fill="#E8EDF0"><path transform="translate(16.00 130.00) scale(0.05000 -0.05000)" d="M160 0V1440H432V254H1052V0Z"/><path transform="translate(68.10 130.00) scale(0.05000 -0.05000)" d="M160 0V1080H432V0Z"/><path transform="translate(95.70 130.00) scale(0.05000 -0.05000)" d="M432 0 40 1080H312L568 332L824 1080H1096L704 0Z"/><path transform="translate(150.50 130.00) scale(0.05000 -0.05000)" d="M642 -30Q476 -30 349.5 41.5Q223 113 151.5 238.5Q80 364 80 526Q80 703 150.0 834.0Q220 965 343.0 1037.5Q466 1110 626 1110Q796 1110 915.0 1030.0Q1034 950 1091.0 805.0Q1148 660 1131 464H862V564Q862 729 809.5 801.5Q757 874 638 874Q499 874 433.5 789.5Q368 705 368 540Q368 389 433.5 306.5Q499 224 626 224Q706 224 763.0 259.0Q820 294 850 360L1122 282Q1061 134 929.5 52.0Q798 -30 642 -30ZM284 464V666H1000V464Z"/><path transform="translate(209.30 130.00) scale(0.05000 -0.05000)" d="M1266 -30 846 388 1014 556 1432 138ZM758 -30Q542 -30 385.5 64.0Q229 158 144.5 327.0Q60 496 60 720Q60 944 144.5 1113.0Q229 1282 385.5 1376.0Q542 1470 758 1470Q974 1470 1130.5 1376.0Q1287 1282 1371.5 1113.0Q1456 944 1456 720Q1456 496 1371.5 327.0Q1287 158 1130.5 64.0Q974 -30 758 -30ZM758 226Q895 224 986.0 285.0Q1077 346 1122.5 458.0Q1168 570 1168 720Q1168 870 1122.5 980.0Q1077 1090 986.0 1151.0Q895 1212 758 1214Q621 1216 530.0 1155.0Q439 1094 393.5 982.0Q348 870 348 720Q348 570 393.5 460.0Q439 350 530.0 289.0Q621 228 758 226Z"/><path transform="translate(283.10 130.00) scale(0.05000 -0.05000)" d="M542 -32Q415 -32 335.0 11.0Q255 54 210.5 120.0Q166 186 147.0 257.5Q128 329 124.0 388.0Q120 447 120 474V1080H396V570Q396 533 400.0 475.5Q404 418 425.0 360.0Q446 302 493.5 263.0Q541 224 628 224Q663 224 703.0 235.0Q743 246 778.0 277.5Q813 309 835.5 370.5Q858 432 858 532L1014 458Q1014 330 962.0 218.0Q910 106 805.5 37.0Q701 -32 542 -32ZM892 0V358H858V1080H1132V0Z"/><path transform="translate(344.70 130.00) scale(0.05000 -0.05000)" d="M642 -30Q476 -30 349.5 41.5Q223 113 151.5 238.5Q80 364 80 526Q80 703 150.0 834.0Q220 965 343.0 1037.5Q466 1110 626 1110Q796 1110 915.0 1030.0Q1034 950 1091.0 805.0Q1148 660 1131 464H862V564Q862 729 809.5 801.5Q757 874 638 874Q499 874 433.5 789.5Q368 705 368 540Q368 389 433.5 306.5Q499 224 626 224Q706 224 763.0 259.0Q820 294 850 360L1122 282Q1061 134 929.5 52.0Q798 -30 642 -30ZM284 464V666H1000V464Z"/></g>
+<g transform="translate(82.90 62.50)" stroke="#4ECDC4" stroke-width="2.4" fill="none" stroke-linecap="round">
+  <path class="em e1" d="M -24 0 A 24 24 0 0 1 24 0"/>
+  <path class="em e2" d="M -24 0 A 24 24 0 0 1 24 0"/>
+  <path class="em e3" d="M -24 0 A 24 24 0 0 1 24 0"/>
+</g>
+</svg>
+<button class="replay" onclick="var h=document.querySelector('.hero'),c=h.cloneNode(true);h.replaceWith(c)">Replay the reveal</button>
+<div class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 433.5 168">
+<path transform="translate(16.00 130.00) scale(0.05000 -0.05000)" d="M160 0V1440H432V254H1052V0Z" fill="#0B0F12"/>
+<path transform="translate(68.10 130.00) scale(0.05000 -0.05000)" d="M160 0V1080H432V0Z" fill="#0B0F12"/>
+<path transform="translate(95.70 130.00) scale(0.05000 -0.05000)" d="M432 0 40 1080H312L568 332L824 1080H1096L704 0Z" fill="#0B0F12"/>
+<path transform="translate(150.50 130.00) scale(0.05000 -0.05000)" d="M642 -30Q476 -30 349.5 41.5Q223 113 151.5 238.5Q80 364 80 526Q80 703 150.0 834.0Q220 965 343.0 1037.5Q466 1110 626 1110Q796 1110 915.0 1030.0Q1034 950 1091.0 805.0Q1148 660 1131 464H862V564Q862 729 809.5 801.5Q757 874 638 874Q499 874 433.5 789.5Q368 705 368 540Q368 389 433.5 306.5Q499 224 626 224Q706 224 763.0 259.0Q820 294 850 360L1122 282Q1061 134 929.5 52.0Q798 -30 642 -30ZM284 464V666H1000V464Z" fill="#0B0F12"/>
+<path transform="translate(209.30 130.00) scale(0.05000 -0.05000)" d="M1266 -30 846 388 1014 556 1432 138ZM758 -30Q542 -30 385.5 64.0Q229 158 144.5 327.0Q60 496 60 720Q60 944 144.5 1113.0Q229 1282 385.5 1376.0Q542 1470 758 1470Q974 1470 1130.5 1376.0Q1287 1282 1371.5 1113.0Q1456 944 1456 720Q1456 496 1371.5 327.0Q1287 158 1130.5 64.0Q974 -30 758 -30ZM758 226Q895 224 986.0 285.0Q1077 346 1122.5 458.0Q1168 570 1168 720Q1168 870 1122.5 980.0Q1077 1090 986.0 1151.0Q895 1212 758 1214Q621 1216 530.0 1155.0Q439 1094 393.5 982.0Q348 870 348 720Q348 570 393.5 460.0Q439 350 530.0 289.0Q621 228 758 226Z" fill="#0B0F12"/>
+<path transform="translate(283.10 130.00) scale(0.05000 -0.05000)" d="M542 -32Q415 -32 335.0 11.0Q255 54 210.5 120.0Q166 186 147.0 257.5Q128 329 124.0 388.0Q120 447 120 474V1080H396V570Q396 533 400.0 475.5Q404 418 425.0 360.0Q446 302 493.5 263.0Q541 224 628 224Q663 224 703.0 235.0Q743 246 778.0 277.5Q813 309 835.5 370.5Q858 432 858 532L1014 458Q1014 330 962.0 218.0Q910 106 805.5 37.0Q701 -32 542 -32ZM892 0V358H858V1080H1132V0Z" fill="#0B0F12"/>
+<path transform="translate(344.70 130.00) scale(0.05000 -0.05000)" d="M642 -30Q476 -30 349.5 41.5Q223 113 151.5 238.5Q80 364 80 526Q80 703 150.0 834.0Q220 965 343.0 1037.5Q466 1110 626 1110Q796 1110 915.0 1030.0Q1034 950 1091.0 805.0Q1148 660 1131 464H862V564Q862 729 809.5 801.5Q757 874 638 874Q499 874 433.5 789.5Q368 705 368 540Q368 389 433.5 306.5Q499 224 626 224Q706 224 763.0 259.0Q820 294 850 360L1122 282Q1061 134 929.5 52.0Q798 -30 642 -30ZM284 464V666H1000V464Z" fill="#0B0F12"/>
+<path transform="translate(68.10 130.00) scale(0.05000 -0.05000)" d="M160 1230V1470H432V1230Z" fill="#0E7A72"/>
+<path d="M69.4 62.5 L69.5155 60.7379 L69.86 59.0059 L70.4276 57.3338 L71.2087 55.75 L72.1897 54.2817 L73.3541 52.9541 L74.6817 51.7897 L76.15 50.8087 L77.7338 50.0276 L79.4059 49.46 L81.1379 49.1155 L82.9 49 L84.6621 49.1155 L86.3941 49.46 L88.0662 50.0276 L89.65 50.8087 L91.1183 51.7897 L92.4459 52.9541 L93.6103 54.2817 L94.5913 55.75 L95.3724 57.3338 L95.94 59.0059 L96.2845 60.7379 L96.4 62.5" fill="none" stroke="#0E7A72" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M62.9 62.5 L63.0258 60.2607 L63.4014 58.0496 L64.0223 55.8944 L64.8806 53.8223 L65.9655 51.8594 L67.2634 50.0302 L68.7579 48.3579 L70.4302 46.8634 L72.2594 45.5655 L74.2223 44.4806 L76.2944 43.6223 L78.4496 43.0014 L80.6607 42.6258 L82.9 42.5 L85.1393 42.6258 L87.3504 43.0014 L89.5056 43.6223 L91.5777 44.4806 L93.5406 45.5655 L95.3698 46.8634 L97.0421 48.3579 L98.5366 50.0302 L99.8345 51.8594 L100.919 53.8223 L101.778 55.8944 L102.399 58.0496 L102.774 60.2607 L102.9 62.5" fill="none" stroke="#0E7A72" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M56.4 62.5 L56.5276 59.9025 L56.9092 57.3301 L57.5411 54.8075 L58.4172 52.3589 L59.5291 50.008 L60.8661 47.7774 L62.4152 45.6886 L64.1617 43.7617 L66.0886 42.0152 L68.1774 40.4661 L70.408 39.1291 L72.7589 38.0172 L75.2075 37.1411 L77.7301 36.5092 L80.3025 36.1276 L82.9 36 L85.4975 36.1276 L88.0699 36.5092 L90.5925 37.1411 L93.0411 38.0172 L95.392 39.1291 L97.6226 40.4661 L99.7114 42.0152 L101.638 43.7617 L103.385 45.6886 L104.934 47.7774 L106.271 50.008 L107.383 52.3589 L108.259 54.8075 L108.891 57.3301 L109.272 59.9025 L109.4 62.5" fill="none" stroke="#0E7A72" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg></div>
+<div class="note">The dot is Manrope's actual i-dot - the font's own tittle, in teal. It starts hidden behind the letters, rises above the i, then transmits: half-circle radio arcs emitting from its center. Bottom: the static mark for print.</div>
 </body>
 </html>
