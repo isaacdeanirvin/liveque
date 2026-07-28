@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LiveQue · On-Air variations, live</title>
+<style>
+  @font-face {
+    font-family: 'ManropeXB';
+    src: url('/fonts/Manrope-ExtraBold.ttf') format('truetype');
+    font-weight: 800;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#0B0F12; color:#E8EDF0; font-family:system-ui; padding:36px 24px 60px; }
+  h1 { font-size:15px; font-weight:600; color:#8A949C; margin-bottom:6px; letter-spacing:.12em; text-transform:uppercase; }
+  p.sub { font-size:13px; color:#8A949C; margin-bottom:30px; }
+  .card { background:#11161C; border-radius:16px; padding:34px 38px 24px; margin-bottom:20px; max-width:760px; }
+  .tag { font-size:11px; font-weight:700; color:#17B7AE; letter-spacing:.1em; margin-bottom:4px; }
+  .note { font-size:12px; color:#8A949C; margin-top:14px; line-height:1.5; }
+  .wm { font-family:'ManropeXB'; font-size:76px; letter-spacing:-1.5px; color:#E8EDF0; position:relative; display:inline-block; line-height:1.15; }
+  /* inline-block so each anchor is a deterministic containing block */
+  .wm .i, .wm .q { position:relative; display:inline-block; }
+
+  /* shared beacon pieces */
+  .dot, .halo, .born, .arc { position:absolute; pointer-events:none; }
+  .dot { background:#4ECDC4; border-radius:50%; }
+  .halo { border:2.5px solid #4ECDC4; border-radius:50%; opacity:.35; }
+  .born { border:2px solid #4ECDC4; border-radius:50%; opacity:0; }
+
+  /* A · TITTLE — dot only; ring exists only as motion */
+  .vA .dot  { width:13px; height:13px; left:50%; top:2px; transform:translateX(-50%); animation:beat 2.4s ease-in-out infinite; }
+  .vA .born { width:13px; height:13px; left:50%; top:2px; transform:translateX(-50%); animation:sonar 2.4s cubic-bezier(.22,.61,.36,1) infinite; }
+
+  /* B · HALO — dot + hairline halo that breathes */
+  .vB .dot  { width:11px; height:11px; left:50%; top:3px; transform:translateX(-50%); animation:beat 2.4s ease-in-out infinite; }
+  .vB .halo { width:23px; height:23px; left:50%; top:-3px; transform:translateX(-50%); animation:breathe 2.4s ease-in-out infinite; }
+
+  /* C · SIGNAL — dot + two transmitter arcs lighting in sequence */
+  .vC .dot { width:11px; height:11px; left:50%; top:3px; transform:translateX(-50%); }
+  .vC .arc { width:22px; height:22px; left:calc(50% - 4px); top:-8px;
+             border:2.5px solid #4ECDC4; border-radius:50%;
+             border-color:#4ECDC4 transparent transparent transparent;
+             transform:rotate(38deg); opacity:.25; animation:sig 2.4s ease-in-out infinite; }
+  .vC .arc.a2 { width:34px; height:34px; left:calc(50% - 10px); top:-14px; animation-delay:.18s; }
+
+  /* D · Q-BEACON — normal wordmark, the dot lives in the Q counter */
+  .vD .dot { width:13px; height:13px; left:calc(44% - 6.5px); top:40px; animation:beatplain 2.4s ease-in-out infinite; }
+  .vD .born { width:13px; height:13px; left:calc(44% - 6.5px); top:40px; animation:sonarplain 2.4s cubic-bezier(.22,.61,.36,1) infinite; }
+
+  /* E · PING — tittle dot + one born ring, tighter, faster decay (radar blip) */
+  .vE .dot  { width:10px; height:10px; left:50%; top:4px; transform:translateX(-50%); animation:beat 3.2s ease-in-out infinite; }
+  .vE .born { width:10px; height:10px; left:50%; top:4px; transform:translateX(-50%); animation:blip 3.2s cubic-bezier(.3,.7,.4,1) infinite; }
+
+  @keyframes beat {
+    0%, 100% { transform:translateX(-50%) scale(1); }
+    8%       { transform:translateX(-50%) scale(1.18); }
+    16%      { transform:translateX(-50%) scale(1); }
+  }
+  @keyframes sonar {
+    0%   { transform:translateX(-50%) scale(1);   opacity:.55; }
+    60%  { transform:translateX(-50%) scale(3.1); opacity:0; }
+    100% { transform:translateX(-50%) scale(3.1); opacity:0; }
+  }
+  @keyframes blip {
+    0%   { transform:translateX(-50%) scale(1);   opacity:.5; }
+    38%  { transform:translateX(-50%) scale(2.4); opacity:0; }
+    100% { transform:translateX(-50%) scale(2.4); opacity:0; }
+  }
+  @keyframes breathe {
+    0%, 100% { transform:translateX(-50%) scale(1);   opacity:.35; }
+    50%      { transform:translateX(-50%) scale(1.22); opacity:.14; }
+  }
+  @keyframes sig {
+    0%, 100% { opacity:.18; }
+    12%      { opacity:.85; }
+    40%      { opacity:.18; }
+  }
+  @keyframes beatplain {
+    0%,100% { transform:scale(1); } 8% { transform:scale(1.18); } 16% { transform:scale(1); }
+  }
+  @keyframes sonarplain {
+    0%   { transform:scale(1);   opacity:.55; }
+    60%  { transform:scale(3.1); opacity:0; }
+    100% { transform:scale(3.1); opacity:0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dot, .halo, .born, .arc { animation:none !important; }
+    .born { display:none; }
+  }
+</style>
+</head>
+<body>
+  <h1>LiveQue · On-Air</h1>
+  <p class="sub">Five slimmer takes on the live beacon — all pulsing at a 2.4s heartbeat. This page is the animation spec.</p>
+
+  <div class="card vA">
+    <div class="tag">A · TITTLE</div>
+    <span class="wm">L<span class="i">ı<span class="dot"></span><span class="born"></span></span>veQue</span>
+    <div class="note">Dot is exactly tittle-weight — no static ring at all. The ring exists <b>only in motion</b>: born from the dot, expands, fades. Cleanest at rest, most alive in motion.</div>
+  </div>
+
+  <div class="card vB">
+    <div class="tag">B · HALO</div>
+    <span class="wm">L<span class="i">ı<span class="dot"></span><span class="halo"></span></span>veQue</span>
+    <div class="note">Smaller dot + one hairline halo that breathes. Keeps the "on-air" ring at rest but at a third of the current visual weight.</div>
+  </div>
+
+  <div class="card vC">
+    <div class="tag">C · SIGNAL</div>
+    <span class="wm">L<span class="i">ı<span class="dot"></span><span class="arc"></span><span class="arc a2"></span></span>veQue</span>
+    <div class="note">Transmitter arcs radiating up-right instead of a full ring — lights in sequence like a broadcast feed. The most literal "satellite" read.</div>
+  </div>
+
+  <div class="card vD">
+    <div class="tag">D · Q-BEACON</div>
+    <span class="wm">Live<span class="q">Q<span class="dot"></span><span class="born"></span></span>ue</span>
+    <div class="note">The i keeps its normal tittle; the beacon moves into the <b>Q counter</b> — ties the live signal to the queue, and the Q alone becomes the app icon.</div>
+  </div>
+
+  <div class="card vE">
+    <div class="tag">E · PING</div>
+    <span class="wm">L<span class="i">ı<span class="dot"></span><span class="born"></span></span>veQue</span>
+    <div class="note">Smallest dot, slower 3.2s cycle, tight radar blip. The quietest option — barely-there until you notice it, then you can't unsee it.</div>
+  </div>
+
+  <p class="sub" style="margin-top:26px">All variants: teal #4ECDC4 on ink · gold takes over the dot only when a tip lands · <code>prefers-reduced-motion</code> freezes to a static dot.</p>
+</body>
+</html>
