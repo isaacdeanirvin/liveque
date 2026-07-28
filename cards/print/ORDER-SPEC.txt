@@ -21,7 +21,10 @@
 ***************************************************************************
 
 LIVEQUE BUSINESS CARDS - PRINT ORDER SPEC
-Generated 20 July 2026
+Generated 20 July 2026. Rebuilt 28 July 2026 with the FINAL G-Emit logo
+(white wordmark, teal dot + radar arcs, outlined TM) on both faces:
+small top-right on the front, sign-off lockup with getliveque.com on the
+back. QR re-verified after the rebuild, at full size and at 400px.
 
 ===========================================================================
 WHAT TO UPLOAD

@@ -16,7 +16,7 @@ sized above the 0.8 in floor in the print spec with a full 4-module quiet zone.
 """
 import os
 import segno
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFont
 
 DPI = 600
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -98,6 +98,19 @@ def new_card():
     img = Image.new("RGB", (BLEED_W, BLEED_H), BG)
     return img, ImageDraw.Draw(img)
 
+def logo(width_px):
+    """The FINAL G-Emit logo (white body, teal dot + radar arcs, outlined ™).
+
+    logo-dark.png is rendered from the vector source (scratchpad marks_onair.py G)
+    on the exact card ground #080808 at ~3500px, so a plain RGB paste is seamless
+    and the LANCZOS downscale to card size stays crisp. Cropped to ink bounds so
+    width_px is the true visible width.
+    """
+    im = Image.open(os.path.join(HERE, "logo-dark.png")).convert("RGB")
+    im = im.crop(ImageChops.difference(im, Image.new("RGB", im.size, BG)).getbbox())
+    h = max(1, int(round(width_px * im.size[1] / im.size[0])))
+    return im.resize((int(width_px), h), Image.LANCZOS)
+
 def front(p):
     img, d = new_card()
     f_kick = font("Inter-SemiBold.ttf", inch(0.097))
@@ -108,6 +121,10 @@ def front(p):
 
     y = SAFE + inch(0.02)
     tracked(d, (SAFE, y), "WHAT YOU HEAR ALL NIGHT", f_kick, (120, 120, 120), track=inch(0.019))
+
+    # brand mark, top-right, optically balancing the kicker line
+    lg = logo(inch(0.82))
+    img.paste(lg, (BLEED_W - SAFE - lg.size[0], y - inch(0.01)))
     y += inch(0.155)
 
     for line in ["“Sorry, I don’t", "have cash.”"]:
@@ -139,7 +156,6 @@ def back():
     f_kick = font("Inter-SemiBold.ttf", inch(0.097))
     f_hook = font("Inter-Bold.ttf", inch(0.170))
     f_body = font("Inter-Regular.ttf", inch(0.115))
-    f_site = font("Inter-Bold.ttf", inch(0.132))
 
     # QR: above the 0.8in floor in the spec, with a true 4-module quiet zone
     code_px = inch(0.86)
@@ -148,7 +164,9 @@ def back():
     panel = qr.size[0] + quiet * 2
     px = BLEED_W - SAFE - panel
     py = BLEED_H - SAFE - panel
-    d.rectangle([px, py, px + panel, py + panel], fill=(255, 255, 255))
+    # PIL rectangles are inclusive of the end pixel: [px, px+panel] paints
+    # panel+1 columns, poking 1px over the safe boundary. -1 keeps it exact.
+    d.rectangle([px, py, px + panel - 1, py + panel - 1], fill=(255, 255, 255))
     img.paste(qr, (px + quiet, py + quiet))
 
     col_w = px - SAFE - inch(0.16)
@@ -168,7 +186,15 @@ def back():
         d.text((SAFE, y), line, font=f_body, fill=(178, 178, 178))
         y += inch(0.152)
 
-    d.text((SAFE, BLEED_H - SAFE - inch(0.155)), "getliveque.com", font=f_site, fill=TEAL)
+    # sign-off lockup: logo bottom-left, URL beside it on the wordmark baseline.
+    # Side-by-side (not stacked) because the 4-line body leaves ~0.55in down
+    # here; stacking pushed the arcs into the body's descenders.
+    lg = logo(inch(1.15))
+    lg_y = BLEED_H - SAFE - inch(0.02) - lg.size[1]
+    img.paste(lg, (SAFE, lg_y))
+    d.text((SAFE + lg.size[0] + inch(0.14), lg_y + lg.size[1] - inch(0.005)),
+           "getliveque.com", font=font("Inter-Regular.ttf", inch(0.095)),
+           fill=(150, 150, 150), anchor="ls")
     return img
 
 def with_guides(img):
