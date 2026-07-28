@@ -12,14 +12,14 @@ body{background:#0B0F12;color:#E8EDF0;font-family:system-ui,-apple-system,sans-s
 .tag{color:#8A949C;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
 .hero{width:min(680px,92vw);height:auto;overflow:visible}
 .dotg{transform-box:fill-box;transform-origin:center;
-      animation: rise .9s cubic-bezier(.2,.8,.25,1.08) .3s both,
-                 beat 1.7s ease-in-out 1.2s infinite}
+      animation: rise .55s cubic-bezier(.2,.8,.25,1.08) .15s both,
+                 beat 1.4s ease-in-out .7s infinite}
 @keyframes rise{from{transform:translateY(52px)}to{transform:translateY(0)}}
 @keyframes beat{0%,100%{transform:scale(1)}4%{transform:scale(1.14)}12%{transform:scale(1)}}
 .em{opacity:0}
-.e1{animation:boop1 1.7s ease-in-out 1.2s infinite}
-.e2{animation:boop2 1.7s ease-in-out 1.2s infinite}
-.e3{animation:boop3 1.7s ease-in-out 1.2s infinite}
+.e1{animation:boop1 1.4s ease-in-out .7s infinite}
+.e2{animation:boop2 1.4s ease-in-out .7s infinite}
+.e3{animation:boop3 1.4s ease-in-out .7s infinite}
 @keyframes boop1{0%{opacity:0}12%{opacity:0.95}58%{opacity:0}100%{opacity:0}}
 @keyframes boop2{0%,7%{opacity:0}21%{opacity:0.95}68%{opacity:0}100%{opacity:0}}
 @keyframes boop3{0%,15%{opacity:0}31%{opacity:0.9}78%{opacity:0}100%{opacity:0}}
