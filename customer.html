@@ -1409,6 +1409,32 @@ var SKIN_FX={
 function applySkin(k){
   currentSkin=(SKIN_FX[k])?k:'default';
   document.body.setAttribute('data-skin',currentSkin);
+  buildSkinDecor();
+}
+// The MySpace layer: the skin's motif tiled as wallpaper plus big tilted
+// stamps scattered around the page edges - the Hello-Kitty-page energy,
+// with our own glyphs. Lives at z-index -1: above the wall color, behind
+// every card and every money element. Static DOM, zero animation cost.
+function buildSkinDecor(){
+  var old=document.getElementById('skinDecor'); if(old) old.remove();
+  var fx=SKIN_FX[currentSkin];
+  if(!fx||currentSkin==='default') return;
+  var g=fx.glyphs;
+  var layer=document.createElement('div'); layer.id='skinDecor';
+  layer.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:-1;overflow:hidden;';
+  var tile='<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150">'
+    +'<text x="16" y="46" font-size="32" opacity="0.12" transform="rotate(-14 32 40)">'+g[0]+'</text>'
+    +'<text x="92" y="118" font-size="25" opacity="0.09" transform="rotate(12 102 110)">'+(g[1]||g[0])+'</text>'
+    +'</svg>';
+  layer.style.backgroundImage='url("data:image/svg+xml;utf8,'+encodeURIComponent(tile)+'")';
+  var spots=[[3,5,-16,68],[76,2,12,84],[84,26,-8,58],[1,40,10,76],[78,60,-14,92],[4,76,8,64],[68,87,-10,74],[36,93,14,56],[88,46,16,50]];
+  for(var i=0;i<spots.length;i++){
+    var s=spots[i]; var el=document.createElement('div');
+    el.textContent=g[i%g.length];
+    el.style.cssText='position:absolute;left:'+s[0]+'%;top:'+s[1]+'%;font-size:'+s[3]+'px;opacity:0.16;transform:rotate('+s[2]+'deg);line-height:1;';
+    layer.appendChild(el);
+  }
+  document.body.appendChild(layer);
 }
 // ?skin= applies immediately, even before (or without) the artist resolving,
 // so the skin lineup is demoable on any URL. ?fxtest=25 fires the matching
