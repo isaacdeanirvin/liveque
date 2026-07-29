@@ -1391,21 +1391,57 @@ function shareThisArtist(btn){
 // hearts, country throws hats. The gold amount flourish never changes -
 // money keeps its color on every skin.
 var currentSkin='default';
-var SKIN_FX={
-  'default':   { glyphs:['♪','♫','♬','♩','♭'],       colors:['#ffd700','#4ecdc4','#ff4b9b','#635bff','#ffffff','#ffb300'] },
-  'bubblegum': { glyphs:['💖','💗','✨','🫧','💋'],   colors:['#FF7BC1','#FF3D9A','#FFFFFF','#FFD6EC','#ffd700'] },
-  'greenroom': { glyphs:['⚡','💚','✳️','🍏'],        colors:['#8ACE00','#557F00','#F4FFE1','#ffffff'] },
-  'basement':  { glyphs:['🖤','⛓️','🦇','💔','🧷'],   colors:['#D42B4C','#F2EFEA','#8C8794','#000000'] },
-  'afterparty':{ glyphs:['📸','🪩','🍸','✨'],        colors:['#E8404F','#F2EAE2','#B9AFB6','#ffffff'] },
-  'mudseason': { glyphs:['🍂','🌲','🪕','🔥'],        colors:['#B3552F','#F3EAD3','#7A8C6E','#ffd700'] },
-  'loser':     { glyphs:['📼','⚡','🧷','🎸'],        colors:['#B3311B','#E9E5DB','#6E675C','#C9B98F'] },
-  'sunset':    { glyphs:['🎸','⚡','🔥','💜','🤘'],   colors:['#FF3D8A','#7B3FF2','#C9CFDA','#ffffff'] },
-  'blackout':  { glyphs:['🦴','⚔️','💀','🤘','🗡️'],  colors:['#C1121F','#E8E4E1','#8a0d16','#000000'] },
-  'marquee':   { glyphs:['🤠','🥃','🐎','⭐'],        colors:['#B5432A','#F0E5C9','#33587A','#ffd700'] },
-  'gatefold':  { glyphs:['🌙','⭐','🔮','✨'],        colors:['#A08BD0','#55688C','#EEF1F6','#ffd700'] },
-  'velvet':    { glyphs:['🥂','🎺','💜','✨'],        colors:['#D9A0B4','#F4E7D0','#56243F','#ffd700'] },
-  'canyon':    { glyphs:['☀️','🪶','🌻','🌿'],        colors:['#B05A38','#EDE3D0','#77764A','#ffd700'] }
+// Vector glyph library: real drawn silhouettes (band-merch ink, not emoji),
+// 100x100 viewBox, single-fill paths. Used tinted for wall stamps AND as
+// Path2D celebration particles, so a skin's iconography is one system.
+var VEC={
+  note:    'M60 8 L88 16 V30 L66 24 V72 A16 16 0 1 1 60 59 Z',
+  heart:   'M50 86 C20 62 8 44 8 29 A17 17 0 0 1 50 21 A17 17 0 0 1 92 29 C92 44 80 62 50 86 Z',
+  sparkle: 'M50 2 L59 41 L98 50 L59 59 L50 98 L41 59 L2 50 L41 41 Z',
+  bubble:  'M50 4 a46 46 0 1 0 0.01 0 Z M50 16 a34 34 0 1 1 -0.01 0 Z M36 26 a12 12 0 1 0 0.01 0 Z',
+  bone:    'M30 40 H70 V60 H30 Z M20 22 a11 11 0 1 0 0.01 0 Z M20 56 a11 11 0 1 0 0.01 0 Z M80 22 a11 11 0 1 0 0.01 0 Z M80 56 a11 11 0 1 0 0.01 0 Z',
+  sword:   'M50 0 L59 12 L58 60 H42 L41 12 Z M26 60 H74 V70 H58 L56 84 H44 L42 70 H26 Z M44 84 H56 L58 92 A9 9 0 1 1 42 92 Z',
+  skull:   'M50 4 A34 34 0 0 0 16 38 C16 52 24 60 32 64 L32 82 A6 6 0 0 0 44 82 L44 70 H56 L56 82 A6 6 0 0 0 68 82 L68 64 C76 60 84 52 84 38 A34 34 0 0 0 50 4 Z M36 34 a9 9 0 1 0 0.01 0 Z M64 34 a9 9 0 1 0 0.01 0 Z M50 46 L56 58 H44 Z',
+  bolt:    'M56 2 L18 56 H42 L36 98 L82 38 L54 38 Z',
+  star:    'M50 2 L61 36 H97 L68 57 L79 92 L50 71 L21 92 L32 57 L3 36 H39 Z',
+  pick:    'M50 6 C74 6 88 20 88 38 C88 62 66 84 50 94 C34 84 12 62 12 38 C12 20 26 6 50 6 Z',
+  vinyl:   'M50 2 a48 48 0 1 0 0.01 0 Z M50 30 a20 20 0 1 1 -0.01 0 Z M50 44 a6 6 0 1 0 0.01 0 Z',
+  disc45:  'M50 2 a48 48 0 1 0 0.01 0 Z M50 34 a16 16 0 1 1 -0.01 0 Z',
+  cassette:'M8 22 H92 A6 6 0 0 1 98 28 V72 A6 6 0 0 1 92 78 H8 A6 6 0 0 1 2 72 V28 A6 6 0 0 1 8 22 Z M28 40 a11 11 0 1 1 -0.01 0 Z M72 40 a11 11 0 1 1 -0.01 0 Z M36 64 H64 V72 H36 Z',
+  boot:    'M28 6 H60 V44 C60 52 66 56 74 59 L88 64 C95 67 95 78 87 80 H40 C32 80 28 74 28 66 Z M28 80 H52 V90 H28 Z',
+  shoe:    'M22 8 A24 24 0 0 0 8 30 V52 A24 24 0 0 0 22 74 H36 A24 24 0 0 0 50 52 V30 A24 24 0 0 0 36 8 H32 V20 H36 A12 12 0 0 1 40 30 V52 A12 12 0 0 1 30 62 A12 12 0 0 1 18 52 V30 A12 12 0 0 1 26 20 Z',
+  bulb:    'M50 22 a22 22 0 1 0 0.01 0 Z M46 66 H54 V78 H46 Z M50 0 L53 12 H47 Z M50 88 L47 100 H53 Z M14 44 L2 47 V41 Z M98 47 L86 44 V50 Z',
+  leaf:    'M50 2 C80 24 86 58 50 98 C14 58 20 24 50 2 Z M47 30 H53 V86 H47 Z',
+  feather: 'M50 2 C72 28 74 66 52 96 L48 96 C26 66 28 28 50 2 Z M48 20 H52 V96 H48 Z',
+  plane:   'M2 54 L98 6 L64 94 L48 62 Z M48 62 L98 6 L44 54 Z',
+  prism:   'M50 8 L94 88 H6 Z M50 26 L80 80 H20 Z',
+  shard:   'M50 2 L78 50 L50 98 L22 50 Z',
+  laser:   'M12 42 H88 A8 8 0 0 1 88 58 H12 A8 8 0 0 1 12 42 Z',
+  scrap:   'M14 20 L46 10 L58 22 L88 16 L80 44 L92 60 L64 68 L58 92 L34 78 L12 84 L22 56 L8 40 Z',
+  aster:   'M46 4 H54 V96 H46 Z M8 27 L12 20 L92 66 L88 73 Z M88 27 L92 34 L12 80 L8 73 Z',
+  smoke:   'M42 98 C18 80 58 66 40 48 C24 32 58 24 46 4 L58 8 C66 26 38 36 54 52 C72 70 34 78 56 92 Z',
+  drop:    'M50 4 C62 34 82 50 82 68 A32 32 0 1 1 18 68 C18 50 38 34 50 4 Z',
+  horseshoe:'M50 4 A40 40 0 0 0 10 44 V88 H28 V44 A22 22 0 0 1 72 44 V88 H90 V44 A40 40 0 0 0 50 4 Z',
+  moon:    'M62 2 A48 48 0 1 0 62 98 A38 38 0 1 1 62 2 Z',
+  lips:    'M8 48 C20 30 38 32 50 42 C62 32 80 30 92 48 C78 68 62 76 50 70 C38 76 22 68 8 48 Z M14 50 C30 58 70 58 86 50 C70 54 30 54 14 50 Z'
 };
+var SKIN_FX={
+  'default':   { vec:['note','sparkle','note'],        colors:['#ffd700','#4ecdc4','#ff4b9b','#635bff','#ffffff'] },
+  'bubblegum': { vec:['heart','sparkle','bubble','lips'], colors:['#FF7BC1','#FF3D9A','#FFFFFF','#FFD6EC'] },
+  'greenroom': { vec:['bolt','shard','laser'],         colors:['#8ACE00','#B7FF2E','#F4FFE1'] },
+  'basement':  { vec:['heart','drop','aster'],         colors:['#D42B4C','#F2EFEA','#8C8794'] },
+  'afterparty':{ vec:['cassette','shard','bulb'],      colors:['#E8404F','#F2EAE2','#B9AFB6'] },
+  'mudseason': { vec:['leaf','feather','drop'],        colors:['#B3552F','#F3EAD3','#7A8C6E'] },
+  'loser':     { vec:['scrap','aster','note'],         colors:['#B3311B','#E9E5DB','#6E675C'] },
+  'sunset':    { vec:['bolt','star','pick'],           colors:['#FF3D8A','#7B3FF2','#C9CFDA'] },
+  'blackout':  { vec:['bone','sword','skull'],         colors:['#C1121F','#E8E4E1','#6e0a11'] },
+  'marquee':   { vec:['boot','bulb','horseshoe'],      colors:['#B5432A','#F0E5C9','#33587A'] },
+  'gatefold':  { vec:['vinyl','prism','moon'],         colors:['#A08BD0','#55688C','#EEF1F6'] },
+  'velvet':    { vec:['disc45','smoke','heart'],       colors:['#D9A0B4','#F4E7D0','#56243F'] },
+  'canyon':    { vec:['plane','feather','sparkle'],    colors:['#B05A38','#EDE3D0','#77764A'] }
+};
+var VEC_PATHS={};
+function vecPath(name){ if(!VEC_PATHS[name]&&window.Path2D&&VEC[name]){ VEC_PATHS[name]=new Path2D(VEC[name]); } return VEC_PATHS[name]||null; }
 function applySkin(k){
   currentSkin=(SKIN_FX[k])?k:'default';
   document.body.setAttribute('data-skin',currentSkin);
@@ -1415,23 +1451,30 @@ function applySkin(k){
 // stamps scattered around the page edges - the Hello-Kitty-page energy,
 // with our own glyphs. Lives at z-index -1: above the wall color, behind
 // every card and every money element. Static DOM, zero animation cost.
+function stampSVG(name,color,size,opacity,rot){
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="'+size+'" height="'+size+'"'
+    +' style="opacity:'+opacity+';transform:rotate('+rot+'deg);display:block;">'
+    +'<path d="'+VEC[name]+'" fill="'+color+'" fill-rule="evenodd"/></svg>';
+}
 function buildSkinDecor(){
   var old=document.getElementById('skinDecor'); if(old) old.remove();
   var fx=SKIN_FX[currentSkin];
   if(!fx||currentSkin==='default') return;
-  var g=fx.glyphs;
+  var v=fx.vec, c=fx.colors;
   var layer=document.createElement('div'); layer.id='skinDecor';
   layer.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:-1;overflow:hidden;';
+  // tiled wallpaper: two small silhouettes per 150px tile, printed like merch
   var tile='<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150">'
-    +'<text x="16" y="46" font-size="32" opacity="0.12" transform="rotate(-14 32 40)">'+g[0]+'</text>'
-    +'<text x="92" y="118" font-size="25" opacity="0.09" transform="rotate(12 102 110)">'+(g[1]||g[0])+'</text>'
+    +'<g transform="translate(14,12) rotate(-14 18 18) scale(0.36)"><path d="'+VEC[v[0]]+'" fill="'+c[0]+'" fill-rule="evenodd" opacity="0.13"/></g>'
+    +'<g transform="translate(88,86) rotate(12 14 14) scale(0.28)"><path d="'+VEC[v[1]||v[0]]+'" fill="'+c[0]+'" fill-rule="evenodd" opacity="0.09"/></g>'
     +'</svg>';
   layer.style.backgroundImage='url("data:image/svg+xml;utf8,'+encodeURIComponent(tile)+'")';
-  var spots=[[3,5,-16,68],[76,2,12,84],[84,26,-8,58],[1,40,10,76],[78,60,-14,92],[4,76,8,64],[68,87,-10,74],[36,93,14,56],[88,46,16,50]];
+  // big edge stamps, alternating glyphs and tints
+  var spots=[[3,5,-16,72],[76,2,12,88],[84,26,-8,60],[1,40,10,80],[78,60,-14,96],[4,76,8,66],[68,87,-10,78],[36,93,14,58],[88,46,16,52]];
   for(var i=0;i<spots.length;i++){
     var s=spots[i]; var el=document.createElement('div');
-    el.textContent=g[i%g.length];
-    el.style.cssText='position:absolute;left:'+s[0]+'%;top:'+s[1]+'%;font-size:'+s[3]+'px;opacity:0.16;transform:rotate('+s[2]+'deg);line-height:1;';
+    el.style.cssText='position:absolute;left:'+s[0]+'%;top:'+s[1]+'%;line-height:0;';
+    el.innerHTML=stampSVG(v[i%v.length], c[i%2===0?0:(c.length>2?2:1)], s[3], 0.17, s[2]);
     layer.appendChild(el);
   }
   document.body.appendChild(layer);
@@ -1461,7 +1504,7 @@ function launchTipConfetti(amount, senderName){
     canvas.width=vw*dpr; canvas.height=vh*dpr; ctx.scale(dpr,dpr);
     var fx=SKIN_FX[currentSkin]||SKIN_FX['default'];
     var colors=fx.colors;
-    var notes=drinkMode?['🍺','🍻','🥂'].concat(fx.glyphs.slice(0,3)):fx.glyphs;
+    var shapes=fx.vec; var beers=['🍺','🍻','🥂'];
     var amt=Number(amount)||0;
     var tier=amt>=20?4:amt>=10?3:amt>=5?2:1;
     var count=tier===1?45:tier===2?85:tier===3?110:70;
@@ -1507,7 +1550,8 @@ function launchTipConfetti(amount, senderName){
       if(tier===1){ ox=(i%2===0)?vw*0.1:vw*0.9; }
       var ang=-Math.PI/2+(lane===0?0.5:lane===1?-0.5:0)+(Math.random()-0.5)*0.9;
       var speed=(tier===1?7:9)+Math.random()*(tier>=3?11:9); var isNote=Math.random()<0.58;
-      parts.push({x:ox,y:oy,vx:Math.cos(ang)*speed,vy:Math.sin(ang)*speed,g:0.22+Math.random()*0.14,size:isNote?((tier>=3?20:16)+Math.random()*16):(7+Math.random()*7),color:colors[(Math.random()*colors.length)|0],rot:Math.random()*6.28,vr:(Math.random()-0.5)*0.4,isNote:isNote,note:notes[(Math.random()*notes.length)|0],life:1});
+      var beer=isNote&&drinkMode&&Math.random()<0.4;
+      parts.push({x:ox,y:oy,vx:Math.cos(ang)*speed,vy:Math.sin(ang)*speed,g:0.22+Math.random()*0.14,size:isNote?((tier>=3?22:18)+Math.random()*16):(7+Math.random()*7),color:colors[(Math.random()*colors.length)|0],rot:Math.random()*6.28,vr:(Math.random()-0.5)*0.4,isNote:isNote,beer:beer,note:beer?beers[(Math.random()*beers.length)|0]:null,shape:vecPath(shapes[(Math.random()*shapes.length)|0]),life:1});
     }
     var flourish=amount?{t:0,txt:(drinkMode?'🍺 $':'$')+amount}:null;
     var start=null;
@@ -1534,8 +1578,9 @@ function launchTipConfetti(amount, senderName){
           var hp=(el-0.5)/1.1, hs=1+Math.sin(hp*Math.PI)*0.25;
           ctx.save(); ctx.globalAlpha=Math.sin(hp*Math.PI);
           ctx.translate(vw/2,vh*0.34); ctx.scale(hs,hs);
-          ctx.font='90px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-          ctx.fillText(fx.glyphs[0],0,0); ctx.restore();
+          var heroP=vecPath(fx.vec[0]);
+          if(heroP){ ctx.fillStyle=accent; ctx.scale(1.3,1.3); ctx.translate(-50,-50); ctx.fill(heroP,'evenodd'); }
+          ctx.restore();
         }
       }
       if(ribbon){
@@ -1543,7 +1588,7 @@ function launchTipConfetti(amount, senderName){
         var rx=vw+20-(vw+ribbon.w+40)*rp;
         if(rp<1){ ctx.drawImage(ribbon.c,rx,ribbon.y); }
       }
-      for(var k=0;k<parts.length;k++){ var p=parts[k]; p.vy+=p.g; p.vx*=0.995; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr; if(p.y>vh*0.7)p.life-=0.018; if(p.life<=0)continue; ctx.save(); ctx.globalAlpha=Math.max(0,p.life); ctx.translate(p.x,p.y); ctx.rotate(p.rot); if(p.isNote){ ctx.fillStyle=p.color; ctx.font='bold '+p.size+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(p.note,0,0);}else{ ctx.fillStyle=p.color; ctx.fillRect(-p.size/2,-p.size/4,p.size,p.size/2);} ctx.restore(); }
+      for(var k=0;k<parts.length;k++){ var p=parts[k]; p.vy+=p.g; p.vx*=0.995; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr; if(p.y>vh*0.7)p.life-=0.018; if(p.life<=0)continue; ctx.save(); ctx.globalAlpha=Math.max(0,p.life); ctx.translate(p.x,p.y); ctx.rotate(p.rot); if(p.isNote&&p.beer){ ctx.fillStyle=p.color; ctx.font='bold '+p.size+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(p.note,0,0);}else if(p.isNote&&p.shape){ ctx.fillStyle=p.color; var sc=p.size/100; ctx.scale(sc,sc); ctx.translate(-50,-50); ctx.fill(p.shape,'evenodd');}else{ ctx.fillStyle=p.color; ctx.fillRect(-p.size/2,-p.size/4,p.size,p.size/2);} ctx.restore(); }
       if(flourish){ flourish.t+=0.016; var ft=flourish.t; var sc=ft<0.22?(ft/0.22):1; var pop=1+Math.sin(Math.min(ft,0.5)*Math.PI*2)*0.18; var al=ft<1.3?1:Math.max(0,1-(ft-1.3)/0.7); if(al>0){ ctx.save(); ctx.globalAlpha=al; ctx.translate(vw/2,vh*0.4); ctx.scale(sc*pop,sc*pop); ctx.font='800 62px system-ui,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.shadowColor='rgba(255,215,0,0.85)'; ctx.shadowBlur=28; ctx.fillStyle='#ffd700'; ctx.fillText(flourish.txt,0,0); ctx.restore(); } }
       if(el<dur){ requestAnimationFrame(frame);} else { canvas.remove(); }
     }
