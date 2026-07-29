@@ -30,9 +30,44 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
         .search-bar { -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; user-select: text; }
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Fredoka:wght@600&family=Archivo+Narrow:wght@700&family=Pirata+One&family=Archivo+Black&family=Fraunces:opsz,wght@9..144,700&family=Permanent+Marker&family=Metal+Mania&family=New+Rocker&family=Rye&family=Ultra&family=Yellowtail&display=swap');
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #080808; color: white; min-height: 100vh; overflow-x: hidden; }
         .section-title, .artist-name-display, h2, h3 { font-family: 'Playfair Display', Georgia, serif; }
+
+        /* ── SKINS ──────────────────────────────────────────
+           Genre skins: wallpaper tint, display face, and accent change;
+           everything that touches money (tip buttons, queue gold, payment
+           sheet) is locked chrome and identical on every skin. All twelve
+           are dark-safe variants so the page's light-on-dark text never
+           breaks; the full light-mode looks stay in the lab until the
+           CSS-var refactor. */
+        body[data-skin] { --skin-accent: #4ecdc4; }
+        body[data-skin="bubblegum"] { background: linear-gradient(180deg, #3A0E26 0%, #240818 100%); --skin-accent: #FF7BC1; }
+        body[data-skin="bubblegum"] .artist-name, body[data-skin="bubblegum"] .section-title { font-family: 'Fredoka', sans-serif; color: #FF9BD0; }
+        body[data-skin="greenroom"] { background: #0d1204; --skin-accent: #8ACE00; }
+        body[data-skin="greenroom"] .artist-name, body[data-skin="greenroom"] .section-title { font-family: 'Archivo Narrow', sans-serif; color: #8ACE00; text-transform: lowercase; }
+        body[data-skin="basement"] { background: linear-gradient(180deg, #0E0C10 0%, #1C0710 100%); --skin-accent: #D42B4C; }
+        body[data-skin="basement"] .artist-name { font-family: 'Pirata One', serif; color: #D42B4C; }
+        body[data-skin="basement"] .section-title { font-family: 'Permanent Marker', cursive; color: #D42B4C; }
+        body[data-skin="afterparty"] { background: radial-gradient(120% 100% at 50% 0%, #241820 0%, #16090f 100%); --skin-accent: #E8404F; }
+        body[data-skin="afterparty"] .artist-name, body[data-skin="afterparty"] .section-title { font-family: 'Archivo Black', sans-serif; color: #F2EAE2; }
+        body[data-skin="mudseason"] { background: linear-gradient(180deg, #1a2b21 0%, #10160f 100%); --skin-accent: #B3552F; }
+        body[data-skin="mudseason"] .artist-name, body[data-skin="mudseason"] .section-title { font-family: 'Fraunces', serif; color: #F3EAD3; }
+        body[data-skin="loser"] { background: #211d17; --skin-accent: #B3311B; }
+        body[data-skin="loser"] .artist-name, body[data-skin="loser"] .section-title { font-family: 'Permanent Marker', cursive; color: #E9E5DB; }
+        body[data-skin="sunset"] { background: linear-gradient(155deg, #241a33 0%, #150e1f 100%); --skin-accent: #FF3D8A; }
+        body[data-skin="sunset"] .artist-name, body[data-skin="sunset"] .section-title { font-family: 'Metal Mania', cursive; color: #FF3D8A; }
+        body[data-skin="blackout"] { background: linear-gradient(180deg, #0A0A0C 0%, #1C0508 100%); --skin-accent: #C1121F; }
+        body[data-skin="blackout"] .artist-name, body[data-skin="blackout"] .section-title { font-family: 'New Rocker', cursive; color: #C1121F; text-shadow: 0 2px 0 #000; }
+        body[data-skin="marquee"] { background: #241c10; --skin-accent: #F0E5C9; }
+        body[data-skin="marquee"] .artist-name, body[data-skin="marquee"] .section-title { font-family: 'Rye', serif; color: #F0E5C9; }
+        body[data-skin="gatefold"] { background: linear-gradient(180deg, #141A26 0%, #1D2433 60%, #141A26 100%); --skin-accent: #A08BD0; }
+        body[data-skin="gatefold"] .artist-name, body[data-skin="gatefold"] .section-title { font-family: 'Ultra', serif; color: #EEF1F6; }
+        body[data-skin="velvet"] { background: radial-gradient(130% 110% at 50% 15%, #3a1830 0%, #1c0a16 100%); --skin-accent: #D9A0B4; }
+        body[data-skin="velvet"] .artist-name { font-family: 'Yellowtail', cursive; color: #F4E7D0; font-size: 26px; }
+        body[data-skin="velvet"] .section-title { color: #D9A0B4; }
+        body[data-skin="canyon"] { background: #2b2116; --skin-accent: #EDE3D0; }
+        body[data-skin="canyon"] .artist-name, body[data-skin="canyon"] .section-title { font-family: 'Fraunces', serif; color: #EDE3D0; }
         .container { max-width: 400px; margin: 0 auto; padding: 8px; min-height: 100vh; }
         .header { text-align: center; margin-bottom: 12px; padding: 12px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); }
         .payment-section { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border-radius: 15px; padding: 12px; margin-bottom: 12px; border: 1px solid rgba(255, 255, 255, 0.1); }        .artist-avatar { width: 50px; height: 50px; border-radius: 50%; margin: 0 auto 10px; background: linear-gradient(45deg, #ff6b6b, #4ecdc4); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; }
@@ -359,6 +394,7 @@ async function loadFromSupabase(){
             tipAmounts=st.data.tip_amounts||[0,2,5,10];
             drinkMode=st.data.drink_mode!==false;
             drinkPrice=(typeof st.data.drink_price==='number'&&st.data.drink_price>0)?st.data.drink_price:8;
+            applySkin(new URLSearchParams(location.search).get('skin')||st.data.skin||'default');
             stripeChargesEnabled = STRIPE_TIPS_ENABLED && st.data.stripe_charges_enabled===true;
         }
         
@@ -1350,6 +1386,30 @@ function shareThisArtist(btn){
     );
 }
 
+// ── SKINS + THEMED CELEBRATIONS ─────────────────────────
+// Each skin throws its own party: metal throws bones and swords, pop throws
+// hearts, country throws hats. The gold amount flourish never changes -
+// money keeps its color on every skin.
+var currentSkin='default';
+var SKIN_FX={
+  'default':   { glyphs:['♪','♫','♬','♩','♭'],       colors:['#ffd700','#4ecdc4','#ff4b9b','#635bff','#ffffff','#ffb300'] },
+  'bubblegum': { glyphs:['💖','💗','✨','🫧','💋'],   colors:['#FF7BC1','#FF3D9A','#FFFFFF','#FFD6EC','#ffd700'] },
+  'greenroom': { glyphs:['⚡','💚','✳️','🍏'],        colors:['#8ACE00','#557F00','#F4FFE1','#ffffff'] },
+  'basement':  { glyphs:['🖤','⛓️','🦇','💔','🧷'],   colors:['#D42B4C','#F2EFEA','#8C8794','#000000'] },
+  'afterparty':{ glyphs:['📸','🪩','🍸','✨'],        colors:['#E8404F','#F2EAE2','#B9AFB6','#ffffff'] },
+  'mudseason': { glyphs:['🍂','🌲','🪕','🔥'],        colors:['#B3552F','#F3EAD3','#7A8C6E','#ffd700'] },
+  'loser':     { glyphs:['📼','⚡','🧷','🎸'],        colors:['#B3311B','#E9E5DB','#6E675C','#C9B98F'] },
+  'sunset':    { glyphs:['🎸','⚡','🔥','💜','🤘'],   colors:['#FF3D8A','#7B3FF2','#C9CFDA','#ffffff'] },
+  'blackout':  { glyphs:['🦴','⚔️','💀','🤘','🗡️'],  colors:['#C1121F','#E8E4E1','#8a0d16','#000000'] },
+  'marquee':   { glyphs:['🤠','🥃','🐎','⭐'],        colors:['#B5432A','#F0E5C9','#33587A','#ffd700'] },
+  'gatefold':  { glyphs:['🌙','⭐','🔮','✨'],        colors:['#A08BD0','#55688C','#EEF1F6','#ffd700'] },
+  'velvet':    { glyphs:['🥂','🎺','💜','✨'],        colors:['#D9A0B4','#F4E7D0','#56243F','#ffd700'] },
+  'canyon':    { glyphs:['☀️','🪶','🌻','🌿'],        colors:['#B05A38','#EDE3D0','#77764A','#ffd700'] }
+};
+function applySkin(k){
+  currentSkin=(SKIN_FX[k])?k:'default';
+  document.body.setAttribute('data-skin',currentSkin);
+}
 function launchTipConfetti(amount){
   try{
     var vw=window.innerWidth, vh=window.innerHeight;
@@ -1359,8 +1419,9 @@ function launchTipConfetti(amount){
     var ctx=canvas.getContext('2d');
     var dpr=Math.min(window.devicePixelRatio||1,2);
     canvas.width=vw*dpr; canvas.height=vh*dpr; ctx.scale(dpr,dpr);
-    var colors=['#ffd700','#4ecdc4','#ff4b9b','#635bff','#ffffff','#ffb300'];
-    var notes=drinkMode?['🍺','🍻','🥂','♪','♫','♬']:['♪','♫','♬','♩','♭'];
+    var fx=SKIN_FX[currentSkin]||SKIN_FX['default'];
+    var colors=fx.colors;
+    var notes=drinkMode?['🍺','🍻','🥂'].concat(fx.glyphs.slice(0,3)):fx.glyphs;
     var parts=[];
     for(var i=0;i<150;i++){
       var lane=i%3; var ox=lane===0?vw*0.12:lane===1?vw*0.88:vw*0.5; var oy=vh*0.94;
