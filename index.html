@@ -585,6 +585,10 @@
                     <button class="auth-btn" id="proAnnualBtn" onclick="startProCheckout('annual')" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18);">$39 / year</button>
                 </div>
                 <div style="text-align: center; margin-top: 8px;"><button id="proManageBtn" onclick="openProPortal()" style="display:none; background:none; border:none; color: rgba(255,255,255,0.5); font-size: 11.5px; cursor: pointer; text-decoration: underline;">Manage subscription</button></div>
+                <div style="display: flex; gap: 8px; max-width: 320px; margin: 12px auto 0;">
+                    <input type="text" id="giftCodeInput" class="auth-input" placeholder="Gift code" autocapitalize="characters" autocomplete="off" style="flex: 1; text-align: center; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; padding: 10px;">
+                    <button class="auth-btn" id="giftCodeBtn" onclick="redeemGiftCode()" style="background: rgba(245,165,36,0.15); border: 1px solid rgba(245,165,36,0.5); color: #F5A524; font-size: 13px; padding: 10px 16px;">Redeem</button>
+                </div>
             </div>
             <div class="payment-section"><div class="section-title">Payment Settings</div><div style="margin-bottom: 12px; font-size: 12px; opacity: 0.6; text-align: center;">Requests are free right now. These are how your crowd tips you.</div><div id="paymentMethodsDisplay"></div><div style="text-align: center;"><button class="auth-btn" onclick="openPaymentSettings()">Configure Payment Methods</button></div></div>
             <div class="payment-section"><div class="section-title">Social Media</div><div id="socialMediaDisplay"></div><div style="text-align: center;"><button class="auth-btn" onclick="openSocialSettings()">Update Social Profiles</button></div></div>
@@ -1654,6 +1658,24 @@ async function openProPortal() {
         if (error || !data || !data.url) throw new Error('Portal unavailable - email getliveque@gmail.com to change your plan.');
         window.location.href = data.url;
     } catch (e) { showToast(e.message, 'warning'); }
+}
+async function redeemGiftCode() {
+    const input = document.getElementById('giftCodeInput');
+    const btn = document.getElementById('giftCodeBtn');
+    const code = (input && input.value || '').trim();
+    if (!code) { showToast('Type a gift code first', 'warning'); return; }
+    if (btn) { btn.disabled = true; btn.textContent = '...'; }
+    try {
+        const { data, error } = await db.functions.invoke('gift-redeem', { body: { code: code } });
+        if (error) { let msg = error.message; try { const b = await error.context.json(); if (b && b.error) msg = b.error; } catch(_) {} throw new Error(msg); }
+        if (!data || !data.ok) throw new Error((data && data.error) || 'Code not recognized');
+        isProActive = true; renderProCard(); renderSkinPicker();
+        if (input) input.value = '';
+        showToast('🎁 Code accepted - welcome to LiveQue Pro.');
+    } catch (e) {
+        showToast(e.message || 'Code not recognized', 'error');
+    }
+    if (btn) { btn.disabled = false; btn.textContent = 'Redeem'; }
 }
 async function handleProReturn() {
     const params = new URLSearchParams(window.location.search);
