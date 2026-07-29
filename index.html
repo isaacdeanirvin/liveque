@@ -1304,7 +1304,7 @@ async function loadFromSupabase() {
     const playedResult = await db.from('played_songs').select('*').eq('artist_id', ARTIST_ID);
     if (playedResult.data && !playedResult.error) { playedSongs = {}; playedResult.data.forEach(function(p) { const songKey = p.song_title + '-' + p.song_artist; playedSongs[songKey] = new Date(p.played_at).getTime(); }); }
     const settingsResult = await db.from('artist_settings').select('*').eq('artist_id', ARTIST_ID).single();
-    if (settingsResult.data && !settingsResult.error) { artistSettings = settingsResult.data; paymentMethods = settingsResult.data.payment_methods || {}; socialMediaHandles = settingsResult.data.social_handles || {}; tipAmounts = settingsResult.data.tip_amounts || [0, 2, 5, 10]; drinkMode = settingsResult.data.drink_mode !== false; drinkPrice = (typeof settingsResult.data.drink_price === 'number' && settingsResult.data.drink_price > 0) ? settingsResult.data.drink_price : 8; currentGigSessionId = settingsResult.data.current_gig_session_id || null; currentSkin = settingsResult.data.skin || 'default'; isFounding = settingsResult.data.founding !== false; isProActive = settingsResult.data.pro_active === true; renderSkinPicker(); renderProCard(); updateSessionBadge(); renderDrinkSettings(); } loadPerformerReviews(); loadGigHistory();
+    if (settingsResult.data && !settingsResult.error) { artistSettings = settingsResult.data; paymentMethods = settingsResult.data.payment_methods || {}; socialMediaHandles = settingsResult.data.social_handles || {}; tipAmounts = settingsResult.data.tip_amounts || [0, 2, 5, 10]; drinkMode = settingsResult.data.drink_mode !== false; drinkPrice = (typeof settingsResult.data.drink_price === 'number' && settingsResult.data.drink_price > 0) ? settingsResult.data.drink_price : 8; currentGigSessionId = settingsResult.data.current_gig_session_id || null; currentSkin = settingsResult.data.skin || 'default'; isFounding = settingsResult.data.founding !== false; isProPaid = settingsResult.data.pro_active === true; var _gu = settingsResult.data.pro_gift_until; isProGift = settingsResult.data.pro_gift === true && (!_gu || new Date(_gu) > new Date()); isProActive = isProPaid || isProGift; renderSkinPicker(); renderProCard(); retryPendingProSync(); if (isProPaid && settingsResult.data.pro_period_end && new Date(settingsResult.data.pro_period_end) < new Date()) { db.functions.invoke('pro-status', { body: {} }).then(function(r){ if (r && r.data) { isProPaid = r.data.pro_paid === true; isProGift = r.data.pro_gift === true; isProActive = r.data.pro_active === true; renderProCard(); renderSkinPicker(); } }).catch(function(){}); } updateSessionBadge(); renderDrinkSettings(); } loadPerformerReviews(); loadGigHistory();
     const songsResult = await db.from('songs').select('*').eq('artist_id', ARTIST_ID).order('title', { ascending: true });
     if (songsResult.data && !songsResult.error && songsResult.data.length > 0) { songLibrary = songsResult.data.map(function(s) { return { id: s.id, title: s.title, artist: s.artist_name, spanish: s.spanish || false }; }); }
 }
@@ -1612,7 +1612,7 @@ async function startStripeOnboarding() {
 }
 
 // ── SKINS + PRO ─────────────────────────────────────────
-let currentSkin = 'default', isFounding = true, isProActive = false;
+let currentSkin = 'default', isFounding = true, isProActive = false, isProPaid = false, isProGift = false;
 // Free forever: default + the safe country poster + the emo zine. The other
 // nine are Pro - but founding-era accounts (LA beachhead) get everything.
 const FREE_SKINS = ['default', 'marquee', 'basement'];
@@ -1663,13 +1663,22 @@ function renderProCard() {
     const mo = document.getElementById('proMonthlyBtn'), yr = document.getElementById('proAnnualBtn');
     if (!line) return;
     if (isProActive) {
-        line.innerHTML = '<span style="color:#4ecdc4;font-weight:700;">✓ Pro is active.</span> Every look and tool is unlocked.';
+        line.innerHTML = isProPaid
+            ? '<span style="color:#4ecdc4;font-weight:700;">✓ Pro is active.</span> Every look and tool is unlocked.'
+            : '<span style="color:#4ecdc4;font-weight:700;">🎁 Pro is active (gift).</span> Every look and tool is unlocked.';
         if (mo) mo.style.display = 'none'; if (yr) yr.style.display = 'none';
-        if (manage) manage.style.display = '';
+        // The portal only exists for paid subscriptions - a gift has nothing to manage.
+        if (manage) manage.style.display = isProPaid ? '' : 'none';
     } else if (isFounding) {
+        // Founding Artists get everything free forever - showing prices to
+        // them is pure noise, so the buy buttons go away entirely.
         line.innerHTML = '<span style="color:#F5A524;font-weight:700;">★ LA Founding Artist.</span> Everything is unlocked free, forever. Pro exists for the ones who come after you.';
+        if (mo) mo.style.display = 'none'; if (yr) yr.style.display = 'none';
+        if (manage) manage.style.display = 'none';
     } else {
         line.textContent = 'One extra $5 tip covers the month.';
+        if (mo) mo.style.display = ''; if (yr) yr.style.display = '';
+        if (manage) manage.style.display = 'none';
     }
 }
 async function startProCheckout(plan) {
@@ -1715,7 +1724,7 @@ async function redeemGiftCode() {
         const { data, error } = await db.functions.invoke('gift-redeem', { body: { code: code } });
         if (error) { let msg = error.message; try { const b = await error.context.json(); if (b && b.error) msg = b.error; } catch(_) {} throw new Error(msg); }
         if (!data || !data.ok) throw new Error((data && data.error) || 'Code not recognized');
-        isProActive = true; renderProCard(); renderSkinPicker();
+        isProGift = true; isProActive = true; renderProCard(); renderSkinPicker();
         const f = document.getElementById('giftField'); if (f) f.hidden = true;
         showToast('🎁 Code accepted - welcome to LiveQue Pro.');
     } catch (e) {
@@ -1724,19 +1733,58 @@ async function redeemGiftCode() {
     }
     if (btn) { btn.disabled = false; btn.textContent = '→'; giftFieldState(); }
 }
+// A paid checkout's session_id is the ONLY link between this artist and the
+// new subscription until the sync succeeds. It gets persisted BEFORE the URL
+// is cleaned, and retried (on load, on reconnect, every 60s) until the sync
+// lands - so one bad bar-wifi request can never orphan a paid subscription.
+const PRO_PENDING_KEY = 'liveque-pro-pending';
+function setPendingProSession(sid) { try { localStorage.setItem(PRO_PENDING_KEY, JSON.stringify({ sid: sid, t: Date.now() })); } catch (_) {} }
+function getPendingProSession() {
+    try {
+        const raw = localStorage.getItem(PRO_PENDING_KEY);
+        if (!raw) return null;
+        const o = JSON.parse(raw);
+        if (!o || !o.sid || (Date.now() - (o.t || 0)) > 30 * 864e5) { localStorage.removeItem(PRO_PENDING_KEY); return null; }
+        return o.sid;
+    } catch (_) { return null; }
+}
+function clearPendingProSession() { try { localStorage.removeItem(PRO_PENDING_KEY); } catch (_) {} }
+let proSyncBusy = false;
+async function syncProSession(sessionId, quiet) {
+    if (proSyncBusy) return false;
+    proSyncBusy = true;
+    try {
+        const { data, error } = await db.functions.invoke('pro-status', { body: sessionId ? { session_id: sessionId } : {} });
+        if (!error && data && data.pro_active) {
+            isProPaid = data.pro_paid === true; isProGift = data.pro_gift === true; isProActive = true;
+            clearPendingProSession();
+            renderProCard(); renderSkinPicker();
+            if (!quiet) showToast('✓ Welcome to LiveQue Pro.');
+            proSyncBusy = false;
+            return true;
+        }
+    } catch (_) { /* retry later */ }
+    proSyncBusy = false;
+    return false;
+}
+function retryPendingProSync() {
+    const sid = getPendingProSession();
+    if (!sid) return;
+    syncProSession(sid, true);
+}
+window.addEventListener('online', retryPendingProSync);
+setInterval(retryPendingProSync, 60000);
 async function handleProReturn() {
     const params = new URLSearchParams(window.location.search);
     const p = params.get('pro');
     if (!p) return;
     const sessionId = params.get('session_id');
+    if (p === 'done' && sessionId) setPendingProSession(sessionId);
     window.history.replaceState({}, document.title, window.location.pathname);
     if (p === 'done') {
         showToast('Finishing your Pro setup...');
-        try {
-            const { data } = await db.functions.invoke('pro-status', { body: sessionId ? { session_id: sessionId } : {} });
-            if (data && data.pro_active) { isProActive = true; renderProCard(); renderSkinPicker(); showToast('✓ Welcome to LiveQue Pro.'); }
-            else { showToast('Payment received - Pro will show active shortly.', 'warning'); }
-        } catch (_) { showToast('Payment received - Pro will show active shortly.', 'warning'); }
+        const ok = await syncProSession(sessionId, false);
+        if (!ok) showToast('Payment received - confirming with Stripe. This finishes itself, keep the tab open.', 'warning');
     } else if (p === 'cancel') {
         showToast('No charge - Pro is here whenever you want it.', 'warning');
     }

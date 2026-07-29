@@ -82,7 +82,7 @@ serve(async (req) => {
 
     const { data: settings } = await admin
       .from("artist_settings")
-      .select("pro_active, pro_plan, pro_customer_id, pro_subscription_id, pro_period_end, founding")
+      .select("pro_active, pro_plan, pro_customer_id, pro_subscription_id, pro_period_end, pro_gift, pro_gift_until, founding")
       .eq("artist_id", artist.id)
       .single();
 
@@ -112,27 +112,38 @@ serve(async (req) => {
       }
     }
 
-    let active = false, plan: string | null = settings?.pro_plan as string | null, periodEnd: string | null = null;
+    let active = settings?.pro_active === true, plan: string | null = settings?.pro_plan as string | null, periodEnd: string | null = settings?.pro_period_end as string | null;
     if (subId) {
-      const sub = await stripeGet("subscriptions/" + subId);
-      active = sub.status === "active" || sub.status === "trialing" || sub.status === "past_due";
-      plan = sub.items?.data?.[0]?.price?.recurring?.interval === "year" ? "annual" : "monthly";
-      if (sub.current_period_end) periodEnd = new Date(sub.current_period_end * 1000).toISOString();
-      if (typeof sub.customer === "string") customerId = sub.customer;
-      await admin.from("artist_settings").upsert({
-        artist_id: artist.id,
-        pro_active: active,
-        pro_plan: plan,
-        pro_customer_id: customerId,
-        pro_subscription_id: subId,
-        pro_period_end: periodEnd,
-        updated_at: new Date().toISOString(),
-      });
+      let sub: Record<string, unknown> | null = null;
+      try { sub = await stripeGet("subscriptions/" + subId); } catch (_) { sub = null; }
+      if (sub) {
+        active = sub.status === "active" || sub.status === "trialing" || sub.status === "past_due";
+        plan = (sub as any).items?.data?.[0]?.price?.recurring?.interval === "year" ? "annual" : "monthly";
+        // Newer Stripe API versions moved current_period_end onto the item.
+        const pe = (sub as any).current_period_end || (sub as any).items?.data?.[0]?.current_period_end;
+        periodEnd = pe ? new Date(pe * 1000).toISOString() : null;
+        if (typeof (sub as any).customer === "string") customerId = (sub as any).customer;
+        // Subscription columns only - gift columns are a separate rail and
+        // are never written here, so a lapsed sub can't erase a gift.
+        await admin.from("artist_settings").upsert({
+          artist_id: artist.id,
+          pro_active: active,
+          pro_plan: plan,
+          pro_customer_id: customerId,
+          pro_subscription_id: subId,
+          pro_period_end: periodEnd,
+          updated_at: new Date().toISOString(),
+        });
+      }
     }
 
+    const giftValid = settings?.pro_gift === true &&
+      (!settings?.pro_gift_until || new Date(settings.pro_gift_until as string) > new Date());
     return new Response(JSON.stringify({
-      pro_active: active,
-      pro_plan: plan,
+      pro_active: active || giftValid,
+      pro_paid: active,
+      pro_gift: giftValid,
+      pro_plan: active ? plan : (giftValid ? "gift" : plan),
       pro_period_end: periodEnd,
       founding: settings?.founding !== false,
     }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });

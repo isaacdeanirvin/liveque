@@ -3,8 +3,13 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // LiveQue Pro subscription checkout. Stripe BILLING, the platform's own
 // revenue - a completely separate money graph from the Connect tip path.
-// Tips are direct charges on the performer's account and never touch this.
-// Prices are inline price_data so no dashboard product setup is required.
+//
+// Idempotent by design: before selling, we look for a live subscription for
+// this artist (Stripe search on the artist_id metadata we stamp, falling
+// back to the stored subscription id). If one exists we self-heal the DB
+// and return a billing-portal link instead of a second checkout - so a
+// failed post-payment sync or a stale second tab can never double-bill.
+// A stored Stripe customer id is reused so one performer = one customer.
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -28,7 +33,7 @@ function returnBase(req: Request): string {
   return ALLOWED_ORIGINS.has(origin) ? origin : CANONICAL;
 }
 
-async function stripe(path: string, params: URLSearchParams) {
+async function stripePost(path: string, params: URLSearchParams) {
   const res = await fetch("https://api.stripe.com/v1/" + path, {
     method: "POST",
     headers: {
@@ -40,6 +45,35 @@ async function stripe(path: string, params: URLSearchParams) {
   const data = await res.json();
   if (!res.ok) throw new Error(data.error?.message || "Stripe error");
   return data;
+}
+
+async function stripeGet(path: string) {
+  const res = await fetch("https://api.stripe.com/v1/" + path, {
+    headers: { "Authorization": "Bearer " + STRIPE_SECRET_KEY },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error?.message || "Stripe error");
+  return data;
+}
+
+const LIVE = new Set(["active", "trialing", "past_due"]);
+
+/** Any live subscription for this artist, DB-orphaned ones included. */
+async function findLiveSubscription(artistId: string, storedSubId: string | null) {
+  try {
+    const q = encodeURIComponent(`metadata['artist_id']:'${artistId}'`);
+    const found = await stripeGet(`subscriptions/search?query=${q}&limit=10`);
+    for (const sub of found.data || []) {
+      if (LIVE.has(sub.status)) return sub;
+    }
+  } catch (_) { /* search unavailable - fall back to the stored id */ }
+  if (storedSubId) {
+    try {
+      const sub = await stripeGet("subscriptions/" + storedSubId);
+      if (LIVE.has(sub.status)) return sub;
+    } catch (_) { /* stale or cross-mode id */ }
+  }
+  return null;
 }
 
 serve(async (req) => {
@@ -64,13 +98,41 @@ serve(async (req) => {
       .single();
     if (artistErr || !artist) throw new Error("Artist profile not found");
 
+    const { data: settings } = await admin
+      .from("artist_settings")
+      .select("pro_subscription_id, pro_customer_id")
+      .eq("artist_id", artist.id)
+      .single();
+
+    const base = returnBase(req);
+
+    const existing = await findLiveSubscription(artist.id, settings?.pro_subscription_id || null);
+    if (existing) {
+      const periodEnd = existing.current_period_end || existing.items?.data?.[0]?.current_period_end;
+      await admin.from("artist_settings").upsert({
+        artist_id: artist.id,
+        pro_active: true,
+        pro_plan: existing.items?.data?.[0]?.price?.recurring?.interval === "year" ? "annual" : "monthly",
+        pro_customer_id: typeof existing.customer === "string" ? existing.customer : null,
+        pro_subscription_id: existing.id,
+        pro_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+        updated_at: new Date().toISOString(),
+      });
+      const portal = await stripePost("billing_portal/sessions", new URLSearchParams({
+        customer: existing.customer as string,
+        return_url: base + "/index.html",
+      }));
+      return new Response(JSON.stringify({ url: portal.url, already_subscribed: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     let plan = "monthly";
     try {
       const body = await req.json();
       if (body && body.plan === "annual") plan = "annual";
     } catch (_) { /* default monthly */ }
 
-    const base = returnBase(req);
     const params = new URLSearchParams({
       mode: "subscription",
       client_reference_id: artist.id,
@@ -91,10 +153,14 @@ serve(async (req) => {
       params.set("line_items[0][price_data][unit_amount]", "499");
       params.set("line_items[0][price_data][recurring][interval]", "month");
     }
-    const email = artist.email || user.email;
-    if (email) params.set("customer_email", email);
+    if (settings?.pro_customer_id) {
+      params.set("customer", settings.pro_customer_id);
+    } else {
+      const email = artist.email || user.email;
+      if (email) params.set("customer_email", email);
+    }
 
-    const session = await stripe("checkout/sessions", params);
+    const session = await stripePost("checkout/sessions", params);
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

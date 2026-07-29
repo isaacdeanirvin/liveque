@@ -1,11 +1,11 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// Redeems a gift code for the authed performer. Codes live behind RLS with
-// no client policies - this function (service role) is the only door in.
-// A granted gift sets pro_active without a Stripe subscription id, and
-// pro-status only overwrites Pro state when a subscription id exists, so
-// gifted Pro survives status syncs.
+// Redeems a gift code for the authed performer. The whole redemption is one
+// atomic SQL function (row lock + per-artist unique + counted uses), so
+// max_uses cannot be raced past. Gifts write ONLY pro_gift/pro_gift_until -
+// paid-subscription columns are a separate rail and neither can clobber the
+// other. Effective Pro = paid OR unexpired gift, computed at read time.
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -41,38 +41,35 @@ serve(async (req) => {
       const body = await req.json();
       code = String(body?.code || "").trim().toUpperCase();
     } catch (_) { /* fallthrough to validation */ }
-    if (!/^[A-Z0-9-]{3,32}$/.test(code)) throw new Error("That doesn't look like a code");
-
-    const { data: gc } = await admin.from("gift_codes").select("*").eq("code", code).single();
-    if (!gc || !gc.active) throw new Error("Code not recognized");
-    if (gc.uses >= gc.max_uses) throw new Error("That code has been fully redeemed");
-
-    const { error: redeemErr } = await admin.from("gift_redemptions")
-      .insert([{ code: code, artist_id: artist.id }]);
-    if (redeemErr) {
-      if (/duplicate|unique/i.test(redeemErr.message || "")) {
-        throw new Error("You already redeemed this code");
-      }
-      throw new Error("Could not redeem right now");
+    if (!/^[A-Z0-9-]{3,32}$/.test(code)) {
+      await new Promise((r) => setTimeout(r, 400));
+      throw new Error("That doesn't look like a code");
     }
 
-    // Non-atomic counter is acceptable here: the per-artist unique key above
-    // is the real gate, and max_uses on founder codes is intentionally huge.
-    await admin.from("gift_codes").update({ uses: gc.uses + 1 }).eq("code", code);
+    const { data: grants, error: rpcErr } = await admin
+      .rpc("gift_redeem_atomic", { p_code: code, p_artist: artist.id });
+    if (rpcErr) throw new Error("Could not redeem right now");
+    if (grants === "not_found" || grants === "exhausted" || grants === "already") {
+      // Small uniform delay keeps guessing slow and unrevealing.
+      await new Promise((r) => setTimeout(r, 400));
+      const msg = grants === "already" ? "You already redeemed this code"
+        : grants === "exhausted" ? "That code has been fully redeemed"
+        : "Code not recognized";
+      throw new Error(msg);
+    }
 
-    let periodEnd: string | null = null;
-    if (gc.grants === "pro_year") periodEnd = new Date(Date.now() + 366 * 864e5).toISOString();
-    if (gc.grants === "pro_month") periodEnd = new Date(Date.now() + 32 * 864e5).toISOString();
+    let giftUntil: string | null = null;
+    if (grants === "pro_year") giftUntil = new Date(Date.now() + 366 * 864e5).toISOString();
+    if (grants === "pro_month") giftUntil = new Date(Date.now() + 32 * 864e5).toISOString();
 
     await admin.from("artist_settings").upsert({
       artist_id: artist.id,
-      pro_active: true,
-      pro_plan: "gift",
-      pro_period_end: periodEnd,
+      pro_gift: true,
+      pro_gift_until: giftUntil,
       updated_at: new Date().toISOString(),
     });
 
-    return new Response(JSON.stringify({ ok: true, grants: gc.grants }), {
+    return new Response(JSON.stringify({ ok: true, grants: grants }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
