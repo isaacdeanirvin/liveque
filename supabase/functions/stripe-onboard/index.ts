@@ -114,11 +114,21 @@ serve(async (req) => {
         .eq("artist_id", artist.id);
     }
 
+    // Solo acts onboard as individuals; bands should onboard as their LLC or
+    // partnership (business_type "company") so tips are the band's income
+    // rather than one member's 1099-K. Only trusted values pass through, and
+    // it only matters at account creation - existing accounts are untouched.
+    let businessType = "individual";
+    try {
+      const body = await req.json();
+      if (body && body.business_type === "company") businessType = "company";
+    } catch (_) { /* no body sent - solo default */ }
+
     if (!accountId) {
       const acctParams: Record<string, string> = {
         type: "express",
         country: "US",
-        business_type: "individual",
+        business_type: businessType,
         "capabilities[transfers][requested]": "true",
         "business_profile[product_description]": "Live music tips received via LiveQue",
       };

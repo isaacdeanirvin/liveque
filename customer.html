@@ -792,7 +792,8 @@ function renderModalBackupTips(tc){
     wrap.style.cssText='margin-top:14px; border-top:1px solid rgba(255,255,255,0.12); padding-top:12px; text-align:center;';
     var label=document.createElement('div');
     label.style.cssText='font-size:12px; opacity:0.75; margin-bottom:10px;';
-    label.textContent=stripeChargesEnabled?'Or tip your musician directly:':'Tip your musician:';
+    var actName=(window.ARTIST_NAME&&String(window.ARTIST_NAME).trim())||'the performer';
+    label.textContent=stripeChargesEnabled?('Or tip '+actName+' directly:'):('Tip '+actName+':');
     wrap.appendChild(label);
     methods.forEach(function(m){
         var b=document.createElement('button');
