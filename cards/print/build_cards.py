@@ -175,7 +175,9 @@ def back():
     tracked(d, (SAFE, y), "WHAT TO SAY BACK", f_kick, (120, 120, 120), track=inch(0.019))
     y += inch(0.155)
 
-    for line in ["Your tip jar", "takes cards now."]:
+    # "takes cards" is table stakes (Venmo does that); requests are the thing
+    # nobody else takes - the tip visibly picks a song and jumps the queue.
+    for line in ["Your tip jar", "takes requests now."]:
         d.text((SAFE, y), line, font=f_hook, fill=INK)
         y += inch(0.19)
 

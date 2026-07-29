@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>LiveQue Lab · Pro Tier</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Space+Mono:wght@700&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #080808; color: #E8EDF0; font-family: 'Manrope', sans-serif; }
+.shell { max-width: 1200px; margin: 0 auto; padding: 28px 20px 80px; }
+.kick { font-size: 11px; letter-spacing: .18em; color: #17B7AE; font-weight: 700; }
+h1 { font-size: 22px; font-weight: 800; letter-spacing: -.5px; margin: 6px 0 8px; }
+.sub { color: rgba(255,255,255,.55); font-size: 14px; line-height: 1.6; max-width: 760px; margin-bottom: 24px; }
+.stage { display: flex; gap: 44px; flex-wrap: wrap; align-items: flex-start; }
+.col { flex: none; }
+.col-label { font-size: 11px; letter-spacing: .14em; color: rgba(255,255,255,.45); font-weight: 800; margin-bottom: 10px; }
+.switcher { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.sw { border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.05); color: #fff;
+      font-family: inherit; font-weight: 700; font-size: 12px; padding: 8px 14px; border-radius: 999px; cursor: pointer; }
+.sw.active { background: #17B7AE; border-color: #17B7AE; color: #06211f; }
+.phone { width: 383px; border: 4px solid #23282c; border-radius: 40px; overflow: hidden; background: #0B0F12;
+         box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+.screen { width: 375px; height: 720px; overflow-y: auto; scrollbar-width: none; padding-bottom: 24px; }
+.screen::-webkit-scrollbar { display: none; }
+.pscreen { display: none; } .pscreen.on { display: block; }
+
+.topbar { padding: 16px 18px 12px; display: flex; justify-content: space-between; align-items: center; }
+.wordmark { font-weight: 800; font-size: 17px; letter-spacing: -.3px; }
+.wordmark i { font-style: normal; color: #4ECDC4; }
+.badge { font-size: 10px; font-weight: 800; letter-spacing: .12em; color: #F5A524; border: 1px solid rgba(245,165,36,.5);
+         padding: 4px 8px; border-radius: 999px; }
+.tabs { display: flex; border-bottom: 1px solid rgba(255,255,255,.1); padding: 0 10px; }
+.tab { flex: 1; text-align: center; font-size: 12.5px; font-weight: 700; color: rgba(255,255,255,.5);
+       padding: 10px 4px; border-bottom: 2px solid transparent; }
+.tab.on { color: #4ECDC4; border-color: #4ECDC4; }
+.tab .star { color: #F5A524; }
+
+.pad { padding: 18px; }
+.h { font-size: 12px; letter-spacing: .14em; font-weight: 800; color: rgba(255,255,255,.45); margin-bottom: 10px; }
+.big { font-size: 34px; font-weight: 800; letter-spacing: -1px; }
+.big small { font-size: 14px; font-weight: 700; color: rgba(255,255,255,.55); display: block; letter-spacing: 0; }
+.stat-row { display: flex; gap: 10px; margin-top: 14px; }
+.stat { flex: 1; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 12px;
+        padding: 12px; text-align: center; }
+.stat b { display: block; font-size: 18px; } .stat span { font-size: 10.5px; color: rgba(255,255,255,.5); font-weight: 700; }
+.locked { margin-top: 16px; border: 1.5px solid #F5A524; border-radius: 14px; padding: 16px;
+          background: rgba(245,165,36,.06); position: relative; }
+.locked .lock { position: absolute; top: 14px; right: 14px; font-size: 16px; }
+.locked h4 { font-size: 14.5px; margin-bottom: 6px; }
+.locked p { font-size: 12.5px; color: rgba(255,255,255,.62); line-height: 1.55; }
+.blur-teaser { margin-top: 10px; filter: blur(5px); pointer-events: none; user-select: none;
+               font-size: 12px; color: rgba(255,255,255,.8); line-height: 1.7; }
+.cta { display: block; width: 100%; text-align: center; background: linear-gradient(135deg, #4ECDC4, #17B7AE);
+       color: #06211f; font-weight: 800; font-size: 15px; padding: 14px; border: 0; border-radius: 12px;
+       cursor: pointer; margin-top: 14px; font-family: inherit; }
+.cta small { display: block; font-size: 10.5px; opacity: .75; }
+.ghost { display: block; width: 100%; text-align: center; background: none; border: 1px solid rgba(255,255,255,.2);
+         color: rgba(255,255,255,.7); font-weight: 700; font-size: 12.5px; padding: 10px; border-radius: 10px;
+         margin-top: 8px; font-family: inherit; cursor: pointer; }
+
+.feat { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.07); }
+.feat .ic { font-size: 18px; width: 26px; text-align: center; flex: none; }
+.feat .t { flex: 1; } .feat .t b { font-size: 13.5px; display: block; }
+.feat .t span { font-size: 11.5px; color: rgba(255,255,255,.55); line-height: 1.45; display: block; }
+.feat .lk { color: #F5A524; font-size: 13px; flex: none; }
+.demo-tag { font-size: 9px; font-weight: 800; letter-spacing: .1em; color: #06211f; background: #4ECDC4;
+            border-radius: 4px; padding: 2px 5px; vertical-align: 2px; margin-left: 6px; }
+
+.price { text-align: center; padding: 26px 18px 6px; }
+.price .n { font-size: 46px; font-weight: 800; letter-spacing: -2px; }
+.price .n sup { font-size: 18px; vertical-align: 22px; }
+.price .per { color: rgba(255,255,255,.55); font-size: 13px; font-weight: 700; }
+.price .annual { color: #F5A524; font-size: 12px; font-weight: 700; margin-top: 6px; }
+.checks { padding: 10px 26px; }
+.checks div { font-size: 13px; padding: 6px 0; color: rgba(255,255,255,.8); }
+.checks div::before { content: '✓  '; color: #4ECDC4; font-weight: 800; }
+.trust { margin: 16px 18px 0; border-top: 1px solid rgba(255,255,255,.1); padding-top: 14px;
+         font-size: 11.5px; color: rgba(255,255,255,.5); line-height: 1.6; text-align: center; }
+.trust b { color: #F5A524; }
+
+/* fan phone bits */
+.np { margin: 0 14px 12px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12);
+      border-radius: 12px; padding: 10px 14px; font-size: 12.5px; display: flex; justify-content: space-between; }
+.ticker { margin: 0 14px 12px; overflow: hidden; border-radius: 999px; background: rgba(245,165,36,.1);
+          border: 1px solid rgba(245,165,36,.35); padding: 7px 12px; font-size: 11.5px; font-weight: 700;
+          white-space: nowrap; }
+.ticker span { display: inline-block; animation: tick 14s linear infinite; }
+@keyframes tick { from { transform: translateX(30%); } to { transform: translateX(-100%); } }
+.qcard { margin: 0 14px 10px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12);
+         border-radius: 12px; padding: 11px 13px; }
+.qcard .r1 { display: flex; justify-content: space-between; align-items: center; }
+.qcard b { font-size: 13.5px; } .qcard .by { font-size: 10.5px; color: rgba(255,255,255,.5); }
+.tipchip { background: #F5A524; color: #231a02; font-weight: 800; font-size: 11px; padding: 3px 8px; border-radius: 999px; }
+.meter { margin-top: 8px; }
+.meter .lbl { font-size: 10.5px; color: #F5A524; font-weight: 800; margin-bottom: 4px; }
+.meter .bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,.1); overflow: hidden; }
+.meter .fill { height: 100%; width: 72%; background: #F5A524; border-radius: 3px; }
+.fund { margin: 0 14px 12px; border: 1.5px solid #F5A524; background: rgba(245,165,36,.07); border-radius: 12px; padding: 12px 14px; }
+.fund b { font-size: 13px; } .fund .lbl { font-size: 11px; color: rgba(255,255,255,.6); margin: 3px 0 7px; }
+.note { max-width: 420px; color: rgba(255,255,255,.6); font-size: 13px; line-height: 1.65; margin-top: 16px; }
+.note b { color: #fff; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="kick">LIVEQUE LAB · NOTHING HERE IS LIVE</div>
+  <h1>Pro: the tab, the lock, the pitch</h1>
+  <p class="sub">Mockup only. Left phone: the performer's dashboard with a Pro tab injected — flip through the
+  three screens (the post-set recap is the paywall's front door). Right phone: what the crowd sees on a Pro
+  performer's page. Every feature shown passed the science gate; gold only ever means money.</p>
+
+  <div class="stage">
+    <div class="col">
+      <div class="col-label">PERFORMER SIDE</div>
+      <div class="switcher">
+        <button class="sw active" data-s="recap" onclick="show(this)">Set recap</button>
+        <button class="sw" data-s="protab" onclick="show(this)">The Pro tab</button>
+        <button class="sw" data-s="paywall" onclick="show(this)">The pitch</button>
+      </div>
+      <div class="phone"><div class="screen">
+
+        <div class="topbar"><div class="wordmark">L<i>i</i>veQue</div><div class="badge">DASHBOARD</div></div>
+        <div class="tabs">
+          <div class="tab">Queue</div><div class="tab">Songs</div>
+          <div class="tab on">Tonight</div><div class="tab"><span class="star">★</span> Pro</div>
+        </div>
+
+        <div class="pscreen on" id="s-recap">
+          <div class="pad">
+            <div class="h">SET'S OVER · THE CINEMA BAR</div>
+            <div class="big">$63<small>in tips tonight · 100% yours, already in your Stripe</small></div>
+            <div class="stat-row">
+              <div class="stat"><b>14</b><span>REQUESTS</span></div>
+              <div class="stat"><b>9</b><span>TIPPERS</span></div>
+              <div class="stat"><b>2</b><span>CAME BACK TWICE</span></div>
+            </div>
+            <div class="locked">
+              <span class="lock">🔒</span>
+              <h4>Which songs earned the most?</h4>
+              <p>2 fans tipped you twice tonight. Pro shows which songs, hours, and venues do it, every night.</p>
+              <div class="blur-teaser">Wagon Wheel · $18 · 9-10pm peak<br>Landslide · $15 · requested 3 nights running<br>repeat tippers: Tony, Kayla</div>
+              <button class="cta">Run Pro free at your next gig<small>one night, no card required</small></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="pscreen" id="s-protab">
+          <div class="pad" style="padding-bottom:0;">
+            <div class="h">LIVEQUE PRO · $4.99/MO</div>
+          </div>
+          <div style="padding: 0 18px;">
+            <div class="feat"><div class="ic">📊</div><div class="t"><b>Earnings Insights</b><span>Per-gig history, best venue, best hour, repeat tippers.</span></div><div class="lk">🔒</div></div>
+            <div class="feat"><div class="ic">🎚️</div><div class="t"><b>Room-Tuned Presets</b><span>Tip chips anchor to what tonight's room is giving. Never lower than standard.</span></div><div class="lk">🔒</div></div>
+            <div class="feat"><div class="ic">📈</div><div class="t"><b>Bump Meter</b><span>"$3 more bumps you to #1" on every queued song.</span></div><div class="lk">🔒</div></div>
+            <div class="feat"><div class="ic">📣</div><div class="t"><b>Hype Ticker<span class="demo-tag">CROWD SEES IT</span></b><span>Live feed of who just tipped what. Opt-in names.</span></div><div class="lk">🔒</div></div>
+            <div class="feat"><div class="ic">🎯</div><div class="t"><b>Tonight's Fund<span class="demo-tag">CROWD SEES IT</span></b><span>"Tips buy the new mic" with a live thermometer.</span></div><div class="lk">🔒</div></div>
+            <div class="feat"><div class="ic">⚡</div><div class="t"><b>Encore Tap</b><span>One-tap re-tips all night after the first.</span></div><div class="lk">🔒</div></div>
+            <div class="feat"><div class="ic">🥇</div><div class="t"><b>Marquee Request</b><span>The $25 headline-the-set shelf that makes $10 feel normal.</span></div><div class="lk">🔒</div></div>
+            <div class="feat"><div class="ic">✨</div><div class="t"><b>Star Rush Hour<span class="demo-tag">CROWD SEES IT</span></b><span>2x Stars windows you trigger from stage.</span></div><div class="lk">🔒</div></div>
+            <div class="feat"><div class="ic">🧾</div><div class="t"><b>Encore Receipt</b><span>Every tip mints a thank-you the fan keeps and shares.</span></div><div class="lk">🔒</div></div>
+            <div class="feat" style="border:0;"><div class="ic">📇</div><div class="t"><b>Encore Alerts</b><span>Your fan list. One tap to follow at the tip moment, next-gig alerts.</span></div><div class="lk">🔒</div></div>
+          </div>
+          <div class="pad"><button class="cta">Unlock everything · $4.99/mo</button></div>
+        </div>
+
+        <div class="pscreen" id="s-paywall">
+          <div class="price">
+            <div class="n"><sup>$</sup>4.99</div>
+            <div class="per">per month · cancel anytime</div>
+            <div class="annual">or $39/year — two months free</div>
+          </div>
+          <div class="checks">
+            <div>Every earning tool, unlocked</div>
+            <div>Your fan list — yours, exportable, forever</div>
+            <div>Earnings insights across every gig</div>
+            <div>All profile themes + the Gen-Z skins</div>
+            <div>One extra $5 tip covers the month</div>
+          </div>
+          <div class="pad" style="padding-top:6px;">
+            <button class="cta">Start with a free night<small>run Pro at one gig, no card required</small></button>
+            <button class="ghost">Maybe later</button>
+          </div>
+          <div class="trust"><b>0% of tips. Forever.</b><br>
+          LiveQue makes money from performers, never from fans. Tools are $4.99 a month;
+          100% of every tip goes straight to you through Stripe. The money never touches our hands.</div>
+        </div>
+
+      </div></div>
+    </div>
+
+    <div class="col">
+      <div class="col-label">WHAT THE CROWD SEES (PRO PERFORMER)</div>
+      <div style="height:44px;"></div>
+      <div class="phone"><div class="screen">
+        <div class="topbar"><div class="wordmark">L<i>i</i>veQue</div><div class="badge" style="color:#4ECDC4;border-color:rgba(78,205,196,.5);">● LIVE</div></div>
+        <div class="np"><span><b>Now:</b> Black Hole Sun</span><span style="color:#4ECDC4;font-weight:800;">The Smashing 90's</span></div>
+        <div class="ticker"><span>🔥 Kayla tipped $15 to bump Wannabe · Tony sent a $5 with Torn · Jordan added a dedication · someone bought the band a round 🍻 ·</span></div>
+        <div class="fund">
+          <b>🎯 Tonight's tips buy: a new wireless mic</b>
+          <div class="lbl">$63 of $90 · almost there</div>
+          <div class="meter"><div class="bar"><div class="fill" style="width:70%;"></div></div></div>
+        </div>
+        <div class="qcard">
+          <div class="r1"><div><b>1 · Wannabe</b><div class="by">Kayla 👰</div></div><span class="tipchip">$15</span></div>
+        </div>
+        <div class="qcard">
+          <div class="r1"><div><b>2 · Torn</b><div class="by">Tony</div></div><span class="tipchip">$5</span></div>
+          <div class="meter"><div class="lbl">$11 more takes #1</div><div class="bar"><div class="fill" style="width:31%;"></div></div></div>
+        </div>
+        <div class="qcard">
+          <div class="r1"><div><b>3 · Everlong</b><div class="by">Dev</div></div><span class="tipchip">$3</span></div>
+          <div class="meter"><div class="lbl">$3 more bumps you to #2</div><div class="bar"><div class="fill" style="width:50%;"></div></div></div>
+        </div>
+        <div class="pad" style="padding-top:8px;">
+          <button class="cta">Request a Song<small>free, or tip to jump the line · artist keeps 100%</small></button>
+        </div>
+      </div></div>
+      <p class="note"><b>Why these three are on the fan side:</b> the Bump Meter turns one-and-done tippers into
+      second tips, the Hype Ticker is public social proof, and Tonight's Fund gives the room one concrete goal.
+      All three passed the gate with disclosure guardrails — nothing hides, nothing lies.</p>
+    </div>
+  </div>
+</div>
+<script>
+function show(btn) {
+  document.querySelectorAll('.sw').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.pscreen').forEach(s => s.classList.remove('on'));
+  document.getElementById('s-' + btn.dataset.s).classList.add('on');
+}
+</script>
+</body>
+</html>
