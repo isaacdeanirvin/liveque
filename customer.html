@@ -337,6 +337,11 @@ const STRIPE_TIPS_ENABLED = true;
 
 let stripeChargesEnabled=false;
 let pendingTip=null;
+// A fan should type their name once a night, not once per request. Stored on
+// their own device only; never leaves it except as the requester_name they
+// already chose to send.
+function rememberedRequesterName(){ try{ return localStorage.getItem('liveque-fan-name')||''; }catch(_){ return ''; } }
+function rememberRequesterName(n){ try{ localStorage.setItem('liveque-fan-name',String(n).slice(0,40)); }catch(_){} }
 
 const paymentIcons = {
     paypal: '💳',
@@ -1196,8 +1201,15 @@ function openRequestModal(t,a,sp){
     
     const nameDiv=document.createElement('div');
     nameDiv.style.cssText='margin-bottom: 12px; text-align: left;';
-    nameDiv.innerHTML='<label class="name-label">Your Name (optional):</label><input type="text" id="requesterNameInput" class="name-input-field" placeholder="Anonymous" aria-label="Your name for this request">';
+    // Named requests are the whole point of the queue card ("by Kayla" is the
+    // status moment, and the band can shout you out). The old copy said
+    // "(optional)" next to an "Anonymous" placeholder, which taught fans to
+    // skip it, and it never remembered a name - so a fan who requested twice
+    // typed it twice. Now: warmer prompt and the name persists per device.
+    nameDiv.innerHTML='<label class="name-label">Your name (so they can shout you out):</label><input type="text" id="requesterNameInput" class="name-input-field" placeholder="Your name" maxlength="40" autocomplete="given-name" aria-label="Your name for this request">';
     tc.appendChild(nameDiv);
+    var savedName=rememberedRequesterName();
+    if(savedName){ var ni=nameDiv.querySelector('#requesterNameInput'); if(ni) ni.value=savedName; }
     
     // Only show paid tip buttons when the performer's Stripe is ready to charge
     // (F2). Otherwise the audience gets the free request plus the external
@@ -1289,6 +1301,7 @@ function openRequestModal(t,a,sp){
 async function requestSong(payAmount){
     const nameInput=document.getElementById('requesterNameInput');
     const requesterName=nameInput&&nameInput.value.trim()?nameInput.value.trim():'Anonymous';
+    if(requesterName&&requesterName!=='Anonymous') rememberRequesterName(requesterName);
     
     try{
         const insertData={
@@ -1324,6 +1337,7 @@ let stripeTipState=null;
 async function startTipPayment(amount){
     const nameInput=document.getElementById('requesterNameInput');
     const requesterName=nameInput&&nameInput.value.trim()?nameInput.value.trim():'Anonymous';
+    if(requesterName&&requesterName!=='Anonymous') rememberRequesterName(requesterName);
     const tc=document.getElementById('tipButtonsContainer');
     const pa=document.getElementById('paymentArea');
     const msg=document.getElementById('paymentMessage');
@@ -1426,6 +1440,22 @@ async function confirmTipPayment(){
             if(pendingTip&&pendingTip.timer) clearTimeout(pendingTip.timer);
             pendingTip={title:currentSong.title,requester:who,amount:stripeTipState.amount,done:false,timer:null};
             pendingTip.timer=setTimeout(function(){resolvePendingTip(true);},10000);
+            // Safety net: the row normally arrives via webhook in 1-5s. If it
+            // has not, ask the server to reconcile straight from Stripe, so a
+            // failed webhook delivery can never mean charged-but-not-queued.
+            (function(pid){
+                if(!pid) return;
+                var tries=0;
+                var iv=setInterval(function(){
+                    tries++;
+                    // pendingTip clears the moment the row arrives via realtime.
+                    var landed=!pendingTip||pendingTip.done;
+                    if(landed||tries>6){ clearInterval(iv); return; }
+                    if(tries>=2){
+                        db.functions.invoke('tip-reconcile',{ body:{ payment_intent_id:pid } }).catch(function(){});
+                    }
+                },2500);
+            })(paymentIntent.id);
             stripeTipState=null;
             payBtn.disabled=true;
             payBtn.textContent='Locking in…';
@@ -1755,7 +1785,7 @@ document.addEventListener('DOMContentLoaded',async function(){
    version file and, when the deployed build changes, offer a one-tap
    update instead of silently reloading over someone's payment. */
 (function(){
-  var BUILD='2026-07-30-01';
+  var BUILD='2026-07-30-02';
   function showUpdatePill(){
     if(document.getElementById('lqUpdatePill')) return;
     var p=document.createElement('button');
