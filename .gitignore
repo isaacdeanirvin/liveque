@@ -2,3 +2,4 @@
 
 # Inter TTFs are large binaries; build_cards.py documents where to get them
 cards/print/fonts/*.ttf
+supabase/.temp/
