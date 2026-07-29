@@ -53,6 +53,14 @@
         .gift-pill input::placeholder { color: rgba(255,255,255,0.28); letter-spacing: 0.14em; }
         .gift-pill button { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 50%; border: none; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.35); font-size: 15px; cursor: pointer; transition: background .2s, color .2s; font-family: inherit; }
         .gift-pill button.ready { background: #17B7AE; color: #06211f; }
+        /* Pro feature menu: quiet rows, one accent per state. */
+        .pro-feat { display: flex; align-items: flex-start; gap: 10px; padding: 9px 2px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+        .pro-feat .pf-ic { flex: none; width: 22px; text-align: center; font-size: 15px; }
+        .pro-feat .pf-t { flex: 1; min-width: 0; }
+        .pro-feat .pf-t b { display: block; font-size: 13px; }
+        .pro-feat .pf-t small { display: block; font-size: 11px; opacity: 0.55; line-height: 1.45; }
+        .pro-feat .pf-tag { flex: none; font-size: 9px; font-weight: 800; letter-spacing: 0.1em; padding: 3px 7px; border-radius: 999px; color: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.18); align-self: center; }
+        .pro-feat .pf-tag.now { color: #06211f; background: #4ecdc4; border-color: #4ecdc4; }
         .auth-input::placeholder { color: rgba(255, 255, 255, 0.7); }
         .auth-btn { background: linear-gradient(45deg, #4ecdc4, #44a08d); border: none; padding: 12px; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; }
         .auth-btn:hover { transform: scale(1.05); }
@@ -586,7 +594,21 @@
             <div class="payment-section" id="proCard">
                 <div class="section-title">LiveQue Pro</div>
                 <div id="proStatusLine" style="font-size: 12.5px; text-align: center; margin-bottom: 10px; opacity: 0.8; min-height: 16px;"></div>
-                <div style="margin-bottom: 12px; font-size: 12px; opacity: 0.65; text-align: center; line-height: 1.55;">Earning tools for performers: all twelve page looks, themed tip celebrations, and everything we ship next. <b>0% of tips, forever</b> - Pro is tools, never a cut.</div>
+                <div style="margin-bottom: 12px; font-size: 12px; opacity: 0.65; text-align: center; line-height: 1.55;">Earning tools for performers. <b>0% of tips, forever</b> - Pro is tools, never a cut.</div>
+                <div id="proFeatureList" style="max-width: 420px; margin: 0 auto 14px; text-align: left;">
+                    <div class="pro-feat"><span class="pf-ic">🎨</span><span class="pf-t"><b>All twelve page looks</b><small>Genre skins, stamped walls, themed tip explosions</small></span><span class="pf-tag now">NOW</span></div>
+                    <div class="pro-feat"><span class="pf-ic">📊</span><span class="pf-t"><b>Earnings Insights</b><small>Best songs, hours, venues, repeat tippers - every gig</small></span><span class="pf-tag">SOON</span></div>
+                    <div class="pro-feat"><span class="pf-ic">📇</span><span class="pf-t"><b>Encore Alerts</b><small>Your own fan list: one tap to follow at the tip moment</small></span><span class="pf-tag">SOON</span></div>
+                    <div class="pro-feat"><span class="pf-ic">🎚️</span><span class="pf-t"><b>Room-Tuned Presets</b><small>Tip amounts anchor to what tonight's room is giving</small></span><span class="pf-tag">SOON</span></div>
+                    <div class="pro-feat"><span class="pf-ic">📈</span><span class="pf-t"><b>Bump Meter</b><small>"$3 more takes #1" on every queued song</small></span><span class="pf-tag">SOON</span></div>
+                    <div class="pro-feat"><span class="pf-ic">📣</span><span class="pf-t"><b>Hype Ticker</b><small>Live feed of who just tipped, for the whole room</small></span><span class="pf-tag">SOON</span></div>
+                    <div class="pro-feat"><span class="pf-ic">🎯</span><span class="pf-t"><b>Tonight's Fund</b><small>"Tips buy the new mic" with a live thermometer</small></span><span class="pf-tag">SOON</span></div>
+                    <div class="pro-feat"><span class="pf-ic">⚡</span><span class="pf-t"><b>Encore Tap</b><small>One-tap re-tips all night after the first</small></span><span class="pf-tag">SOON</span></div>
+                    <div class="pro-feat"><span class="pf-ic">🥇</span><span class="pf-t"><b>Marquee Request</b><small>The $25 headline-the-set shelf</small></span><span class="pf-tag">SOON</span></div>
+                    <div class="pro-feat"><span class="pf-ic">✨</span><span class="pf-t"><b>Star Rush Hour</b><small>Double-star windows you trigger from stage</small></span><span class="pf-tag">SOON</span></div>
+                    <div class="pro-feat"><span class="pf-ic">🧾</span><span class="pf-t"><b>Encore Receipt</b><small>Every tip mints a keepsake the fan shares</small></span><span class="pf-tag">SOON</span></div>
+                    <div class="pro-feat" style="border-bottom:0;"><span class="pf-ic">🪙</span><span class="pf-t"><b>Make It Even</b><small>The round-up nudge on every tip</small></span><span class="pf-tag">SOON</span></div>
+                </div>
                 <div style="display: flex; gap: 8px; justify-content: center;">
                     <button class="auth-btn" id="proMonthlyBtn" onclick="startProCheckout('monthly')" style="background: linear-gradient(45deg, #17B7AE, #0E7A72);">$4.99 / month</button>
                     <button class="auth-btn" id="proAnnualBtn" onclick="startProCheckout('annual')" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18);">$39 / year</button>
