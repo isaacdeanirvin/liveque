@@ -46,6 +46,13 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .auth-input { width: 100%; padding: 12px; border: none; border-radius: 10px; background: rgba(255, 255, 255, 0.2); color: white; font-size: 16px; text-align: center; }
+        /* Gift code: one quiet pill, the action lives inside it. */
+        .gift-pill { position: relative; max-width: 250px; margin: 10px auto 0; }
+        .gift-pill input { width: 100%; padding: 12px 46px 12px 20px; border: 1px solid rgba(255,255,255,0.14); border-radius: 999px; background: rgba(255,255,255,0.06); color: #fff; font-size: 13.5px; letter-spacing: 0.14em; text-align: center; text-transform: uppercase; font-family: inherit; outline: none; transition: border-color .2s; -webkit-user-select: text; user-select: text; }
+        .gift-pill input:focus { border-color: rgba(78,205,196,0.55); }
+        .gift-pill input::placeholder { color: rgba(255,255,255,0.28); letter-spacing: 0.14em; }
+        .gift-pill button { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 50%; border: none; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.35); font-size: 15px; cursor: pointer; transition: background .2s, color .2s; font-family: inherit; }
+        .gift-pill button.ready { background: #17B7AE; color: #06211f; }
         .auth-input::placeholder { color: rgba(255, 255, 255, 0.7); }
         .auth-btn { background: linear-gradient(45deg, #4ecdc4, #44a08d); border: none; padding: 12px; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; }
         .auth-btn:hover { transform: scale(1.05); }
@@ -585,9 +592,13 @@
                     <button class="auth-btn" id="proAnnualBtn" onclick="startProCheckout('annual')" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18);">$39 / year</button>
                 </div>
                 <div style="text-align: center; margin-top: 8px;"><button id="proManageBtn" onclick="openProPortal()" style="display:none; background:none; border:none; color: rgba(255,255,255,0.5); font-size: 11.5px; cursor: pointer; text-decoration: underline;">Manage subscription</button></div>
-                <div style="display: flex; gap: 8px; max-width: 320px; margin: 12px auto 0;">
-                    <input type="text" id="giftCodeInput" class="auth-input" placeholder="Gift code" autocapitalize="characters" autocomplete="off" style="flex: 1; text-align: center; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; padding: 10px;">
-                    <button class="auth-btn" id="giftCodeBtn" onclick="redeemGiftCode()" style="background: rgba(245,165,36,0.15); border: 1px solid rgba(245,165,36,0.5); color: #F5A524; font-size: 13px; padding: 10px 16px;">Redeem</button>
+                <div id="giftRow" style="text-align: center; margin-top: 14px;">
+                    <button id="giftToggle" onclick="toggleGiftField()" style="background: none; border: none; color: rgba(255,255,255,0.45); font-size: 12px; font-family: inherit; cursor: pointer;">Have a gift code?</button>
+                    <div id="giftField" class="gift-pill" hidden>
+                        <input type="text" id="giftCodeInput" placeholder="ENTER CODE" autocapitalize="characters" autocomplete="off" spellcheck="false" maxlength="32"
+                               oninput="giftFieldState()" onkeydown="if(event.key==='Enter')redeemGiftCode()">
+                        <button id="giftCodeBtn" onclick="redeemGiftCode()" aria-label="Redeem code">→</button>
+                    </div>
                 </div>
             </div>
             <div class="payment-section"><div class="section-title">Payment Settings</div><div style="margin-bottom: 12px; font-size: 12px; opacity: 0.6; text-align: center;">Requests are free right now. These are how your crowd tips you.</div><div id="paymentMethodsDisplay"></div><div style="text-align: center;"><button class="auth-btn" onclick="openPaymentSettings()">Configure Payment Methods</button></div></div>
@@ -1659,23 +1670,37 @@ async function openProPortal() {
         window.location.href = data.url;
     } catch (e) { showToast(e.message, 'warning'); }
 }
+function toggleGiftField() {
+    const t = document.getElementById('giftToggle');
+    const f = document.getElementById('giftField');
+    if (!t || !f) return;
+    t.style.display = 'none'; f.hidden = false;
+    const input = document.getElementById('giftCodeInput');
+    if (input) input.focus();
+}
+function giftFieldState() {
+    const input = document.getElementById('giftCodeInput');
+    const btn = document.getElementById('giftCodeBtn');
+    if (btn) btn.classList.toggle('ready', !!(input && input.value.trim().length >= 3));
+}
 async function redeemGiftCode() {
     const input = document.getElementById('giftCodeInput');
     const btn = document.getElementById('giftCodeBtn');
     const code = (input && input.value || '').trim();
-    if (!code) { showToast('Type a gift code first', 'warning'); return; }
-    if (btn) { btn.disabled = true; btn.textContent = '...'; }
+    if (!code) { if (input) input.focus(); return; }
+    if (btn) { btn.disabled = true; btn.textContent = '·'; }
     try {
         const { data, error } = await db.functions.invoke('gift-redeem', { body: { code: code } });
         if (error) { let msg = error.message; try { const b = await error.context.json(); if (b && b.error) msg = b.error; } catch(_) {} throw new Error(msg); }
         if (!data || !data.ok) throw new Error((data && data.error) || 'Code not recognized');
         isProActive = true; renderProCard(); renderSkinPicker();
-        if (input) input.value = '';
+        const f = document.getElementById('giftField'); if (f) f.hidden = true;
         showToast('🎁 Code accepted - welcome to LiveQue Pro.');
     } catch (e) {
         showToast(e.message || 'Code not recognized', 'error');
+        if (input) { input.select(); }
     }
-    if (btn) { btn.disabled = false; btn.textContent = 'Redeem'; }
+    if (btn) { btn.disabled = false; btn.textContent = '→'; giftFieldState(); }
 }
 async function handleProReturn() {
     const params = new URLSearchParams(window.location.search);
