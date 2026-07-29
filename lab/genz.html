@@ -4,85 +4,123 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex">
-<title>LiveQue Lab · Gen-Z Reskin</title>
+<title>LiveQue Lab · Skins</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Pirata+One&family=Permanent+Marker&family=Alfa+Slab+One&family=Space+Mono:wght@400;700&family=Manrope:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@700&family=Archivo+Black&family=Pirata+One&family=Permanent+Marker&family=Fraunces:opsz,wght@9..144,700&family=Metal+Mania&family=New+Rocker&family=Fredoka:wght@600&family=Rye&family=Ultra&family=Yellowtail&family=Space+Mono:wght@700&family=Manrope:wght@400;600;700;800&display=swap');
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { background: #080808; color: #E8EDF0; font-family: 'Manrope', sans-serif; }
 a { color: #4ECDC4; }
 
 .lab-shell { max-width: 1200px; margin: 0 auto; padding: 28px 20px 80px; }
-.lab-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 6px; }
-.lab-head h1 { font-size: 22px; font-weight: 800; letter-spacing: -.5px; }
 .lab-kick { font-size: 11px; letter-spacing: .18em; color: #17B7AE; font-weight: 700; }
-.lab-sub { color: rgba(255,255,255,.55); font-size: 14px; line-height: 1.6; max-width: 720px; margin-bottom: 22px; }
+.lab-shell h1 { font-size: 22px; font-weight: 800; letter-spacing: -.5px; margin: 6px 0 8px; }
+.lab-sub { color: rgba(255,255,255,.55); font-size: 14px; line-height: 1.6; max-width: 760px; margin-bottom: 22px; }
 
-.switcher { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 26px; }
+.switcher { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 26px; max-width: 800px; }
 .sw { border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.05); color: #fff;
-      font-family: inherit; font-weight: 700; font-size: 13px; padding: 10px 18px; border-radius: 999px; cursor: pointer; }
+      font-family: inherit; font-weight: 700; font-size: 12.5px; padding: 8px 13px; border-radius: 12px;
+      cursor: pointer; text-align: left; }
+.sw small { display: block; font-weight: 600; font-size: 10px; opacity: .55; margin-top: 1px; }
 .sw.active { background: #17B7AE; border-color: #17B7AE; color: #06211f; }
+.sw.active small { opacity: .8; }
 
 .stage { display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap; }
 
-/* ---------- PHONE FRAME ---------- */
 .phone { width: 383px; border: 4px solid #23282c; border-radius: 40px; overflow: hidden; background: #000;
          box-shadow: 0 30px 80px rgba(0,0,0,.6); flex: none; }
 .screen { width: 375px; height: 730px; overflow-y: auto; position: relative; scrollbar-width: none; }
 .screen::-webkit-scrollbar { display: none; }
 
-/* ---------- THEME VARIABLES ---------- */
+/* ---------- THEME SYSTEM ----------
+   Ten skins from the generational research, youngest to oldest energy.
+   Locked chrome never changes: teal request CTA, gold money, Manrope
+   transactional text, no autoplay, tonight-only stats. */
 .screen { --wall: #0B0F12; --card: rgba(255,255,255,.06); --line: rgba(255,255,255,.12);
-          --text: #F2F2F2; --dim: rgba(255,255,255,.55); --accent: #B7C4FF; --accent-ink: #06211f;
-          --namefont: 'Audiowide'; --headfont: 'Audiowide'; --tilt: -2deg; }
-.screen[data-theme="chrome"] { --wall: linear-gradient(160deg, #3a4150 0%, #171b22 45%, #0B0F12 100%);
-          --accent: #B7C4FF; --pop: #FF4D8D; --namefont: 'Audiowide'; --headfont: 'Audiowide';
-          --card: rgba(183,196,255,.08); --line: rgba(183,196,255,.25); }
-.screen[data-theme="emo"] { --wall: linear-gradient(175deg, #000 0%, #1a0509 55%, #2b060d 100%);
-          --accent: #E84D6F; --pop: #E84D6F; --namefont: 'Pirata One'; --headfont: 'Permanent Marker';
-          --card: rgba(232,77,111,.07); --line: rgba(232,77,111,.28); }
-.screen[data-theme="marquee"] { --wall: #F2E8D5; --accent: #C1440E; --pop: #C1440E;
-          --namefont: 'Alfa Slab One'; --headfont: 'Alfa Slab One';
-          --card: rgba(26,26,26,.05); --line: rgba(26,26,26,.22); --text: #1A1A1A; --dim: rgba(26,26,26,.6); }
+          --text: #F2F2F2; --dim: rgba(255,255,255,.55); --accent: #4ECDC4;
+          --namefont: 'Archivo Black'; --headfont: 'Archivo Black'; }
+
+.screen[data-theme="greenroom"] { --wall: #8ACE00; --card: rgba(244,255,225,.65); --line: #557F00;
+  --text: #0B0F12; --dim: rgba(11,15,18,.6); --accent: #0B0F12;
+  --namefont: 'Archivo Narrow'; --headfont: 'Archivo Narrow'; }
+.screen[data-theme="basement"] { --wall: linear-gradient(180deg, #0E0C10 0%, #1C1720 100%);
+  --card: rgba(242,239,234,.06); --line: rgba(212,43,76,.35); --text: #F2EFEA; --dim: #8C8794;
+  --accent: #D42B4C; --namefont: 'Pirata One'; --headfont: 'Permanent Marker'; }
+.screen[data-theme="afterparty"] { --wall: radial-gradient(120% 100% at 50% 0%, #241820 0%, #1A1216 55%, #100B0F 100%);
+  --card: rgba(242,234,226,.06); --line: rgba(242,234,226,.16); --text: #F2EAE2; --dim: #B9AFB6;
+  --accent: #E8404F; --namefont: 'Archivo Black'; --headfont: 'Archivo Black'; }
+.screen[data-theme="mudseason"] { --wall: linear-gradient(180deg, #22392C 0%, #22392C 78%, #161D14 100%);
+  --card: rgba(243,234,211,.07); --line: rgba(243,234,211,.2); --text: #F3EAD3; --dim: rgba(243,234,211,.55);
+  --accent: #B3552F; --namefont: 'Fraunces'; --headfont: 'Fraunces'; }
+.screen[data-theme="loser"] { --wall: #E9E5DB; --card: rgba(23,19,14,.05); --line: rgba(23,19,14,.25);
+  --text: #17130E; --dim: #6E675C; --accent: #B3311B;
+  --namefont: 'Permanent Marker'; --headfont: 'Permanent Marker'; }
+.screen[data-theme="sunset"] { --wall: linear-gradient(155deg, #241a33 0%, #1C1428 55%, #150e1f 100%);
+  --card: rgba(238,234,244,.06); --line: rgba(255,61,138,.35); --text: #EEEAF4; --dim: #C9CFDA;
+  --accent: #FF3D8A; --namefont: 'Metal Mania'; --headfont: 'Metal Mania'; }
+.screen[data-theme="marquee"] { --wall: #F0E5C9; --card: rgba(34,29,21,.05); --line: rgba(34,29,21,.3);
+  --text: #221D15; --dim: #7A6A4F; --accent: #B5432A;
+  --namefont: 'Rye'; --headfont: 'Rye'; }
+.screen[data-theme="gatefold"] { --wall: linear-gradient(180deg, #141A26 0%, #1D2433 55%, #2c3c57 78%, #1D2433 100%);
+  --card: rgba(238,241,246,.06); --line: rgba(85,104,140,.45); --text: #EEF1F6; --dim: rgba(238,241,246,.55);
+  --accent: #A08BD0; --namefont: 'Ultra'; --headfont: 'Ultra'; }
+.screen[data-theme="velvet"] { --wall: radial-gradient(130% 110% at 50% 20%, #3a1830 0%, #2E1022 55%, #160812 100%);
+  --card: rgba(244,231,208,.06); --line: rgba(217,160,180,.3); --text: #F4E7D0; --dim: #D9A0B4;
+  --accent: #D9A0B4; --namefont: 'Yellowtail'; --headfont: 'Manrope'; }
+.screen[data-theme="canyon"] { --wall: #EDE3D0; --card: rgba(59,46,34,.05); --line: rgba(59,46,34,.25);
+  --text: #3B2E22; --dim: rgba(59,46,34,.6); --accent: #B05A38;
+  --namefont: 'Fraunces'; --headfont: 'Fraunces'; }
+.screen[data-theme="bubblegum"] { --wall: linear-gradient(170deg, #FF7BC1 0%, #FF3D9A 60%, #E01F7E 100%);
+  --card: rgba(255,255,255,.55); --line: rgba(43,10,28,.25); --text: #2B0A1C; --dim: rgba(43,10,28,.6);
+  --accent: #2B0A1C; --namefont: 'Fredoka'; --headfont: 'Fredoka'; }
+.screen[data-theme="blackout"] { --wall: linear-gradient(180deg, #0A0A0C 0%, #14090B 70%, #1C0508 100%);
+  --card: rgba(193,18,31,.08); --line: rgba(193,18,31,.4); --text: #E8E4E1; --dim: rgba(232,228,225,.5);
+  --accent: #C1121F; --namefont: 'New Rocker'; --headfont: 'New Rocker'; }
+
 .wall { background: var(--wall); min-height: 100%; color: var(--text); padding-bottom: 90px; }
 
-/* stars texture for chrome theme */
-.screen[data-theme="chrome"] .wall { background-image:
-  radial-gradient(1.5px 1.5px at 40px 60px, rgba(255,255,255,.8) 50%, transparent 51%),
-  radial-gradient(1px 1px at 190px 140px, rgba(255,255,255,.6) 50%, transparent 51%),
-  radial-gradient(1.5px 1.5px at 320px 90px, rgba(183,196,255,.9) 50%, transparent 51%),
-  radial-gradient(1px 1px at 110px 230px, rgba(255,255,255,.5) 50%, transparent 51%),
-  linear-gradient(160deg, #3a4150 0%, #171b22 45%, #0B0F12 100%); }
-
 /* ---------- 1 · EXPRESSION HEADER ---------- */
-.banner { height: 118px; position: relative; }
-.screen[data-theme="chrome"] .banner { background: linear-gradient(120deg, #B7C4FF 0%, #7d8fd8 30%, #C0C7D1 55%, #8fa0e8 80%, #B7C4FF 100%); }
-.screen[data-theme="emo"] .banner { background: repeating-linear-gradient(45deg, #14050a 0 14px, #1f070e 14px 28px); border-bottom: 1px dashed var(--accent); }
-.screen[data-theme="marquee"] .banner { background: #C1440E; background-image: radial-gradient(rgba(242,232,213,.25) 1px, transparent 1.5px); background-size: 8px 8px; }
+.banner { height: 118px; position: relative; background: var(--card); }
+.screen[data-theme="greenroom"] .banner { background: #557F00; }
+.screen[data-theme="basement"] .banner { background: repeating-linear-gradient(45deg, #14050a 0 14px, #1f070e 14px 28px); border-bottom: 1px dashed var(--accent); }
+.screen[data-theme="afterparty"] .banner { background: #241820; border-bottom: 1px solid rgba(242,234,226,.2); }
+.screen[data-theme="mudseason"] .banner { background: #161D14; border-bottom: 3px solid #B3552F; }
+.screen[data-theme="loser"] .banner { background: repeating-linear-gradient(0deg, #dcd6c8 0 3px, #E9E5DB 3px 6px); border-bottom: 2px solid #17130E; }
+.screen[data-theme="sunset"] .banner { background: linear-gradient(120deg, #1C1428 40%, #7B3FF2 41%, #1C1428 43%, #1C1428 55%, #FF3D8A 56%, #1C1428 58%); }
+.screen[data-theme="marquee"] .banner { background: #B5432A; background-image: radial-gradient(rgba(240,229,201,.3) 1px, transparent 1.5px); background-size: 8px 8px; }
+.screen[data-theme="gatefold"] .banner { background: radial-gradient(circle at 72% 40%, rgba(160,139,208,.35) 0 26%, transparent 27%), linear-gradient(180deg, #0f1420, #141A26); }
+.screen[data-theme="velvet"] .banner { background: radial-gradient(60% 90% at 50% 100%, rgba(244,231,208,.14) 0%, transparent 70%), #1e0a17; }
+.screen[data-theme="canyon"] .banner { background: linear-gradient(180deg, #DCCBA9, #EDE3D0); border-bottom: 2px solid #B05A38; }
+.screen[data-theme="bubblegum"] .banner { background: radial-gradient(1.6px 1.6px at 40px 50px, #fff 50%, transparent 51%), radial-gradient(1.2px 1.2px at 200px 90px, #fff 50%, transparent 51%), radial-gradient(1.6px 1.6px at 320px 40px, #FFD6EC 50%, transparent 51%), linear-gradient(120deg, #FF9BD0, #FF2D8A); }
+.screen[data-theme="blackout"] .banner { background: repeating-linear-gradient(65deg, #0A0A0C 0 22px, #16070a 22px 24px), #0A0A0C; border-bottom: 2px solid #C1121F; }
+
 .onair { position: absolute; top: 12px; right: 12px; background: #0B0F12; color: #4ECDC4;
          font-size: 10px; font-weight: 800; letter-spacing: .16em; padding: 6px 10px; border-radius: 999px;
          display: flex; gap: 6px; align-items: center; }
 .onair .dot { width: 7px; height: 7px; border-radius: 50%; background: #4ECDC4; animation: pulse 1.4s ease-in-out infinite; }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
-.screen[data-theme="emo"] .onair { animation: flicker 3.5s steps(1) infinite; }
+.screen[data-theme="basement"] .onair { animation: flicker 3.5s steps(1) infinite; }
 @keyframes flicker { 0%,92%,96%,100% { opacity: 1; } 93%,97% { opacity: .35; } }
 
 .idrow { padding: 0 18px; margin-top: -34px; position: relative; }
 .avatar { width: 84px; height: 84px; border-radius: 50%; border: 4px solid var(--accent);
-          background: #232a31 url('') center/cover; display: flex; align-items: center; justify-content: center;
+          background: #232a31; display: flex; align-items: center; justify-content: center;
           font-weight: 800; font-size: 24px; color: #fff; }
-.screen[data-theme="marquee"] .avatar { color: #F2E8D5; }
 .sticker { position: absolute; font-size: 22px; transform: rotate(14deg); }
 .stk1 { top: -6px; left: 96px; } .stk2 { top: 26px; right: 26px; transform: rotate(-11deg); }
 .artist { padding: 10px 18px 0; }
-.artist h2 { font-family: var(--namefont), sans-serif; font-size: 30px; font-weight: 400; letter-spacing: .02em; line-height: 1.1; }
-.screen[data-theme="chrome"] .artist h2 { background: linear-gradient(180deg, #fff 20%, #B7C4FF 60%, #6f83d6 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.screen[data-theme="emo"] .artist h2 { color: var(--accent); text-shadow: 2px 2px 0 #000; font-size: 34px; }
-/* 2 · MOOD LINE */
+.artist h2 { font-family: var(--namefont), sans-serif; font-size: 30px; font-weight: 400; letter-spacing: .02em; line-height: 1.12; color: var(--text); }
+.screen[data-theme="greenroom"] .artist h2 { transform: scaleY(1.15); transform-origin: left bottom; text-transform: lowercase; letter-spacing: -.01em; }
+.screen[data-theme="basement"] .artist h2 { color: var(--accent); text-shadow: 2px 2px 0 #000; font-size: 34px; }
+.screen[data-theme="sunset"] .artist h2 { background: linear-gradient(180deg, #EEEAF4 15%, #C9CFDA 45%, #8f97a8 55%, #EEEAF4 90%); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 33px; }
+.screen[data-theme="velvet"] .artist h2 { color: #F4E7D0; font-size: 38px; }
+.screen[data-theme="marquee"] .artist h2 { color: #221D15; }
+.screen[data-theme="bubblegum"] .artist h2 { color: #fff; text-shadow: 2px 3px 0 #C4176B; font-size: 33px; }
+.screen[data-theme="blackout"] .artist h2 { color: #C1121F; text-shadow: 0 2px 0 #000, 0 0 24px rgba(193,18,31,.5); font-size: 33px; }
 .mood { color: var(--accent); font-size: 13px; font-weight: 600; margin-top: 4px; font-style: italic; }
 .bio { color: var(--dim); font-size: 12.5px; margin-top: 4px; }
 
-/* ---------- 3 · NOW PLAYING / ANTHEM ---------- */
+/* ---------- SECTIONS ---------- */
 .section { margin: 18px 14px 0; }
 .sec-h { font-family: var(--headfont), sans-serif; font-size: 13px; letter-spacing: .12em; color: var(--accent);
          margin-bottom: 8px; font-weight: 400; }
@@ -90,7 +128,7 @@ a { color: #4ECDC4; }
               display: flex; align-items: center; gap: 12px; }
 .eq { display: flex; gap: 3px; align-items: flex-end; height: 26px; flex: none; }
 .eq span { width: 4px; background: var(--accent); border-radius: 2px; animation: eq 1s ease-in-out infinite; }
-.eq span:nth-child(1) { height: 40%; animation-delay: 0s; } .eq span:nth-child(2) { height: 90%; animation-delay: .15s; }
+.eq span:nth-child(1) { height: 40%; } .eq span:nth-child(2) { height: 90%; animation-delay: .15s; }
 .eq span:nth-child(3) { height: 60%; animation-delay: .3s; } .eq span:nth-child(4) { height: 100%; animation-delay: .45s; }
 .eq span:nth-child(5) { height: 50%; animation-delay: .6s; }
 @keyframes eq { 0%,100% { transform: scaleY(.5); } 50% { transform: scaleY(1); } }
@@ -101,7 +139,7 @@ a { color: #4ECDC4; }
 .float { position: absolute; left: 50%; top: -6px; font-size: 16px; pointer-events: none; animation: rise 1.1s ease-out forwards; }
 @keyframes rise { to { transform: translate(-50%, -46px); opacity: 0; } }
 
-/* ---------- 4 · REQUEST CTA (locked chrome) ---------- */
+/* Locked chrome: identical on every skin */
 .cta-bar { position: sticky; top: 0; z-index: 20; padding: 10px 14px; background: rgba(11,15,18,.92);
            backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,.08); }
 .cta { display: block; width: 100%; text-align: center; background: linear-gradient(135deg, #4ECDC4, #17B7AE);
@@ -109,7 +147,6 @@ a { color: #4ECDC4; }
        border-radius: 12px; cursor: pointer; }
 .cta small { display: block; font-size: 10.5px; font-weight: 700; opacity: .75; }
 
-/* ---------- 5 · QUEUE ---------- */
 .q-item { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px;
           display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
 .q-pos { font-family: 'Space Mono'; font-weight: 700; font-size: 13px; color: var(--dim); width: 20px; }
@@ -118,15 +155,13 @@ a { color: #4ECDC4; }
 .q-boost { border-color: #F5A524; box-shadow: 0 0 0 1px rgba(245,165,36,.35); }
 .bump { color: #F5A524; font-size: 10.5px; font-weight: 700; }
 
-/* ---------- 6 · DRINK ---------- */
-.drink { border: 1.5px solid #F5A524; background: rgba(245,165,36,.07); border-radius: 14px; padding: 14px;
+.drink { border: 1.5px solid #F5A524; background: rgba(245,165,36,.09); border-radius: 14px; padding: 14px;
          display: flex; align-items: center; gap: 12px; }
 .drink .e { font-size: 26px; } .drink .t { flex: 1; }
 .drink .t b { font-size: 14px; } .drink .t div { color: var(--dim); font-size: 11.5px; }
 .drink button { background: #F5A524; border: 0; color: #231a02; font-family: 'Manrope'; font-weight: 800;
                 font-size: 13px; padding: 10px 14px; border-radius: 10px; cursor: pointer; }
 
-/* ---------- 7 · TOP FANS ---------- */
 .fans { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 .fan { text-align: center; }
 .fan .c { width: 56px; height: 56px; margin: 0 auto 4px; border-radius: 50%; background: var(--card);
@@ -136,20 +171,19 @@ a { color: #4ECDC4; }
 .crown { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 15px; }
 .fan .n { font-size: 10.5px; color: var(--dim); font-weight: 700; }
 .fan .amt { font-family: 'Space Mono'; font-size: 10px; color: #F5A524; font-weight: 700; }
+.screen[data-theme="loser"] .fan .amt, .screen[data-theme="marquee"] .fan .amt,
+.screen[data-theme="canyon"] .fan .amt, .screen[data-theme="greenroom"] .fan .amt,
+.screen[data-theme="bubblegum"] .fan .amt { color: #8a5a00; }
 
-/* ---------- 8 · WALL ---------- */
 .shout { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px;
          font-size: 12.5px; margin-bottom: 7px; }
 .shout .who { color: var(--dim); font-size: 10.5px; font-weight: 700; margin-top: 3px; }
 .shout.gold { border-left: 3px solid #F5A524; }
 .pin { color: var(--accent); font-size: 10.5px; font-weight: 800; }
 
-/* ---------- 9 · STARS CHIPS ---------- */
 .chips { display: flex; flex-wrap: wrap; gap: 7px; }
 .chip { border: 1px solid var(--accent); color: var(--accent); font-size: 11.5px; font-weight: 700;
         padding: 5px 11px; border-radius: 999px; }
-
-/* ---------- 10/11 · PINNED + FOOTER ---------- */
 .pinned { display: flex; gap: 8px; }
 .pcard { flex: 1; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 8px;
          text-align: center; font-size: 11px; font-weight: 700; }
@@ -157,57 +191,32 @@ a { color: #4ECDC4; }
 .socials { display: flex; gap: 14px; justify-content: center; color: var(--dim); font-size: 12px; font-weight: 700; padding: 18px 0 6px; }
 .enddot { text-align: center; color: var(--dim); font-size: 11px; padding: 14px 0 4px; }
 
-/* ---------- RIGHT COLUMN ---------- */
-.rightcol { flex: 1; min-width: 320px; max-width: 460px; }
-.receipt { background: #fff; color: #111; font-family: 'Space Mono', monospace; width: 290px; padding: 20px 22px;
-           box-shadow: 0 18px 50px rgba(0,0,0,.5); transform: rotate(-1.5deg); margin: 8px 0 26px; }
-.receipt h4 { text-align: center; font-size: 13px; letter-spacing: .1em; }
-.receipt .rl { display: flex; justify-content: space-between; font-size: 11px; margin-top: 7px; }
-.receipt hr { border: 0; border-top: 1.5px dashed #999; margin: 10px 0; }
-.receipt .bar { height: 34px; margin-top: 12px;
-  background: repeating-linear-gradient(90deg, #111 0 2px, #fff 2px 4px, #111 4px 5px, #fff 5px 9px, #111 9px 12px, #fff 12px 13px); }
-.receipt .url { text-align: center; font-size: 9.5px; margin-top: 4px; letter-spacing: .06em; }
-.note-h { font-size: 12px; letter-spacing: .16em; color: #17B7AE; font-weight: 800; margin: 22px 0 10px; }
-.note { color: rgba(255,255,255,.7); font-size: 13px; line-height: 1.65; margin-bottom: 8px; }
+.rightcol { flex: 1; min-width: 320px; max-width: 480px; }
+.note-h { font-size: 12px; letter-spacing: .16em; color: #17B7AE; font-weight: 800; margin: 4px 0 10px; }
+.note { color: rgba(255,255,255,.68); font-size: 13px; line-height: 1.65; margin-bottom: 10px; }
 .note b { color: #fff; }
-
-/* ---------- PERSONAS ---------- */
-.personas { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: 14px; }
-.persona { background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.1); border-radius: 14px; padding: 16px; }
-.persona h4 { font-size: 14px; } .persona .age { color: #17B7AE; font-size: 11px; font-weight: 800; }
-.persona p { color: rgba(255,255,255,.62); font-size: 12px; line-height: 1.55; margin-top: 7px; }
-.persona .tt { margin-top: 8px; font-size: 11.5px; color: #F5A524; font-weight: 700; }
-h3.labsec { margin: 46px 0 4px; font-size: 17px; font-weight: 800; }
-.labsub { color: rgba(255,255,255,.5); font-size: 13px; margin-bottom: 10px; }
-.twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 14px; }
-@media (max-width: 700px) { .twocol { grid-template-columns: 1fr; } }
-.rulebox { background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.1); border-radius: 14px; padding: 16px; }
-.rulebox h4 { font-size: 13px; margin-bottom: 8px; }
-.rulebox li { color: rgba(255,255,255,.66); font-size: 12.5px; line-height: 1.6; margin: 0 0 5px 16px; }
+.skininfo { background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.1); border-radius: 14px;
+            padding: 16px; margin-bottom: 14px; }
+.skininfo h4 { font-size: 15px; } .skininfo .g { color: #17B7AE; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; }
+.skininfo p { color: rgba(255,255,255,.62); font-size: 12.5px; line-height: 1.6; margin-top: 7px; }
+.skininfo .fits { margin-top: 8px; font-size: 11.5px; color: #F5A524; font-weight: 700; }
 </style>
 </head>
 <body>
 <div class="lab-shell">
-  <div class="lab-head">
-    <span class="lab-kick">LIVEQUE LAB</span>
-    <h1>The performer page, MySpace mechanics, Gen-Z skin</h1>
-  </div>
-  <p class="lab-sub">What a fan sees after scanning the QR. Everything decorative is the musician's to customize.
-  Everything that touches money (teal request button, gold tip elements, queue order) is locked LiveQue chrome and identical across every skin.
-  Three starter themes below, from the research. Scroll inside the phone.</p>
+  <div class="lab-kick">LIVEQUE LAB · SKINS</div>
+  <h1>Pick your genre, get your page</h1>
+  <p class="lab-sub">Twelve skins built off the act's genre and style — the pop act gets pink and glossy,
+  the metal band gets black and blood red with sharp type. Backed by the four-generation aesthetic research.
+  Decoration changes; the teal request button, gold money elements, and queue logic never do.
+  Scroll inside the phone.</p>
 
-  <div class="switcher">
-    <button class="sw active" data-t="chrome" onclick="setTheme(this)">🪩 Chrome Angel (Y2K)</button>
-    <button class="sw" data-t="emo" onclick="setTheme(this)">🖤 Basement Show (Emo/Zine)</button>
-    <button class="sw" data-t="marquee" onclick="setTheme(this)">🎪 Marquee (Gig Poster)</button>
-  </div>
+  <div class="switcher" id="switcher"></div>
 
   <div class="stage">
-    <div class="phone"><div class="screen" data-theme="chrome" id="screen"><div class="wall">
+    <div class="phone"><div class="screen" data-theme="greenroom" id="screen"><div class="wall">
 
-      <div class="banner">
-        <div class="onair"><span class="dot"></span>LIVE · ON AIR</div>
-      </div>
+      <div class="banner"><div class="onair"><span class="dot"></span>LIVE · ON AIR</div></div>
       <div class="idrow">
         <div class="avatar">S9</div>
         <span class="sticker stk1">⚡</span><span class="sticker stk2">📼</span>
@@ -300,80 +309,87 @@ h3.labsec { margin: 46px 0 4px; font-size: 17px; font-weight: 800; }
     </div></div></div>
 
     <div class="rightcol">
-      <div class="note-h">THE SHARE MOMENT · TIP RECEIPT</div>
-      <div class="receipt">
-        <h4>LIVEQUE ★ LIVE RECEIPT</h4>
-        <hr>
-        <div class="rl"><span>SONG REQUESTED</span><span>WANNABE</span></div>
-        <div class="rl"><span>TIP</span><span>$15.00</span></div>
-        <div class="rl"><span>SHOUTOUT</span><span>FOR THE BRIDE</span></div>
-        <div class="rl"><span>VENUE</span><span>THE CINEMA BAR</span></div>
-        <div class="rl"><span>CUSTOMER</span><span>KAYLA 👑</span></div>
-        <hr>
-        <div class="rl"><span>ARTIST KEEPS</span><span>100%</span></div>
-        <div class="bar"></div>
-        <div class="url">getliveque.com/thesmashing90s</div>
-      </div>
-      <p class="note">Fan tips → this story-sized receipt renders in the performer's theme colors with one-tap Share to Story.
-      Receiptify's proven format; every tip becomes a post <b>the fan wants to make</b>.</p>
-
-      <div class="note-h">WHAT THE MUSICIAN CONTROLS</div>
-      <p class="note">Wallpaper, accent color, banner, avatar ring, display font (6 curated), mood line (editable from stage),
-      stars chips, sticker layer, anthem, top-8 song tiles, pinned 3. Bounded like Noplace — <b>no raw CSS</b>.</p>
-      <div class="note-h">WHAT NEVER CHANGES</div>
-      <p class="note">Teal request button, gold money elements, queue order logic, payment sheet, ON AIR badge, no autoplay,
-      no follower counts, tonight-only stats. <b>Gold is blocked in the performer's accent picker</b> — money keeps its own color.</p>
+      <div class="note-h">THIS SKIN</div>
+      <div class="skininfo" id="skininfo"></div>
+      <div class="note-h">THE RULES (EVERY SKIN)</div>
+      <p class="note"><b>Locked:</b> teal request button, gold money elements, queue order logic, payment sheet,
+      ON AIR badge, no autoplay ever, no follower counts, tonight-only stats. Gold is blocked in every
+      skin's palette — money keeps its own color on all ten.</p>
+      <p class="note"><b>Musician controls:</b> skin, accent, banner, avatar ring, mood line, stars chips,
+      stickers, anthem, pinned 3. Bounded customization — no raw CSS, ever.</p>
+      <p class="note"><b>Dropped by the design director:</b> Chrome Angel (Y2K crested — archived as a future
+      seasonal), Top 8 (Basement Show owns emo), Barnburner (Mud Season owns folk), Blue Hour (prettiest cut,
+      thinnest bar-booking market), Liquid Light (drifting blobs near a payment surface is the highest
+      distrust-risk move for the crowd that tips most).</p>
     </div>
-  </div>
-
-  <h3 class="labsec">Who's in the room</h3>
-  <p class="labsub">Five personas from the research. The page above has to work for all of them at once.</p>
-  <div class="personas">
-    <div class="persona"><h4>Maddie</h4><div class="age">21 · COLLEGE DIVE BAR</div>
-      <p>Apple Pay native, zero cash. Judges the page by Story standards in 5 seconds. 2000s-nostalgic like 56% of Gen Z.</p>
-      <div class="tt">Tips $2-5 when money visibly moves her song up.</div></div>
-    <div class="persona"><h4>Dev</h4><div class="age">24 · MUSICIAN IN THE CROWD</div>
-      <p>Cash App first. Secretly evaluating LiveQue for his own gigs. Screenshots mechanics into group chats.</p>
-      <div class="tt">Tips $1-3 in solidarity when the page feels DIY, not corporate.</div></div>
-    <div class="persona"><h4>Priya + Jordan</h4><div class="age">29 · DATE NIGHT</div>
-      <p>Venmo between themselves. Scans when the band pitches from stage. One tasteful Story per night.</p>
-      <div class="tt">Tips $5-10 when a dedication rides along with the request.</div></div>
-    <div class="persona"><h4>Tony</h4><div class="age">52 · THE REGULAR</div>
-      <p>Scam-wary, buys merch, biggest habitual tipper of anyone (78% always-tip cohort). Needs big type and trust marks.</p>
-      <div class="tt">Tips habitually once verified. Loves seeing "Tony's request" on screen.</div></div>
-    <div class="persona"><h4>Kayla</h4><div class="age">27 · BACHELORETTE CIRCUIT</div>
-      <p>Runs the weekend from a Venmo group fund. One scan cascades to the whole party.</p>
-      <div class="tt">Tips $10-20+ to force the bride's song. Group rivalry multiplies it.</div></div>
-  </div>
-
-  <h3 class="labsec">The lineage</h3>
-  <p class="labsub">Every section descends from a mechanic that already worked somewhere Gen Z lives.</p>
-  <div class="twocol">
-    <div class="rulebox"><h4>From MySpace</h4><ul>
-      <li>Top 8 → <b>Top Fans Tonight</b> (resets nightly, winnable, monetized status)</li>
-      <li>Profile song → <b>Anthem / Now Playing</b> with live reactions</li>
-      <li>Comment wall → <b>Shoutout Wall</b>, tipped notes get gold borders</li>
-      <li>Glitter chaos → <b>sticker layer + themes</b>, bounded so it can't touch money</li>
-      <li>Mood → <b>status line</b> editable from the stage</li></ul></div>
-    <div class="rulebox"><h4>From Gen-Z apps</h4><ul>
-      <li>Noplace: bounded color customization + "stars" interest chips</li>
-      <li>Discord: banner/accent/decoration flair layers</li>
-      <li>Airbuds: react-to-the-song as the social gesture</li>
-      <li>BeReal: night-scoped states, finite page, "you were here"</li>
-      <li>Receiptify/Wrapped: the tip receipt share card</li></ul></div>
   </div>
 </div>
 
 <script>
-function setTheme(btn) {
-  document.querySelectorAll('.sw').forEach(b => b.classList.remove('active'));
+var SKINS = [
+  { k: 'bubblegum', name: 'POP', gen: 'Bubblegum', anchor: 'Taylor, Sabrina, Chappell nights',
+    vibe: 'Hot pink and glossy, white bubble type, glitter in the banner. The pop-star page.',
+    fits: 'Pop cover acts, girl-group tributes, bachelorette-magnet party sets.' },
+  { k: 'greenroom', name: 'DANCE / HYPERPOP', gen: 'Green Room', anchor: 'Charli, club nights',
+    vibe: 'Acid-flat anti-design. One lime JPEG that knows exactly what it is doing.',
+    fits: 'DJ-backed dance cover acts, club-adjacent residencies.' },
+  { k: 'basement', name: 'EMO / POP-PUNK', gen: 'Basement Show', anchor: 'MCR, Paramore, Blink',
+    vibe: 'Photocopied zine taped to the basement wall. Blackletter, blood pink, safety pins.',
+    fits: 'Emo and pop-punk tributes, 2000s emo-night events.' },
+  { k: 'afterparty', name: 'INDIE ROCK', gen: 'Afterparty', anchor: 'Strokes, Killers, LCD',
+    vibe: 'Indie-sleaze 2 a.m. camera flash. Grainy, warm-black, a little too honest.',
+    fits: 'Indie and dance-rock cover bands, DJ-hybrid acts.' },
+  { k: 'mudseason', name: 'FOLK / AMERICANA', gen: 'Mud Season', anchor: 'Kahan, Zach Bryan, Mumford',
+    vibe: 'Spruce-dark New England folk revival. The merch table at a stomp-clap show.',
+    fits: 'Folk and Americana acts, songwriter rounds, stomp-clap nights.' },
+  { k: 'loser', name: 'GRUNGE / 90s ALT', gen: 'Loser Deluxe', anchor: 'Nirvana, Pearl Jam',
+    vibe: 'A Sub Pop flyer through a dying Kinko’s photocopier, taped to the venue door.',
+    fits: '90s alt and grunge cover bands in dive bars.' },
+  { k: 'sunset', name: 'HAIR METAL / 80s', gen: 'Sunset Strip', anchor: 'Bon Jovi, GNR, Poison',
+    vibe: '1987 on the Strip. Stage-black, airbrushed laser pink, brushed chrome.',
+    fits: 'Hair-metal tributes and 80s party bands.' },
+  { k: 'blackout', name: 'METAL', gen: 'Blackout', anchor: 'Metallica, Sabbath, Maiden',
+    vibe: 'Black on black with blood red. Sharp spiked type, scratched stage wall, no apologies.',
+    fits: 'Metal tributes and heavy originals. The red glow stays off the money.' },
+  { k: 'marquee', name: 'COUNTRY / HONKY-TONK', gen: 'Marquee', anchor: 'country, red-dirt, bluegrass',
+    vibe: 'Hatch-style woodtype poster on cream stock, slightly off-register.',
+    fits: 'Country, red-dirt, rockabilly, bluegrass. The safe default.' },
+  { k: 'gatefold', name: 'CLASSIC ROCK', gen: 'Gatefold', anchor: 'Floyd, Zeppelin, Fleetwood Mac',
+    vibe: 'A Hipgnosis 12-inch sleeve at dusk. One huge quiet image, big empty sky.',
+    fits: 'Classic-rock tributes and serious-listener originals.' },
+  { k: 'velvet', name: 'SOUL / MOTOWN', gen: 'Velvet Revue', anchor: 'Motown revues, standards, jazz',
+    vibe: 'The Supremes at the Copa in 1965. Aubergine velvet, champagne light.',
+    fits: 'Soul and Motown revues, R&B vocalists, jazz trios.' },
+  { k: 'canyon', name: 'SINGER-SONGWRITER', gen: 'Canyon', anchor: 'James Taylor, Carole King',
+    vibe: 'Tapestry-era Laurel Canyon. Sun through a window onto kraft paper. Stillness is the feature.',
+    fits: 'Acoustic singer-songwriters, folk and soft-rock duos. The most readable skin - biggest type, highest contrast, zero motion.' },
+];
+
+var sw = document.getElementById('switcher');
+SKINS.forEach(function(s, i) {
+  var b = document.createElement('button');
+  b.className = 'sw' + (i === 0 ? ' active' : '');
+  b.innerHTML = s.name + '<small>' + s.anchor + '</small>';
+  b.onclick = function() { pick(s, b); };
+  sw.appendChild(b);
+});
+function pick(s, btn) {
+  document.querySelectorAll('.sw').forEach(function(x) { x.classList.remove('active'); });
   btn.classList.add('active');
-  document.getElementById('screen').dataset.theme = btn.dataset.t;
+  document.getElementById('screen').dataset.theme = s.k;
+  renderInfo(s);
 }
+function renderInfo(s) {
+  document.getElementById('skininfo').innerHTML =
+    '<div class="g">' + s.name + '</div><h4>' + s.gen + '</h4><p>' + s.vibe + '</p><div class="fits">' + s.fits + '</div>';
+}
+document.getElementById('screen').dataset.theme = SKINS[0].k;
+renderInfo(SKINS[0]);
+
 function react(btn, e) {
-  const f = document.createElement('span');
+  var f = document.createElement('span');
   f.className = 'float'; f.textContent = e;
-  btn.appendChild(f); setTimeout(() => f.remove(), 1100);
+  btn.appendChild(f); setTimeout(function() { f.remove(); }, 1100);
 }
 </script>
 </body>
