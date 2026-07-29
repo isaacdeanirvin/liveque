@@ -1410,6 +1410,9 @@ function applySkin(k){
   currentSkin=(SKIN_FX[k])?k:'default';
   document.body.setAttribute('data-skin',currentSkin);
 }
+// ?skin= applies immediately, even before (or without) the artist resolving,
+// so the skin lineup is demoable on any URL.
+(function(){ var q=new URLSearchParams(location.search).get('skin'); if(q) applySkin(q); })();
 function launchTipConfetti(amount){
   try{
     var vw=window.innerWidth, vh=window.innerHeight;
