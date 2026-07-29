@@ -266,7 +266,7 @@
             <div class="social-links" id="socialLinksContainer"></div>
         </div>
         <div id="nowPlayingSection" style="display: none;"></div>
-        <div class="payment-section"><div class="section-title">🥃 Feeling Tipsy?</div><div class="payment-buttons" id="paymentButtonsContainer"></div><div style="font-size:11px; opacity:0.55; text-align:center; margin-top:10px; line-height:1.5;">These send money straight to the performer. To move a song up the queue, tip with the request itself.</div></div>
+        <div class="payment-section"><div class="section-title">🥃 Feeling Tipsy?</div><div class="payment-buttons" id="paymentButtonsContainer"></div><div style="font-size:11px; opacity:0.55; text-align:center; margin-top:10px; line-height:1.5;">These go straight to the band and mean a lot. Heads up: they arrive outside LiveQue, so they cannot bump a song up the queue. To move up the list, tip with the request itself.</div></div>
         <div class="payment-section"><div class="section-title">Current Queue</div><div id="audienceQueue"></div></div>
         <div class="payment-section"><div class="section-title">Request a Song</div><input type="text" class="search-bar" placeholder="Search LiveQue..." oninput="searchSongs(this.value)" aria-label="Search LiveQue"><div id="songsList"></div></div>
         <div class="payment-section" id="reviewSection" style="display:none;">
@@ -880,6 +880,15 @@ function renderModalBackupTips(tc){
         b.onclick=function(){ openPayment(m[0], m[2]); };
         wrap.appendChild(b);
     });
+    // Kind, honest disclaimer: these apps send money straight to the performer,
+    // so LiveQue never sees them and cannot move the song. Said gratefully, not
+    // as a warning - the point is that the generosity still lands.
+    if(stripeChargesEnabled){
+        var note=document.createElement('div');
+        note.style.cssText='font-size:11px; opacity:0.6; margin-top:10px; line-height:1.5;';
+        note.textContent='These go straight to the band and mean a lot. Heads up: they arrive outside LiveQue, so they cannot bump your song up the queue. To move up the list, tip with the request itself above.';
+        wrap.appendChild(note);
+    }
     tc.appendChild(wrap);
 }
 
@@ -1239,6 +1248,33 @@ function openRequestModal(t,a,sp){
         tc.appendChild(b);
     });
 
+    // Custom amount. Some fans want to give more than the biggest tier and
+    // some want a specific number; without this the ceiling is whatever the
+    // performer happened to preset, which caps the whales the research says
+    // drive most of a night's money.
+    if(stripeChargesEnabled){
+        const wrap=document.createElement('div');
+        wrap.style.cssText='display:flex; gap:8px; margin:8px 0 2px; align-items:stretch;';
+        const inp=document.createElement('input');
+        inp.type='number'; inp.min='1'; inp.max='500'; inp.step='1'; inp.inputMode='numeric';
+        inp.placeholder='Any amount';
+        inp.setAttribute('aria-label','Custom tip amount in dollars');
+        inp.style.cssText='flex:1; min-width:0; padding:12px 14px; border-radius:10px; border:1px solid rgba(255,215,0,0.45); background:rgba(255,215,0,0.08); color:#ffd700; font-size:15px; font-weight:700; text-align:center; font-family:inherit;';
+        const go=document.createElement('button');
+        go.className='tip-btn';
+        go.style.cssText='margin:0; flex:none; padding:12px 18px; background:rgba(255,215,0,0.14); color:#ffd700; border:2px solid rgba(255,215,0,0.55);';
+        go.textContent='Request + Tip';
+        function fire(){
+            const v=Math.floor(Number(inp.value));
+            if(!v||v<1){ inp.focus(); return; }
+            startTipPayment(Math.min(v,500));
+        }
+        go.onclick=fire;
+        inp.onkeydown=function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); fire(); } };
+        wrap.appendChild(inp); wrap.appendChild(go);
+        tc.appendChild(wrap);
+    }
+
     if(quietFree) tc.appendChild(freeBtn);
 
     renderModalBackupTips(tc);
@@ -1345,7 +1381,18 @@ async function startTipPayment(amount){
     }catch(e){
         pa.style.display='none';
         tc.querySelectorAll('button').forEach(function(b){ b.disabled=false; b.style.opacity='1'; });
-        showToast(e.message||'Could not start payment','error');
+        // Self-heal the "performer isn't set up" case. The database flag can
+        // say an act takes cards while Stripe says the account is gone - that
+        // is exactly what happened when live keys replaced test keys and every
+        // connected account reset. Show a fan a graceful fallback, not an error.
+        if(/isn'?t set up|not set up|no longer/i.test(e.message||'')){
+            stripeChargesEnabled=false;
+            try{ renderPaymentMethods(); }catch(_){}
+            try{ closeModal(); }catch(_){}
+            showToast('Card tips are off for this act tonight. Your request is still free, or use their tip links below.','warning');
+        } else {
+            showToast(e.message||'Could not start payment','error');
+        }
     }
 }
 
@@ -1699,6 +1746,38 @@ window.onclick=function(e){
 document.addEventListener('DOMContentLoaded',async function(){
     await initializeApp();
 });
+
+/* ── STALE-TAB GUARD ─────────────────────────────────────
+   The pages are single-file apps, so a cached copy IS old code running
+   against a live database - the "dead page in my normal browser, fine in
+   incognito" bug. _headers stops the browser caching HTML; this catches
+   the other half: a tab already open for hours or weeks. We poll a tiny
+   version file and, when the deployed build changes, offer a one-tap
+   update instead of silently reloading over someone's payment. */
+(function(){
+  var BUILD='2026-07-30-01';
+  function showUpdatePill(){
+    if(document.getElementById('lqUpdatePill')) return;
+    var p=document.createElement('button');
+    p.id='lqUpdatePill';
+    p.textContent='Update available \u2013 tap to refresh';
+    p.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:2147483647;'
+      +'background:#17B7AE;color:#06211f;border:0;border-radius:999px;padding:11px 18px;font-weight:800;'
+      +'font-size:13px;font-family:inherit;box-shadow:0 10px 30px rgba(0,0,0,.5);cursor:pointer;';
+    p.onclick=function(){ location.reload(); };
+    document.body.appendChild(p);
+  }
+  function check(){
+    if(document.hidden) return;
+    fetch('/version.json?t='+Date.now(),{cache:'no-store'})
+      .then(function(r){ return r.ok?r.json():null; })
+      .then(function(j){ if(j&&j.build&&j.build!==BUILD) showUpdatePill(); })
+      .catch(function(){});
+  }
+  setTimeout(check,15000);
+  setInterval(check,600000);
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) check(); });
+})();
 </script>
 </body>
 </html>

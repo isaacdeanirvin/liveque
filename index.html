@@ -2041,6 +2041,38 @@ async function downloadQRPDF() {
     }, 500);
   }, 6000);
 })();
+
+/* ── STALE-TAB GUARD ─────────────────────────────────────
+   The pages are single-file apps, so a cached copy IS old code running
+   against a live database - the "dead page in my normal browser, fine in
+   incognito" bug. _headers stops the browser caching HTML; this catches
+   the other half: a tab already open for hours or weeks. We poll a tiny
+   version file and, when the deployed build changes, offer a one-tap
+   update instead of silently reloading over someone's payment. */
+(function(){
+  var BUILD='2026-07-30-01';
+  function showUpdatePill(){
+    if(document.getElementById('lqUpdatePill')) return;
+    var p=document.createElement('button');
+    p.id='lqUpdatePill';
+    p.textContent='Update available \u2013 tap to refresh';
+    p.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:2147483647;'
+      +'background:#17B7AE;color:#06211f;border:0;border-radius:999px;padding:11px 18px;font-weight:800;'
+      +'font-size:13px;font-family:inherit;box-shadow:0 10px 30px rgba(0,0,0,.5);cursor:pointer;';
+    p.onclick=function(){ location.reload(); };
+    document.body.appendChild(p);
+  }
+  function check(){
+    if(document.hidden) return;
+    fetch('/version.json?t='+Date.now(),{cache:'no-store'})
+      .then(function(r){ return r.ok?r.json():null; })
+      .then(function(j){ if(j&&j.build&&j.build!==BUILD) showUpdatePill(); })
+      .catch(function(){});
+  }
+  setTimeout(check,15000);
+  setInterval(check,600000);
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) check(); });
+})();
 </script>
 </body>
 </html>

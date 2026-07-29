@@ -1,0 +1,27 @@
+# Cache policy.
+#
+# THE BUG THIS FIXES: a fan opened Glen's page and got a dead, unstyled,
+# data-less render, while the same URL was perfect in incognito and on
+# another machine. Classic stale-HTML cache. These pages are single-file
+# apps - the HTML *is* the code - so a browser holding yesterday's copy is
+# running yesterday's app against today's database. Same reason a dashboard
+# tab left open for weeks never saw new features.
+#
+# The standard fix (what every large site does): HTML is always revalidated,
+# never served blind from cache; immutable assets may cache hard. must-revalidate
+# plus max-age=0 means the browser may keep a copy but must ask "still fresh?"
+# on every load - one tiny 304 round trip, and staleness becomes impossible.
+
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Content-Type-Options: nosniff
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Fingerprinted/vendored static assets are safe to cache for a year.
+/brand/*
+  Cache-Control: public, max-age=31536000
+
+/cards/print/output/*
+  Cache-Control: public, max-age=31536000
