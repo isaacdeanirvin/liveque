@@ -71,9 +71,28 @@ serve(async (req) => {
     // configured amounts, fall back to the range check above.
     const { data: settings } = await admin
       .from("artist_settings")
-      .select("tip_amounts")
+      .select("tip_amounts, tips_blocked")
       .eq("artist_id", artist_id)
       .single();
+
+    // ANTI CARD-TESTING (14 Aug 2026). Four sham "performer" accounts ran ~263
+    // identical $9 charges in days, with cardholder names typed into the song
+    // field. Destination charges mean disputes hit the PLATFORM balance, so this
+    // endpoint is the front door to the platform's money and gets two locks: a
+    // per-artist kill switch, and a rate limit a real bar never reaches but a
+    // card tester trips within seconds.
+    if (settings?.tips_blocked) {
+      throw new Error("This performer isn't set up for in-app tips yet");
+    }
+    const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
+    const { data: rateOk } = await admin.rpc("tip_rate_ok", {
+      p_artist: artist_id, p_ip: ip, p_amount: dollars,
+    });
+    if (rateOk === false) {
+      console.warn("Tip rate limit hit", { artist_id, ip });
+      throw new Error("Too many attempts right now. Please wait a moment and try again.");
+    }
+
     const allowed = Array.isArray(settings?.tip_amounts)
       ? settings.tip_amounts.map(Number).filter((n) => Number.isInteger(n) && n > 0)
       : [];
