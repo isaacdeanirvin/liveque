@@ -131,6 +131,14 @@ serve(async (req) => {
         business_type: businessType,
         "capabilities[transfers][requested]": "true",
         "business_profile[product_description]": "Live music tips received via LiveQue",
+        // TIER 5: payout hold. Every new account is created with a 14-day
+        // delay before money can leave. On 14 Aug 2026 four card-testing
+        // accounts were caught only because their first daily payout had not
+        // run yet - that luck is now policy. A real musician's tips still
+        // arrive, just on a two-week delay for their first payout; the fraud
+        // window closes automatically.
+        "settings[payouts][schedule][interval]": "daily",
+        "settings[payouts][schedule][delay_days]": "14",
       };
       const email = artist.email || user.email;
       if (email) acctParams.email = email;

@@ -84,6 +84,8 @@ serve(async (req) => {
     if (settings?.tips_blocked) {
       throw new Error("This performer isn't set up for in-app tips yet");
     }
+
+    // TIER 2: rate limit. Logs every attempt, so tiers 4 has data to judge.
     const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
     const { data: rateOk } = await admin.rpc("tip_rate_ok", {
       p_artist: artist_id, p_ip: ip, p_amount: dollars,
@@ -91,6 +93,34 @@ serve(async (req) => {
     if (rateOk === false) {
       console.warn("Tip rate limit hit", { artist_id, ip });
       throw new Error("Too many attempts right now. Please wait a moment and try again.");
+    }
+
+    // TIER 4: velocity alarm. Reads the attempt log and freezes the account
+    // itself if the shape is card testing - no human in the loop.
+    const { data: frozenWhy } = await admin.rpc("velocity_check", { p_artist: artist_id });
+    if (frozenWhy) {
+      console.error("AUTO-FROZE artist for velocity", { artist_id, reason: frozenWhy, ip });
+      try {
+        await admin.functions.invoke("liveque-email", {
+          body: {
+            type: "alert",
+            subject: "LiveQue auto-froze a performer account",
+            text: `Automatic fraud freeze.\n\nartist_id: ${artist_id}\nreason: ${frozenWhy}\nip: ${ip}\n\n` +
+              `Card tips are now OFF for this account and no PaymentIntent can be created. ` +
+              `Review in Stripe, and if it is a real musician clear tips_blocked in artist_settings.`,
+          },
+        });
+      } catch (_) { /* alerting must never block the guard */ }
+      throw new Error("This performer isn't set up for in-app tips yet");
+    }
+
+    // TIER 3: earn the right to charge. New accounts cannot take card money
+    // until they look like a working act (songs, age, a real gig started).
+    const { data: gate } = await admin.rpc("tip_gate", { p_artist: artist_id });
+    const gateRow = Array.isArray(gate) ? gate[0] : gate;
+    if (gateRow && gateRow.allowed === false) {
+      console.warn("Tip gate refused", { artist_id, reason: gateRow.reason });
+      throw new Error("This performer isn't set up for in-app tips yet");
     }
 
     const allowed = Array.isArray(settings?.tip_amounts)
