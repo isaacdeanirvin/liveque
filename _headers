@@ -12,9 +12,28 @@
 # plus max-age=0 means the browser may keep a copy but must ask "still fresh?"
 # on every load - one tiny 304 round trip, and staleness becomes impossible.
 
+# Security headers on every page. These are the browser-level locks a
+# bank-grade site sets:
+#   X-Frame-Options DENY   - nobody can iframe LiveQue to trick a fan into
+#                            clicking a hidden button (clickjacking).
+#   X-Content-Type-Options - browser won't guess a file's type and run a
+#                            disguised script (MIME sniffing).
+#   Referrer-Policy        - our URLs (which carry ?artist=) never leak to
+#                            third-party sites in the Referer header.
+#   HSTS                   - once seen, the browser refuses plain http for two
+#                            years, so a coffee-shop wifi attacker can't
+#                            downgrade the connection.
+#   Permissions-Policy     - the page may use payment + Apple/Google Pay, and
+#                            is denied camera, mic and geolocation outright.
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(self)
+
 /*.html
   Cache-Control: public, max-age=0, must-revalidate
-  X-Content-Type-Options: nosniff
 
 /
   Cache-Control: public, max-age=0, must-revalidate

@@ -101,6 +101,12 @@ serve(async (req) => {
     if (frozenWhy) {
       console.error("AUTO-FROZE artist for velocity", { artist_id, reason: frozenWhy, ip });
       try {
+        await admin.rpc("audit", {
+          p_actor: "system", p_action: "account_frozen", p_target: artist_id,
+          p_ip: ip, p_detail: { reason: frozenWhy },
+        });
+      } catch (_) { /* audit best-effort */ }
+      try {
         await admin.functions.invoke("liveque-email", {
           body: {
             type: "alert",
@@ -123,12 +129,10 @@ serve(async (req) => {
       throw new Error("This performer isn't set up for in-app tips yet");
     }
 
-    const allowed = Array.isArray(settings?.tip_amounts)
-      ? settings.tip_amounts.map(Number).filter((n) => Number.isInteger(n) && n > 0)
-      : [];
-    if (allowed.length && !allowed.includes(dollars)) {
-      throw new Error("Invalid tip amount");
-    }
+    // Fans can now enter a custom amount, so the charge is no longer bound to
+    // the performer's preset chips - a whitelist would silently reject every
+    // custom tip. The $1-$500 integer range check above is the real guard
+    // against a forged or absurd amount; that is what protects the money now.
 
     // Pass the card cost through, take nothing on top.
     //
@@ -219,6 +223,13 @@ serve(async (req) => {
       }
       throw piErr;
     }
+
+    try {
+      await admin.rpc("audit", {
+        p_actor: artist_id, p_action: "tip_intent_created", p_target: pi.id,
+        p_ip: ip, p_detail: { cents: chargeCents, song: song_title },
+      });
+    } catch (_) { /* audit best-effort, never blocks the payment */ }
 
     return new Response(JSON.stringify({
       client_secret: pi.client_secret,

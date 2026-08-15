@@ -1128,6 +1128,28 @@ function showLogin(errorMsg) {
 
 function showApp() {
     document.getElementById('loginOverlay').classList.add('hidden');
+    startIdleLogout();
+}
+
+// Auto-logout on inactivity. A dashboard left open on a shared or stolen
+// laptop is a standing key to a performer's earnings and song list. Any real
+// activity (tap, click, key, scroll) resets the clock, so a musician working a
+// gig is never logged out mid-set; but 45 minutes of genuine silence signs
+// them out. Banks do this in 10-15 minutes; a stage act needs more slack.
+var IDLE_MS = 45 * 60 * 1000;
+var idleTimer = null;
+function resetIdle() {
+    if (idleTimer) clearTimeout(idleTimer);
+    idleTimer = setTimeout(function () {
+        showToast('Signed out after 45 minutes of inactivity.', 'warning');
+        signOut();
+    }, IDLE_MS);
+}
+function startIdleLogout() {
+    ['click', 'keydown', 'touchstart', 'scroll', 'mousemove'].forEach(function (ev) {
+        document.addEventListener(ev, resetIdle, { passive: true });
+    });
+    resetIdle();
 }
 
 function hideAuthSubPanels() {
@@ -2207,7 +2229,7 @@ async function downloadQRPDF() {
    version file and, when the deployed build changes, offer a one-tap
    update instead of silently reloading over someone's payment. */
 (function(){
-  var BUILD='2026-08-14-02';
+  var BUILD='2026-08-14-03';
   function showUpdatePill(){
     if(document.getElementById('lqUpdatePill')) return;
     var p=document.createElement('button');

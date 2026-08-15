@@ -69,6 +69,13 @@ serve(async (req) => {
       updated_at: new Date().toISOString(),
     });
 
+    try {
+      await admin.rpc("audit", {
+        p_actor: artist.id, p_action: "gift_redeemed", p_target: code,
+        p_ip: null, p_detail: { grants: grants },
+      });
+    } catch (_) { /* best effort */ }
+
     return new Response(JSON.stringify({ ok: true, grants: grants }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

@@ -77,6 +77,12 @@ serve(async (req) => {
             "settings[payouts][schedule][interval]": "manual",
           }));
           frozen = true;
+          try {
+            await admin.rpc("audit", {
+              p_actor: "admin", p_action: "payouts_frozen", p_target: acct,
+              p_ip: null, p_detail: { name: a.name },
+            });
+          } catch (_) { /* best effort */ }
         }
 
         out.push({

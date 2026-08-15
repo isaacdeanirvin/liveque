@@ -85,11 +85,16 @@ serve(async (req) => {
     }
     rows.sort((x, y) => (y.smells.length - x.smells.length) || (y.earned_usd - x.earned_usd));
 
+    const { data: audit } = await admin
+      .from("audit_log").select("at, actor, action, target, detail")
+      .order("at", { ascending: false }).limit(25);
+
     return new Response(JSON.stringify({
       generated: new Date().toISOString(),
       performers: rows.length,
       flagged,
       rows,
+      recent_activity: audit || [],
     }, null, 2), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
     return new Response(JSON.stringify({ error: (e as Error).message }), {
