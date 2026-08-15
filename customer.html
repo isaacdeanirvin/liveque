@@ -432,7 +432,10 @@ async function loadFromSupabase(){
                 avatarEl.textContent=initials;
             }
         }
-        const st=await db.from('artist_settings').select('*').eq('artist_id',ARTIST_ID).single();
+        // Only the columns a fan actually needs. Internal columns (Stripe ids,
+        // fraud flags, Pro state) are revoked from the anon role at the DB, so
+        // select('*') would now error for a stranger - name the safe set.
+        const st=await db.from('artist_settings').select('artist_id,current_gig_session_id,payment_methods,social_handles,tip_amounts,drink_mode,drink_price,stripe_charges_enabled,skin').eq('artist_id',ARTIST_ID).single();
         if(st.data){
             currentGigSessionId=st.data.current_gig_session_id;
             paymentMethods=st.data.payment_methods||{};
@@ -1785,7 +1788,7 @@ document.addEventListener('DOMContentLoaded',async function(){
    version file and, when the deployed build changes, offer a one-tap
    update instead of silently reloading over someone's payment. */
 (function(){
-  var BUILD='2026-08-14-01';
+  var BUILD='2026-08-14-02';
   function showUpdatePill(){
     if(document.getElementById('lqUpdatePill')) return;
     var p=document.createElement('button');
