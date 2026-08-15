@@ -97,6 +97,17 @@ serve(async (req) => {
       .single();
     if (artistErr || !artist) throw new Error("Artist profile not found");
 
+    // REQUIRED 2FA TO EARN. A performer cannot connect Stripe (and therefore
+    // cannot take card tips) until two-factor is enabled. Server-side gate so
+    // it cannot be skipped from the client.
+    const { data: has2fa } = await admin.rpc("has_verified_mfa", { p_artist: artist.id });
+    if (has2fa !== true) {
+      return new Response(
+        JSON.stringify({ error: "Turn on two-factor first (Account Security), then set up payouts.", need_2fa: true }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     let accountId = artist.stripe_account_id;
 
     // Recover from a mode switch. Without this, account_links is called with a

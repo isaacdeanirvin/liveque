@@ -1099,11 +1099,31 @@ async function renderMfaStatus() {
             if (off) off.style.display = '';
             if (box) { box.style.display = 'none'; box.innerHTML = ''; }
         } else {
-            line.textContent = 'Your password is the only thing protecting this account.';
+            line.innerHTML = '<span style="color:#F5A524;font-weight:700;">Two-factor is required to take card tips.</span> Turn it on to get paid.';
             if (btn) btn.style.display = '';
             if (off) off.style.display = 'none';
         }
+        renderMfaBanner(on);
     } catch (_) { line.textContent = ''; }
+}
+// Loud, persistent reminder at the top of the app until 2FA is on - because
+// without it the account cannot take money, and a musician should know why.
+function renderMfaBanner(on) {
+    var existing = document.getElementById('mfaBanner');
+    if (on) { if (existing) existing.remove(); return; }
+    if (existing) return;
+    var b = document.createElement('div');
+    b.id = 'mfaBanner';
+    b.style.cssText = 'position:sticky; top:0; z-index:50; background:linear-gradient(90deg,#F5A524,#e0951a); color:#231a02; '
+        + 'font-weight:700; font-size:13px; text-align:center; padding:10px 14px; cursor:pointer; font-family:inherit;';
+    b.textContent = '🔒 Turn on two-factor to take tips — tap to set it up';
+    b.onclick = function () {
+        switchTab(0);
+        var sc = document.getElementById('securityCard');
+        if (sc) sc.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    var c = document.querySelector('.container');
+    if (c) c.insertBefore(b, c.firstChild);
 }
 
 async function signOut() {
@@ -1773,6 +1793,19 @@ async function handleSpotifyCallback() {}
 // ── STRIPE CONNECT ONBOARDING ──────────────────────────
 async function startStripeOnboarding() {
     const btn = document.getElementById('stripeOnboardBtn');
+    // 2FA is required to take money. Check before opening Stripe so the
+    // performer is sent to set it up instead of hitting a server refusal.
+    try {
+        const { data: fac } = await db.auth.mfa.listFactors();
+        var has2fa = fac && fac.totp && fac.totp.some(function(f){ return f.status === 'verified'; });
+        if (!has2fa) {
+            showToast('Turn on two-factor first — it protects your earnings. Setting it up now.', 'warning');
+            var sc = document.getElementById('securityCard');
+            if (sc) sc.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            renderMfaStatus();
+            return;
+        }
+    } catch (_) { /* if the check fails, the server still enforces it */ }
     if (btn) { btn.disabled = true; btn.textContent = 'Opening Stripe...'; }
     try {
         const bizSel = document.querySelector('input[name="bizType"]:checked');
@@ -2229,7 +2262,7 @@ async function downloadQRPDF() {
    version file and, when the deployed build changes, offer a one-tap
    update instead of silently reloading over someone's payment. */
 (function(){
-  var BUILD='2026-08-14-03';
+  var BUILD='2026-08-15-01';
   function showUpdatePill(){
     if(document.getElementById('lqUpdatePill')) return;
     var p=document.createElement('button');

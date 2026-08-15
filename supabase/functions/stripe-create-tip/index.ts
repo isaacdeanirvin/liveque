@@ -129,6 +129,16 @@ serve(async (req) => {
       throw new Error("This performer isn't set up for in-app tips yet");
     }
 
+    // REQUIRED 2FA TO EARN (Isaac, 15 Aug: "force them / no leaks"). No account
+    // takes card money without two-factor enabled. Server-side and unskippable.
+    // The fan page treats this like "not set up for cards" and self-heals to the
+    // performer's backup tip links, so a fan never sees a raw error.
+    const { data: has2fa } = await admin.rpc("has_verified_mfa", { p_artist: artist_id });
+    if (has2fa !== true) {
+      console.warn("Tip refused: performer has no 2FA", { artist_id });
+      throw new Error("This performer isn't set up for in-app tips yet");
+    }
+
     // Fans can now enter a custom amount, so the charge is no longer bound to
     // the performer's preset chips - a whitelist would silently reject every
     // custom tip. The $1-$500 integer range check above is the real guard
