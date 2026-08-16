@@ -665,11 +665,14 @@ function handleRequestInsert(nr){
 }
 
 function handleRequestUpdate(nr){
-    
+    // Direct-pay confirmation: the fan's own pending payment just flipped paid.
+    if(pendingDirect && nr.pay_code===pendingDirect.code && nr.paid){
+        directTipConfirmed();
+    }
     if(nr.gig_session_id!==currentGigSessionId){
         return;
     }
-    
+
     const i=requestQueue.findIndex(function(r){return r.id===nr.id;});
     if(i!==-1){
         requestQueue[i]={
@@ -961,6 +964,71 @@ function toggleCoverFees(){
     renderCoverFees();
 }
 
+// Direct-pay: the fan pays the musician's own Venmo/PayPal with a code in the
+// note. When the receipt lands (pay-confirm), the song flips paid and jumps the
+// queue. LiveQue never touches the money.
+function genPayCode(){
+    var s='', a='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+    for(var i=0;i<5;i++) s+=a[Math.floor(Math.random()*a.length)];
+    return 'LQ-'+s;
+}
+async function startDirectTip(amount){
+    var nameInput=document.getElementById('requesterNameInput');
+    var who=nameInput&&nameInput.value.trim()?nameInput.value.trim():'Anonymous';
+    if(who!=='Anonymous') rememberRequesterName(who);
+    var code=genPayCode();
+    var provider=(paymentMethods.venmo)?'venmo':(paymentMethods.paypal)?'paypal':null;
+    var handle=provider==='venmo'?paymentMethods.venmo:paymentMethods.paypal;
+    if(!provider||!handle){ showToast('This act has no tip account set up yet.','warning'); return; }
+    try{
+        var ins=await db.from('requests').insert([{
+            artist_id:ARTIST_ID, song_title:currentSong.title, song_artist:currentSong.artist,
+            requester_name:who, tip_amount:0, status:'queued', gig_session_id:currentGigSessionId,
+            spanish:currentSong.spanish||false, pay_code:code, pay_provider:provider, paid:false
+        }]).select().single();
+        if(ins.error) throw ins.error;
+    }catch(e){ showToast('Could not start: '+(e.message||'try again'),'error'); return; }
+    // Build the deeplink with amount + the code in the note.
+    var url='';
+    if(provider==='venmo'){
+        var vh=handle.replace(/^(https?:\/\/)?(www\.)?(account\.)?venmo\.com\/(u\/)?/i,'').replace(/^@/,'');
+        url='https://venmo.com/'+encodeURIComponent(vh)+'?txn=pay&amount='+amount+'&note='+encodeURIComponent(code);
+    }else{
+        // PayPal.me carries the amount but not a note, so the fan is shown the
+        // code to drop in. (The zero-touch PayPal path is the Connect webhook.)
+        var ph=handle.replace(/^(https?:\/\/)?(www\.)?paypal\.me\//i,'').replace(/^@/,'');
+        url='https://paypal.me/'+encodeURIComponent(ph)+'/'+amount;
+    }
+    pendingDirect={code:code, title:currentSong.title, amount:amount, provider:provider};
+    showDirectPending(provider, code, amount);
+    window.open(url,'_blank');
+}
+var pendingDirect=null;
+function showDirectPending(provider, code, amount){
+    var m=document.getElementById('directPendingModal');
+    if(!m){
+        m=document.createElement('div'); m.id='directPendingModal';
+        m.style.cssText='position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;padding:24px;';
+        document.body.appendChild(m);
+    }
+    var needNote=provider!=='venmo';
+    m.innerHTML='<div style="max-width:340px;text-align:center;background:#12161a;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:26px 22px;color:#fff;">'
+        +'<div style="font-size:34px;">💸</div>'
+        +'<div style="font-size:18px;font-weight:800;margin:8px 0 4px;">Finish in '+(provider==='venmo'?'Venmo':'PayPal')+'</div>'
+        +'<div style="font-size:13px;opacity:.75;line-height:1.55;">Send <b>$'+amount+'</b>'+(needNote?' and put this in the note:':'. The note is already filled in.')+'</div>'
+        +(needNote?'<div style="font-size:22px;font-weight:800;letter-spacing:.12em;color:#4ECDC4;margin:12px 0;">'+code+'</div>':'<div style="height:8px;"></div>')
+        +'<div id="directPendingStatus" style="font-size:13px;color:#F5A524;font-weight:700;margin-top:6px;">Waiting for your payment…</div>'
+        +'<button onclick="closeDirectPending()" style="margin-top:16px;background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);font-size:12.5px;padding:9px 16px;border-radius:10px;cursor:pointer;font-family:inherit;">Close</button>'
+        +'</div>';
+    m.style.display='flex';
+}
+function closeDirectPending(){ var m=document.getElementById('directPendingModal'); if(m) m.style.display='none'; pendingDirect=null; }
+function directTipConfirmed(){
+    var s=document.getElementById('directPendingStatus');
+    if(s){ s.textContent='✓ Payment received — your song jumped the line!'; s.style.color='#4ECDC4'; }
+    if(typeof launchTipConfetti==='function' && pendingDirect) launchTipConfetti(pendingDirect.amount, pendingDirect.requester);
+    setTimeout(closeDirectPending, 2600);
+}
 function openPayment(m,h){
     let u='';
 
@@ -1259,7 +1327,7 @@ function openRequestModal(t,a,sp){
             b.style.cssText='display:block; width:100%; margin:6px 0; background:rgba(255,215,0,0.14); color:#ffd700; border:2px solid rgba(255,215,0,0.55);';
         }
         b.textContent=t.label;
-        b.onclick=function(){startTipPayment(t.amt);};
+        b.onclick=function(){startDirectTip(t.amt);};
         tc.appendChild(b);
     });
 
@@ -1282,7 +1350,7 @@ function openRequestModal(t,a,sp){
         function fire(){
             const v=Math.floor(Number(inp.value));
             if(!v||v<1){ inp.focus(); return; }
-            startTipPayment(Math.min(v,500));
+            startDirectTip(Math.min(v,500));
         }
         go.onclick=fire;
         inp.onkeydown=function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); fire(); } };
@@ -1788,7 +1856,7 @@ document.addEventListener('DOMContentLoaded',async function(){
    version file and, when the deployed build changes, offer a one-tap
    update instead of silently reloading over someone's payment. */
 (function(){
-  var BUILD='2026-08-15-02';
+  var BUILD='2026-08-16-01';
   function showUpdatePill(){
     if(document.getElementById('lqUpdatePill')) return;
     var p=document.createElement('button');
