@@ -984,7 +984,8 @@ async function startDirectTip(amount){
         var ins=await db.from('requests').insert([{
             artist_id:ARTIST_ID, song_title:currentSong.title, song_artist:currentSong.artist,
             requester_name:who, tip_amount:0, status:'queued', gig_session_id:currentGigSessionId,
-            spanish:currentSong.spanish||false, pay_code:code, pay_provider:provider, paid:false
+            spanish:currentSong.spanish||false, pay_code:code, pay_provider:provider, paid:false,
+            paid_amount:amount
         }]).select().single();
         if(ins.error) throw ins.error;
     }catch(e){ showToast('Could not start: '+(e.message||'try again'),'error'); return; }
@@ -1856,7 +1857,7 @@ document.addEventListener('DOMContentLoaded',async function(){
    version file and, when the deployed build changes, offer a one-tap
    update instead of silently reloading over someone's payment. */
 (function(){
-  var BUILD='2026-08-16-01';
+  var BUILD='2026-08-16-02';
   function showUpdatePill(){
     if(document.getElementById('lqUpdatePill')) return;
     var p=document.createElement('button');
