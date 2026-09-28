@@ -34,10 +34,16 @@ const json = (b: unknown, status = 200) =>
 function tonight(): string {
   return new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
 }
+// The coming Thursday in LA (today if it is Thursday). The host creates "the night" for this date.
+function nextThursday(): string {
+  const la = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
+  la.setDate(la.getDate() + ((4 - la.getDay() + 7) % 7));
+  return la.toLocaleDateString("en-CA");
+}
 const COLS = "id, room_id, night_date, name, venmo, socials, position, status, is_featured, created_at, updated_at";
 const STATUSES = new Set(["waiting", "on_deck", "now", "done", "bumped"]);
 const PERF_SOCIALS = ["instagram", "tiktok", "youtube", "spotify", "link"];
-const ROOM_SOCIALS = ["instagram", "tiktok", "website", "maps", "facebook"];
+const ROOM_SOCIALS = ["instagram", "tiktok", "website", "maps", "facebook", "host_instagram"];
 
 const handle = (v: unknown, max: number) => {
   const s = String(v ?? "").trim().replace(/^@/, "").slice(0, max);
@@ -71,7 +77,7 @@ serve(async (req) => {
 
     const { data: room } = await admin.from("mic_rooms").select("*").eq("slug", slug).single();
     if (!room) return json({ error: "no room" }, 404);
-    const night = tonight();
+    const night = room.current_night || tonight();
 
     const lineup = async () => {
       const { data } = await admin.from("mic_signups").select(COLS)
@@ -160,6 +166,8 @@ serve(async (req) => {
 
     if (action === "room_update") {
       const patch: Record<string, unknown> = {};
+      if (body.name !== undefined) patch.name = String(body.name).trim().slice(0, 80);
+      if (body.venue !== undefined) patch.venue = String(body.venue).trim().slice(0, 80);
       if (body.host_venmo !== undefined) patch.host_venmo = handle(body.host_venmo, 40);
       if (body.announcement !== undefined) patch.announcement = String(body.announcement ?? "").trim().slice(0, 300) || null;
       if (body.socials !== undefined) patch.socials = cleanSocials(body.socials, ROOM_SOCIALS, 300);
@@ -173,10 +181,29 @@ serve(async (req) => {
       return json({ ok: true, lineup: await lineup() });
     }
 
+    if (action === "start_night") {
+      // Create the night for the right Thursday (or a given date) and open sign-ups.
+      const date = /^\d{4}-\d{2}-\d{2}$/.test(String(body.date || "")) ? String(body.date) : nextThursday();
+      await admin.from("mic_rooms").update({ current_night: date, is_open: true }).eq("id", room.id);
+      // The night becomes a saved record people can go back to.
+      await admin.from("mic_nights").upsert([{ room_id: room.id, night_date: date, note: room.announcement || null }], { onConflict: "room_id,night_date" });
+      const { data } = await admin.from("mic_signups").select(COLS)
+        .eq("room_id", room.id).eq("night_date", date).order("position", { ascending: true });
+      return json({ ok: true, room: await freshRoom(), night: date, lineup: data || [] });
+    }
+
+    if (action === "close_night") {
+      await admin.from("mic_rooms").update({ is_open: false }).eq("id", room.id);
+      return json({ ok: true, room: await freshRoom(), night, lineup: await lineup() });
+    }
+
     if (action === "end_night") {
+      // Everyone still active is done, and sign-ups close until the host starts the next night.
       await admin.from("mic_signups").update({ status: "done" })
         .eq("room_id", room.id).eq("night_date", night).in("status", ["waiting", "on_deck", "now"]);
-      return json({ ok: true, lineup: await lineup() });
+      await admin.from("mic_rooms").update({ is_open: false }).eq("id", room.id);
+      await admin.from("mic_nights").upsert([{ room_id: room.id, night_date: night, note: room.announcement || null, ended_at: new Date().toISOString() }], { onConflict: "room_id,night_date" });
+      return json({ ok: true, room: await freshRoom(), night, lineup: await lineup() });
     }
 
     return json({ error: "unknown action" }, 400);

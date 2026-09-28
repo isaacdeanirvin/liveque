@@ -17,6 +17,43 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const INBOUND_SECRET = Deno.env.get("PAY_INBOUND_SECRET") || "";
+const RESEND_WEBHOOK_SECRET = Deno.env.get("RESEND_WEBHOOK_SECRET") || "";
+
+// Svix signature check (Resend signs every inbound webhook). This is the
+// un-forgeable lock: a confirmation is only accepted if it carries a valid
+// signature computed with the secret only Resend and this server hold. No
+// signature = not a real receipt = rejected.
+function b64ToBytes(b64: string): Uint8Array {
+  const bin = atob(b64);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+function bytesToB64(bytes: Uint8Array): string {
+  let bin = "";
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin);
+}
+async function verifySvix(secret: string, headers: Headers, rawBody: string): Promise<boolean> {
+  const id = headers.get("svix-id");
+  const ts = headers.get("svix-timestamp");
+  const sigHeader = headers.get("svix-signature");
+  if (!id || !ts || !sigHeader) return false;
+  const now = Math.floor(Date.now() / 1000);
+  if (Math.abs(now - parseInt(ts, 10)) > 300) return false; // 5-min replay window
+  const keyBytes = b64ToBytes(secret.replace(/^whsec_/, ""));
+  const cryptoKey = await crypto.subtle.importKey(
+    "raw", keyBytes, { name: "HMAC", hash: "SHA-256" }, false, ["sign"],
+  );
+  const mac = await crypto.subtle.sign(
+    "HMAC", cryptoKey, new TextEncoder().encode(`${id}.${ts}.${rawBody}`),
+  );
+  const expected = bytesToB64(new Uint8Array(mac));
+  return sigHeader.split(" ").some((p) => {
+    const parts = p.split(",");
+    return parts.length === 2 && parts[1] === expected;
+  });
+}
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -73,18 +110,29 @@ serve(async (req) => {
     const admin = createClient(SUPABASE_URL, SERVICE_ROLE);
 
     if (source === "email") {
-      // Shared-secret gate for the forwarding webhook.
-      if (!INBOUND_SECRET || url.searchParams.get("k") !== INBOUND_SECRET) {
-        return new Response("no", { status: 401, headers: cors });
+      const raw = await req.text();
+      // Two locks. The svix signature proves Resend actually sent this (no
+      // forgery). The URL secret is defense in depth and lets internal tests
+      // run without a signature. Real inbound traffic carries svix headers and
+      // MUST verify; anything with svix headers that fails is rejected.
+      const hasSvix = !!req.headers.get("svix-signature");
+      if (hasSvix) {
+        const ok = RESEND_WEBHOOK_SECRET && await verifySvix(RESEND_WEBHOOK_SECRET, req.headers, raw);
+        if (!ok) return new Response("bad signature", { status: 401, headers: cors });
+      } else {
+        if (!INBOUND_SECRET || url.searchParams.get("k") !== INBOUND_SECRET) {
+          return new Response("no", { status: 401, headers: cors });
+        }
       }
-      const body = await req.json().catch(() => ({}));
-      // Resend inbound shape: { text, html, subject, from, ... } - scan them all.
-      const blob = [body.subject, body.text, body.html, JSON.stringify(body)]
+      const body = JSON.parse(raw || "{}");
+      // Resend email.received nests the email under `data`.
+      const d = body.data || body;
+      const blob = [d.subject, d.text, d.html, body.subject, body.text, body.html, raw]
         .filter(Boolean).join("\n");
       const code = findCode(blob);
       const amount = findDollars(blob);
       const provider = /venmo/i.test(blob) ? "venmo" : /paypal/i.test(blob) ? "paypal" : "email";
-      const matched = await matchAndPay(admin, provider, code, amount, body.from || null, body);
+      const matched = await matchAndPay(admin, provider, code, amount, d.from || body.from || null, body);
       return new Response(JSON.stringify({ matched: !!matched }), {
         headers: { ...cors, "Content-Type": "application/json" },
       });
