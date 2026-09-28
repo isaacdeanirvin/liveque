@@ -2291,9 +2291,19 @@ async function downloadQRPDF() {
 /* Hero cycle: the heckle, then the answer. The brand line is the second beat.
    prefers-reduced-motion leaves the page static on slide one. */
 (function(){
-  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   var kick = document.getElementById('heroKick'), h1 = document.getElementById('heroH1');
   if (!kick || !h1) return;
+  /* Referral variant: musicians arriving from an open-mic sign-up (Hama Sushi Open Mic etc.)
+     get the money pitch instead of the heckle, and the hero holds still. Default landing untouched. */
+  var ref = (new URLSearchParams(location.search).get('ref') || '').toLowerCase();
+  if (/hama|open-?mic|mic/.test(ref)) {
+    kick.textContent = 'For musicians who play gigs';
+    h1.innerHTML = 'Play gigs?<br>Make more money.';
+    var sub = document.querySelector('.lp-sub');
+    if (sub) sub.textContent = 'The crowd requests songs and tips you from their phone. 0% fees. It lands straight in your own Venmo or PayPal, and nobody downloads an app.';
+    return;
+  }
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   var slides = [
     { k: 'What you hear all night', h: '\u201CSorry, I don\u2019t<br>have cash.\u201D' },
     { k: 'What you say back', h: 'The request line<br>is open.' }
