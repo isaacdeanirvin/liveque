@@ -40,7 +40,7 @@ function nextThursday(): string {
   la.setDate(la.getDate() + ((4 - la.getDay() + 7) % 7));
   return la.toLocaleDateString("en-CA");
 }
-const COLS = "id, room_id, night_date, name, venmo, socials, position, status, is_featured, created_at, updated_at";
+const COLS = "id, room_id, night_date, name, venmo, socials, position, status, is_featured, confirmed_at, created_at, updated_at";
 const STATUSES = new Set(["waiting", "on_deck", "now", "done", "bumped"]);
 const PERF_SOCIALS = ["instagram", "tiktok", "youtube", "spotify", "link"];
 const ROOM_SOCIALS = ["instagram", "tiktok", "website", "maps", "facebook", "host_instagram"];
@@ -184,6 +184,11 @@ serve(async (req) => {
     if (action === "confirm_tip") {
       // Host saw the Venmo land: one tap marks the tip paid (the public plate fills in solid).
       await admin.from("mic_tips").update({ paid: true, paid_at: new Date().toISOString() }).eq("id", String(body.id)).eq("room_id", room.id);
+      return json({ ok: true });
+    }
+
+    if (action === "contact_remove") {
+      await admin.from("mic_contacts").delete().eq("room_id", room.id).eq("email", String(body.email || "").toLowerCase().trim());
       return json({ ok: true });
     }
 
