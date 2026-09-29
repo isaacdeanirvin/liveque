@@ -18,6 +18,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 //   reorder {ids[]}                      -> set positions in the given order
 //   room_update {host_venmo?, announcement?, socials?}
 //   end_night                            -> mark everyone still active as done (and clear tonight's announcement)
+//   play {id}                            -> this act on stage now; the previous act is done; first waiting act goes on deck
 //   ping {id}                            -> nudge one performer's phone (stamps pinged_at; their page buzzes + takes over)
 //   remove_any {id}                      -> delete a signup from any night (archive too)
 //   night_note {date, note}              -> rewrite a saved night's note
@@ -112,6 +113,21 @@ serve(async (req) => {
       if (now) await setStatus(now.id, "done");
       if (deck) await setStatus(deck.id, "now");
       if (next) await setStatus(next.id, "on_deck");
+      return json({ ok: true, lineup: await lineup() });
+    }
+
+    if (action === "play") {
+      // One tap: this act is on stage now. Whoever was on stage is done; the first waiting act moves on deck.
+      const id = String(body.id); const rows = await lineup();
+      const now = rows.find((r) => r.status === "now");
+      if (now && now.id !== id) await setStatus(now.id, "done");
+      await admin.from("mic_signups").update({ status: "waiting" }).eq("room_id", room.id).eq("night_date", night).eq("status", "now").neq("id", id);
+      await setStatus(id, "now");
+      const after = await lineup();
+      if (!after.find((r) => r.status === "on_deck")) {
+        const next = after.filter((r) => r.status === "waiting").sort((a, b) => a.position - b.position)[0];
+        if (next) await setStatus(next.id, "on_deck");
+      }
       return json({ ok: true, lineup: await lineup() });
     }
 
