@@ -181,6 +181,33 @@ serve(async (req) => {
       return json({ ok: true, lineup: await lineup() });
     }
 
+    if (action === "confirm_tip") {
+      // Host saw the Venmo land: one tap marks the tip paid (the public plate fills in solid).
+      await admin.from("mic_tips").update({ paid: true, paid_at: new Date().toISOString() }).eq("id", String(body.id)).eq("room_id", room.id);
+      return json({ ok: true });
+    }
+
+    if (action === "contacts") {
+      // The mailing list. Only reachable with the host token; the public can never read it.
+      const { data } = await admin.from("mic_contacts").select("name, email, consented_at").eq("room_id", room.id).order("created_at", { ascending: false });
+      return json({ ok: true, contacts: data || [] });
+    }
+
+    if (action === "slide_down") {
+      // No-show handling that keeps them on the list: move n spots down (default 3), never delete.
+      const n = Math.max(1, Math.min(20, Number(body.n) || 3));
+      const rows = await lineup();
+      const act = rows.filter((r) => r.status !== "bumped").sort((a, b) => a.position - b.position);
+      const ids = act.map((r) => r.id);
+      const k = ids.indexOf(String(body.id));
+      if (k < 0) return json({ error: "not found" }, 404);
+      ids.splice(k, 1); ids.splice(Math.min(ids.length, k + n), 0, String(body.id));
+      let p = 0;
+      for (const id of ids) { p += 1; await admin.from("mic_signups").update({ position: p }).eq("id", id).eq("room_id", room.id); }
+      await admin.from("mic_signups").update({ status: "waiting", confirmed_at: null }).eq("id", String(body.id)).eq("room_id", room.id);
+      return json({ ok: true, lineup: await lineup() });
+    }
+
     if (action === "start_night") {
       // Create the night for the right Thursday (or a given date) and open sign-ups.
       const date = /^\d{4}-\d{2}-\d{2}$/.test(String(body.date || "")) ? String(body.date) : nextThursday();
