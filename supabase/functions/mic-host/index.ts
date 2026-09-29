@@ -17,7 +17,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 //   signup_update {id, name?, venmo?, socials?}
 //   reorder {ids[]}                      -> set positions in the given order
 //   room_update {host_venmo?, announcement?, socials?}
-//   end_night                            -> mark everyone still active as done
+//   end_night                            -> mark everyone still active as done (and clear tonight's announcement)
+//   ping {id}                            -> nudge one performer's phone (stamps pinged_at; their page buzzes + takes over)
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -40,7 +41,7 @@ function nextThursday(): string {
   la.setDate(la.getDate() + ((4 - la.getDay() + 7) % 7));
   return la.toLocaleDateString("en-CA");
 }
-const COLS = "id, room_id, night_date, name, venmo, socials, position, status, is_featured, confirmed_at, created_at, updated_at";
+const COLS = "id, room_id, night_date, name, venmo, socials, position, status, is_featured, confirmed_at, pinged_at, created_at, updated_at";
 const STATUSES = new Set(["waiting", "on_deck", "now", "done", "bumped"]);
 const PERF_SOCIALS = ["instagram", "tiktok", "youtube", "spotify", "link"];
 const ROOM_SOCIALS = ["instagram", "tiktok", "website", "maps", "facebook", "host_instagram"];
@@ -88,7 +89,18 @@ serve(async (req) => {
       admin.from("mic_signups").update({ status }).eq("id", id).eq("room_id", room.id);
     const freshRoom = async () => (await admin.from("mic_rooms").select("*").eq("id", room.id).single()).data;
 
-    if (action === "state") return json({ room, night, lineup: await lineup() });
+    if (action === "state") {
+      // A count only: the manager shows "12 emails" without pulling the addresses on every load.
+      const { count } = await admin.from("mic_contacts").select("*", { count: "exact", head: true }).eq("room_id", room.id);
+      return json({ room, night, lineup: await lineup(), contacts_count: count ?? 0 });
+    }
+
+    if (action === "ping") {
+      // "Mark is calling you": stamp the row; the performer's page watches its own row and buzzes.
+      await admin.from("mic_signups").update({ pinged_at: new Date().toISOString() })
+        .eq("id", String(body.id)).eq("room_id", room.id).eq("night_date", night);
+      return json({ ok: true, lineup: await lineup() });
+    }
 
     if (action === "advance") {
       const rows = await lineup();
@@ -233,8 +245,9 @@ serve(async (req) => {
       // Everyone still active is done, and sign-ups close until the host starts the next night.
       await admin.from("mic_signups").update({ status: "done" })
         .eq("room_id", room.id).eq("night_date", night).in("status", ["waiting", "on_deck", "now"]);
-      await admin.from("mic_rooms").update({ is_open: false }).eq("id", room.id);
+      // The night's note is saved on the night record first, then cleared: tonight's announcement means tonight.
       await admin.from("mic_nights").upsert([{ room_id: room.id, night_date: night, note: room.announcement || null, ended_at: new Date().toISOString() }], { onConflict: "room_id,night_date" });
+      await admin.from("mic_rooms").update({ is_open: false, announcement: null }).eq("id", room.id);
       return json({ ok: true, room: await freshRoom(), night, lineup: await lineup() });
     }
 
