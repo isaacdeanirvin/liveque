@@ -19,6 +19,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 //   room_update {host_venmo?, announcement?, socials?}
 //   end_night                            -> mark everyone still active as done (and clear tonight's announcement)
 //   ping {id}                            -> nudge one performer's phone (stamps pinged_at; their page buzzes + takes over)
+//   remove_any {id}                      -> delete a signup from any night (archive too)
+//   night_note {date, note}              -> rewrite a saved night's note
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -191,6 +193,21 @@ serve(async (req) => {
       // Hard-delete a bogus or duplicate signup from tonight's list.
       await admin.from("mic_signups").delete().eq("id", String(body.id)).eq("room_id", room.id).eq("night_date", night);
       return json({ ok: true, lineup: await lineup() });
+    }
+
+    if (action === "remove_any") {
+      // Scrub one signup from ANY night (a demo name, a duplicate on an old night). Gone from the archive too.
+      await admin.from("mic_signups").delete().eq("id", String(body.id)).eq("room_id", room.id);
+      return json({ ok: true });
+    }
+
+    if (action === "night_note") {
+      // Rewrite the saved note on one night record (the archive shows it).
+      const date = String(body.date || "");
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return json({ error: "bad date" }, 400);
+      const note = String(body.note ?? "").trim().slice(0, 300) || null;
+      await admin.from("mic_nights").update({ note }).eq("room_id", room.id).eq("night_date", date);
+      return json({ ok: true });
     }
 
     if (action === "confirm_tip") {
