@@ -182,6 +182,7 @@ serve(async (req) => {
       const patch: Record<string, unknown> = {};
       if (body.name !== undefined) patch.name = String(body.name).trim().slice(0, 80);
       if (body.venue !== undefined) patch.venue = String(body.venue).trim().slice(0, 80);
+      if (body.host_name !== undefined) patch.host_name = String(body.host_name).trim().slice(0, 80);
       if (body.host_venmo !== undefined) patch.host_venmo = handle(body.host_venmo, 40);
       if (body.announcement !== undefined) patch.announcement = String(body.announcement ?? "").trim().slice(0, 300) || null;
       if (body.socials !== undefined) patch.socials = cleanSocials(body.socials, ROOM_SOCIALS, 300);
